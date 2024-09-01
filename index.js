@@ -1,26 +1,29 @@
-// index.js
 const express = require('express');
-const connectDB = require('./configs/database');
-const User = require('./models/User');
-
 const app = express();
+const mongoose = require('mongoose');
+const userRoutes = require('./routes/userRoutes');
+const authRoutes = require('./routes/authRoutes');
+const restaurantRoutes = require('./routes/restaurantRoutes');
+const mealRoutes = require('./routes/mealRoutes');
+const cors = require('cors');
+const connectDB = require('./configs/database')
 
-// Connect to MongoDB
-connectDB();
-
+app.use(cors());
 app.use(express.json());
 
-app.post('/api/register', async (req, res) => {
-    const { username, email, password, phoneNumber } = req.body;
+app.use('/api/v1/users', userRoutes);
+app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/restaurants', restaurantRoutes);
+app.use('/api/v1/meals', mealRoutes);
 
-    try {
-        const user = new User({ username, email, password, phoneNumber });
-        await user.save();
-        res.status(201).json(user);
-    } catch (err) {
-        console.error(err.message);
-        res.status(500).json({ error: 'Server error' });
-    }
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
 });
 
-app.listen(3000, () => console.log('Server started on port 3000'));
+mongoose.connect(`${process.env.MONGODB_URI}`, {
+})
+    .then(() => console.log('MongoDB connected'))
+    .catch(err => console.error('MongoDB connection error:', err));
+
+

@@ -1,7 +1,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
-const sendEmail = require('../config/nodemailer');
+const sendEmail = require('../configs/nodemailer');
 
 // Generate a 5-digit code
 const generateVerificationCode = () => {

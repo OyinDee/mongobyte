@@ -1,0 +1,115 @@
+
+---
+
+# API Documentation
+
+## 1. Authentication API
+
+### 1.1 Register
+- **Endpoint:** `POST /api/v1/auth/register`
+- **Description:** Register a new user.
+- **Request Body:** Includes fields for username, email, password, and phone number.
+- **Response:**
+  - **Success (201):** Returns a success message and user details.
+  - **Error (400):** Indicates validation errors or that the user already exists.
+
+### 1.2 Login
+- **Endpoint:** `POST /api/v1/auth/login`
+- **Description:** Authenticate a user and obtain a JWT token.
+- **Request Body:** Requires email and password.
+- **Response:**
+  - **Success (200):** Returns a JWT token and user details.
+  - **Error (401):** Indicates invalid email or password.
+
+## 2. User API
+
+### 2.1 Get Profile
+- **Endpoint:** `GET /api/v1/users/profile`
+- **Description:** Retrieve the profile of the logged-in user.
+- **Headers:** Requires a JWT token in the Authorization header.
+- **Response:**
+  - **Success (200):** Returns user profile details.
+  - **Error (401):** Indicates unauthorized access.
+
+### 2.2 Update Profile
+- **Endpoint:** `PUT /api/v1/users/profile`
+- **Description:** Update user profile information.
+- **Headers:** Requires a JWT token in the Authorization header.
+- **Request Body:** Includes fields for bio and image URL.
+- **Response:**
+  - **Success (200):** Returns a success message and updated user profile.
+  - **Error (400):** Indicates validation errors.
+
+## 3. Restaurant API
+
+### 3.1 Create Restaurant
+- **Endpoint:** `POST /api/v1/restaurants`
+- **Description:** Create a new restaurant.
+- **Request Body:** Includes fields for name, location, and description.
+- **Response:**
+  - **Success (201):** Returns a success message and restaurant details.
+  - **Error (400):** Indicates validation errors or that the restaurant already exists.
+
+### 3.2 Update Restaurant
+- **Endpoint:** `PUT /api/v1/restaurants/:id`
+- **Description:** Update restaurant details by custom ID.
+- **Request Body:** Includes fields for name, location, and description.
+- **Response:**
+  - **Success (200):** Returns a success message and updated restaurant details.
+  - **Error (400):** Indicates validation errors.
+
+### 3.3 Get Restaurant
+- **Endpoint:** `GET /api/v1/restaurants/:id`
+- **Description:** Retrieve details of a restaurant by custom ID.
+- **Response:**
+  - **Success (200):** Returns restaurant details.
+  - **Error (404):** Indicates that the restaurant was not found.
+
+### 3.4 Delete Restaurant
+- **Endpoint:** `DELETE /api/v1/restaurants/:id`
+- **Description:** Delete a restaurant by custom ID.
+- **Response:**
+  - **Success (200):** Returns a success message indicating the restaurant was deleted.
+  - **Error (404):** Indicates that the restaurant was not found.
+
+## 4. Meal API
+
+### 4.1 Add New Meal
+- **Endpoint:** `POST /api/v1/meals`
+- **Description:** Add a new meal to a restaurant.
+- **Request Body:** Includes fields for meal name, description, price, and restaurant ID.
+- **Response:**
+  - **Success (201):** Returns a success message and meal details.
+  - **Error (400):** Indicates validation errors or that the meal could not be added.
+
+### 4.2 Update Meal
+- **Endpoint:** `PUT /api/v1/meals/:id`
+- **Description:** Update details of a meal by meal ID.
+- **Request Body:** Includes fields for meal name, description, price.
+- **Response:**
+  - **Success (200):** Returns a success message and updated meal details.
+  - **Error (400):** Indicates validation errors.
+
+### 4.3 Get Meal
+- **Endpoint:** `GET /api/v1/meals/:id`
+- **Description:** Retrieve details of a meal by meal ID.
+- **Response:**
+  - **Success (200):** Returns meal details.
+  - **Error (404):** Indicates that the meal was not found.
+
+### 4.4 Delete Meal
+- **Endpoint:** `DELETE /api/v1/meals/:id`
+- **Description:** Delete a meal by meal ID.
+- **Response:**
+  - **Success (200):** Returns a success message indicating the meal was deleted.
+  - **Error (404):** Indicates that the meal was not found.
+
+### 4.5 Add Batch Meals
+- **Endpoint:** `POST /api/v1/meals/batch`
+- **Description:** Add multiple meals to a restaurant in a batch.
+- **Request Body:** Includes an array of meals with their details.
+- **Response:**
+  - **Success (201):** Returns a success message and details of added meals.
+  - **Error (400):** Indicates validation errors or that the batch could not be processed.
+
+---
