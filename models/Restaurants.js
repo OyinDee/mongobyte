@@ -26,11 +26,6 @@ const restaurantSchema = new mongoose.Schema({
     imageUrl: {
         type: String,
     },
-    walletAddress: {
-        type: String,
-        // required: true, 
-        // unique: true,
-    },
     meals: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Meal',

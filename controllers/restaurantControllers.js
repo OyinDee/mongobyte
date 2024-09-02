@@ -67,3 +67,24 @@ exports.deleteRestaurant = async (request, response) => {
         response.status(500).json({ message: 'Internal server error' });
     }
 };
+
+
+// Update order status
+exports.updateOrderStatus = async (request, response) => {
+    const { orderId } = request.params;
+    const { status } = request.body;
+
+    try {
+        const order = await Order.findByIdAndUpdate(orderId, { status }, { new: true, runValidators: true });
+        if (!order) {
+            return response.status(404).json({ message: 'Order not found' });
+        }
+        response.json({
+            message: 'Order status updated successfully',
+            order,
+        });
+    } catch (error) {
+        console.error(error);
+        response.status(500).json({ message: 'Internal server error' });
+    }
+};

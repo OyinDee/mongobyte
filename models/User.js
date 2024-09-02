@@ -22,16 +22,7 @@ const userSchema = new mongoose.Schema({
         required: true,
         unique: true,
     },
-    walletAddress: {
-        type: String,
-        // required: true,
-        // unique: true,
-    },
     isVerified: {
-        type: Boolean,
-        default: false,
-    },
-    phoneVerified: {
         type: Boolean,
         default: false,
     },
@@ -53,6 +44,9 @@ const userSchema = new mongoose.Schema({
     verificationCode: {
         type: String,
     },
+    phoneVerificationCode: {
+        type: String,
+    },
     resetCode: {
         type: String,
     },
@@ -61,6 +55,10 @@ const userSchema = new mongoose.Schema({
     },
     imageUrl: {
         type: String,
+    },
+    superAdmin: {
+        type: Boolean,
+        default: false
     },
 }, {
     timestamps: true,

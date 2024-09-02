@@ -1,5 +1,7 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
+const Order = require('../models/Orders');
+const Meal = require('../models/Meals');
 
 // Get user profile
 exports.getProfile = async (request, response) => {
@@ -19,40 +21,40 @@ exports.getProfile = async (request, response) => {
 };
 
 // Verify token
-exports.verifyToken = async (request, response) => {
-    const token = request.headers['authorization']?.split(' ')[1]; // Extract token from Authorization header
+// exports.verifyToken = async (request, response) => {
+//     const token = request.headers['authorization']?.split(' ')[1]; // Extract token from Authorization header
 
-    if (!token) {
-        return response.status(401).json({ message: 'No token provided' });
-    }
+//     if (!token) {
+//         return response.status(401).json({ message: 'No token provided' });
+//     }
 
-    try {
-        // Verify the token
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+//     try {
+//         // Verify the token
+//         const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-        // Find user by ID from token payload
-        const user = await User.findById(decoded.id);
-        if (!user) {
-            return response.status(404).json({ message: 'User not found' });
-        }
+//         // Find user by ID from token payload
+//         const user = await User.findById(decoded.id);
+//         if (!user) {
+//             return response.status(404).json({ message: 'User not found' });
+//         }
 
-        response.json({
-            message: 'Token is valid',
-            user: {
-                id: user._id,
-                username: user.username,
-                email: user.email,
-                phoneNumber: user.phoneNumber,
-                byteBalance: user.byteBalance,
-                bio: user.bio,
-                orderHistory: user.orderHistory,
-            },
-        });
-    } catch (error) {
-        console.error(error);
-        response.status(401).json({ message: 'Invalid token' });
-    }
-};
+//         response.json({
+//             message: 'Token is valid',
+//             user: {
+//                 id: user._id,
+//                 username: user.username,
+//                 email: user.email,
+//                 phoneNumber: user.phoneNumber,
+//                 byteBalance: user.byteBalance,
+//                 bio: user.bio,
+//                 orderHistory: user.orderHistory,
+//             },
+//         });
+//     } catch (error) {
+//         console.error(error);
+//         response.status(401).json({ message: 'Invalid token' });
+//     }
+// };
 
 // Update user profile
 exports.updateProfile = async (request, response) => {
@@ -123,3 +125,16 @@ exports.updateByteBalance = async (request, response) => {
         response.status(500).json({ message: 'Internal server error' });
     }
 };
+
+// Get all restaurants
+exports.getAllRestaurants = async (request, response) => {
+    try {
+        const restaurants = await Restaurant.find().populate('meals');
+        response.json(restaurants);
+    } catch (error) {
+        console.error(error);
+        response.status(500).json({ message: 'Internal server error' });
+    }
+};
+
+

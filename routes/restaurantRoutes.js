@@ -2,19 +2,29 @@ const express = require('express');
 const router = express.Router();
 const restaurantController = require('../controllers/restaurantControllers');
 
-// Create a new restaurant
-router.post('/create', restaurantController.createRestaurant);
+const authenticate = require('../middlewares/authenticateRestaurant.js');
 
-// Get all restaurants
+
+router.post('/create', authenticate, restaurantController.createRestaurant);
+
 router.get('/', restaurantController.getAllRestaurants);
 
-// Get a single restaurant by customId
 router.get('/:id', restaurantController.getRestaurantById);
 
-// Update a restaurant by customId
-router.put('/:id', restaurantController.updateRestaurant);
+router.put('/:id', authenticate, (req, res, next) => {
+    if (req.userType !== 'restaurant') {
+        return res.status(403).json({ message: 'Access denied' });
+    }
+    next();
+}, restaurantController.updateRestaurant);
 
-// Delete a restaurant by customId
-router.delete('/:id', restaurantController.deleteRestaurant);
+
+router.delete('/:id', authenticate, (req, res, next) => {
+    if (req.userType !== 'restaurant') {
+        return res.status(403).json({ message: 'Access denied' });
+    }
+    next();
+}, restaurantController.deleteRestaurant);
+
 
 module.exports = router;

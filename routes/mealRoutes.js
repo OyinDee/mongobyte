@@ -1,23 +1,19 @@
 const express = require('express');
 const router = express.Router();
 const mealController = require('../controllers/mealControllers');
+const authenticate = require('../middlewares/authenticateRestaurant'); // Custom middleware to check if user is a restaurant
 
-// Create a new meal for a specific restaurant
-router.post('/create/:restaurantId', mealController.createMeal);
 
-// Get all meals
+router.post('/restaurant/:restaurantId/create', authenticate, mealController.createMeal);
+
 router.get('/', mealController.getAllMeals);
 
-// Get a single meal by customId
 router.get('/:id', mealController.getMealById);
 
-// Update a meal by customId
-router.put('/:id', mealController.updateMeal);
+router.put('/:id', authenticate, authenticate, mealController.updateMeal);
 
-// Delete a meal by customId
-router.delete('/:id', mealController.deleteMeal);
+router.delete('/:id', authenticate, authenticate, mealController.deleteMeal);
 
-// Add batch meals for a specific restaurant
-router.post('/batch/:restaurantId', mealController.addBatchMeals);
+router.post('/restaurant/:restaurantId/batch', authenticate, mealController.addBatchMeals);
 
 module.exports = router;
