@@ -30,8 +30,9 @@ const authenticate = async (req, res, next) => {
             return next();
         }
 
-        // If neither user nor restaurant is found
-        return res.status(404).json({ message: 'User or restaurant not found' });
+        if(!user || !restaurant){
+            return res.status(404).json({ message: 'User or restaurant not found' });
+        }
     } catch (error) {
         console.error(error);
         res.status(401).json({ message: 'Invalid token' });
