@@ -81,7 +81,7 @@ exports.login = async (request, response) => {
         }
 
         // Generate JWT token for verified users
-        const token = jwt.sign({ user: user._id }, process.env.JWT_SECRET, { expiresIn: '48h' });
+        const token = jwt.sign({ user }, process.env.JWT_SECRET, { expiresIn: '48h' });
 
         response.status(202).json({
             message: 'Login successful!',
