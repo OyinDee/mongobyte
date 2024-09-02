@@ -87,12 +87,7 @@ exports.login = async (request, response) => {
             message: 'Login successful!',
             token,
             isVerified: true,
-            user: {
-                id: user._id,
-                username: user.username,
-                email: user.email,
-                phoneNumber: user.phoneNumber,
-            }
+            user: user
         });
     } catch (error) {
         console.error(error);

@@ -58,7 +58,7 @@ exports.getProfile = async (request, response) => {
 
 // Update user profile
 exports.updateProfile = async (request, response) => {
-    const userId = request.user.id; // Assuming user ID is available in request after authentication
+    const userId = request.user.id; 
     const { bio, imageUrl } = request.body;
 
     try {
