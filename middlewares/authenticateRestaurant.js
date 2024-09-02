@@ -15,8 +15,8 @@ const authenticate = async (req, res, next) => {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         
         // Find user or restaurant by ID from token payload
-        const user = await User.findById(decoded.id);
-        const restaurant = await Restaurant.findById(decoded.id);
+        const user = await User.findById(decoded._id);
+        const restaurant = await Restaurant.findById(decoded._id);
 
         if (user) {
             req.user = user; // Attach user info to request object

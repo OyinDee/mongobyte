@@ -5,7 +5,7 @@ const Meal = require('../models/Meals');
 
 // Get user profile
 exports.getProfile = async (request, response) => {
-    const userId = request.user.id; // Assuming user ID is available in request after authentication
+    const userId = request.user._id; 
 
     try {
         const user = await User.findById(userId);
