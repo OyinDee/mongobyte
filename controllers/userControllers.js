@@ -6,13 +6,12 @@ const Meal = require('../models/Meals');
 // Get user profile
 exports.getProfile = async (request, response) => {
     const userId = request.user._id; 
-
+    console.log(request.user._id)
     try {
         const user = await User.findById(userId);
         if (!user) {
             return response.status(404).json({ message: 'User not found' });
         }
-
         response.json(user);
     } catch (error) {
         console.error(error);

@@ -12,11 +12,11 @@ const authenticate = async (request, response, next) => {
 
     try {
         // Verify the token
-        console.log(token)
+
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        console.log(decoded)
+
         // Find user or restaurant by ID from token payload
-        const user = await User.findById(decoded._id);
+        const user = await User.findById(decoded.user._id);
         const restaurant = await Restaurant.findById(decoded._id);
 
         if (user) {

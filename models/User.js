@@ -40,6 +40,7 @@ const userSchema = new mongoose.Schema({
     },
     bio: {
         type: String,
+        default: "I'm just here to byte, nothing much"
     },
     verificationCode: {
         type: String,
