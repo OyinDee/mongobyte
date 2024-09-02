@@ -81,44 +81,7 @@ exports.updateOrderStatus = async (request, response) => {
         response.status(500).json({ message: 'Internal server error' });
     }
 };
-const Order = require('../models/Order');
-const Meal = require('../models/Meal');
 
-// Create a new order
-exports.createOrder = async (request, response) => {
-    const userId = request.user.id; // Assuming user ID is available in request after authentication
-    const { meals } = request.body;
-
-    try {
-        // Calculate total price and validate meals
-        let totalPrice = 0;
-        const mealDetails = await Promise.all(meals.map(async (mealItem) => {
-            const meal = await Meal.findById(mealItem.meal);
-            if (!meal) {
-                throw new Error('Meal not found');
-            }
-            totalPrice += meal.price * mealItem.quantity;
-            return { meal: meal._id, quantity: mealItem.quantity };
-        }));
-
-        // Create a new order
-        const newOrder = new Order({
-            user: userId,
-            meals: mealDetails,
-            totalPrice,
-        });
-
-        await newOrder.save();
-
-        response.status(201).json({
-            message: 'Order placed successfully!',
-            order: newOrder,
-        });
-    } catch (error) {
-        console.error(error);
-        response.status(500).json({ message: 'Internal server error' });
-    }
-};
 
 // Get all orders
 exports.getAllOrders = async (request, response) => {

@@ -1,28 +1,27 @@
-const cloudinary = require('../config/cloudinaryConfig');
-const multer = require('multer');
-const multerStorage = multer.memoryStorage(); // Store file in memory
-const upload = multer({ storage: multerStorage });
+const cloudinary = require('../configs/cloudinary');
 
 // Controller function to handle image upload
-const uploadImage = (req, res) => {
-  try {
-    const result = cloudinary.uploader.upload_stream(
-      { resource_type: 'image' },
-      (error, result) => {
-        if (error) {
-          return res.status(500).json({ message: 'Upload failed', error });
-        }
-        res.status(200).json({ url: result.secure_url });
-      }
-    );
-    req.file.stream.pipe(result);
-  } catch (error) {
-    res.status(500).json({ message: 'Internal server error', error });
-  }
-};
+exports.uploadImage = async (request, response) => {
 
-// Export the uploadImage controller
-module.exports = {
-  uploadImage,
-  upload, // Exporting multer instance if needed elsewhere
+  try {
+    const { image } = request.body
+
+    if (!image) {
+      return response.status(400).json({ message: 'No image provided' });
+    }
+
+    // Upload the Base64 image to Cloudinary
+    const result = await cloudinary.uploader.upload(image, {
+      resource_type: 'image',
+      transformation: [
+        { width: 800, height: 800, crop: 'limit' }
+      ],
+    });
+
+    console.log('Cloudinary upload result:', result);
+    response.status(200).json({ url: result.secure_url });
+  } catch (error) {
+    console.error('Error uploading image:', error);
+    response.status(500).json({ message: 'Internal server error', error: error.message });
+  }
 };
