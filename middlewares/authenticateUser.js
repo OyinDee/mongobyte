@@ -3,11 +3,11 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const Restaurant = require('../models/Restaurants');
 
-const authenticate = async (req, res, next) => {
-    const token = req.headers['authorization']?.split(' ')[1]; // Extract token from Authorization header
+const authenticate = async (request, response, next) => {
+    const token = request.headers['authorization']?.split(' ')[1]; // Extract token from Authorization header
 
     if (!token) {
-        return res.status(401).json({ message: 'No token provided' });
+        return response.status(401).json({ message: 'No token provided' });
     }
 
     try {
@@ -20,23 +20,23 @@ const authenticate = async (req, res, next) => {
         const restaurant = await Restaurant.findById(decoded._id);
 
         if (user) {
-            req.user = user; // Attach user info to request object
-            req.userType = 'user'; // Specify user type
+            request.user = user; // Attach user info to request object
+            request.userType = 'user'; // Specify user type
             return next();
         }
 
         if (restaurant) {
-            req.restaurant = restaurant; // Attach restaurant info to request object
-            req.userType = 'restaurant'; // Specify user type
-            return res.status(403).json({ message: 'Access denied for restaurants' });
+            request.restaurant = restaurant; // Attach restaurant info to request object
+            request.userType = 'restaurant'; // Specify user type
+            return response.status(403).json({ message: 'Access denied for restaurants' });
         }
 
         if(!user || !restaurant){
-            return res.status(404).json({ message: 'User or restaurant not found' });
+            return response.status(404).json({ message: 'User or restaurant not found' });
         }
     } catch (error) {
         console.error(error);
-        res.status(401).json({ message: 'Invalid token' });
+        response.status(401).json({ message: 'Invalid token' });
     }
 };
 
