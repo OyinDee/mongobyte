@@ -58,7 +58,7 @@ exports.getProfile = async (request, response) => {
 
 // Update user profile
 exports.updateProfile = async (request, response) => {
-    const userId = request.user.id; 
+    const userId = request.user._id; 
     const { bio, imageUrl } = request.body;
 
     try {
@@ -93,7 +93,8 @@ exports.updateProfile = async (request, response) => {
 
 // Update byte balance
 exports.updateByteBalance = async (request, response) => {
-    const userId = request.user.id; // Assuming user ID is available in request after authentication
+    const userId = request.user._id; 
+
     const { byteBalance } = request.body;
 
     try {
