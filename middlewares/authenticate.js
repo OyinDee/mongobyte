@@ -10,9 +10,9 @@ const checkSuperAdmin = (request, response, next) => {
     try {
         // Verify the token
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
         // Check if user is a super admin
-        if (!decoded.isSuperAdmin) {
+        if (!decoded.user.superAdmin) {
+
             return response.status(403).json({ message: 'Access denied. Only super admins can perform this action.' });
         }
 

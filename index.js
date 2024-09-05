@@ -21,9 +21,9 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 // Set up routes
-app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/restaurants', restaurantRoutes);
+app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/meals', mealRoutes);
 
 // Start the server

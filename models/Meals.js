@@ -15,6 +15,9 @@ const mealSchema = new mongoose.Schema({
     description: {
         type: String,
     },
+    tag:{
+        type: String,
+    },
     price: {
         type: Number,
         required: true,

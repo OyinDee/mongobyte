@@ -183,3 +183,51 @@ exports.resetPassword = async (request, response) => {
     }
 };
 
+
+
+
+
+
+exports.loginRestaurant = async (request, response) => {
+    const { email, password } = request.body;
+
+    try {
+        // Find restaurant by email
+        const restaurant = await Restaurant.findOne({ email });
+        if (!restaurant) {
+            return response.status(401).json({ message: 'Invalid email or password.' });
+        }
+
+        // Compare password
+        const isMatch = await restaurant.comparePassword(password);
+        if (!isMatch) {
+            return response.status(401).json({ message: 'Invalid email or password.' });
+        }
+
+        // Check if email is verified
+        if (!restaurant.isVerified) {
+            return response.status(403).json({
+                message: 'Email not verified. Please verify your email to proceed.',
+            });
+        }
+
+        // Generate a JWT token
+        const token = jwt.sign({ id: restaurant._id }, process.env.JWT_SECRET);
+
+        return response.status(200).json({
+            message: 'Login successful!',
+            token,
+            restaurant: {
+                id: restaurant._id,
+                name: restaurant.name,
+                email: restaurant.email,
+                location: restaurant.location,
+                contactNumber: restaurant.contactNumber,
+            }
+        });
+    } catch (error) {
+        console.error(error);
+        return response.status(500).json({ message: 'Server error. Please try again later.' });
+    }
+};
+

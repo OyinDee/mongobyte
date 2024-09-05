@@ -1,14 +1,47 @@
 const Restaurant = require('../models/Restaurants');
+const crypto = require('crypto')
+const sendEmail = require('../configs/nodemailer');
 
+function generatePassword() {
+    return crypto.randomBytes(5).toString('hex'); // Generates a 10-character random password
+}
 // Create a new restaurant
 exports.createRestaurant = async (request, response) => {
+    const password = generatePassword();
+    const newRestaurant = new Restaurant({
+        ...request.body,
+        password
+    });
     try {
-        const restaurant = new Restaurant(request.body);
-        await restaurant.save();
-        response.status(201).json({ message: 'Restaurant created successfully!', restaurant });
+        // Check if restaurant already exists
+        const existingRestaurant = await Restaurant.findOne({ email:request.body.email });
+        if (existingRestaurant) {
+            return response.status(400).json({ message: 'A restaurant with this email already exists.' });
+        }
+
+        // Generate 10-digit password
+
+
+
+        // Save restaurant
+        await newRestaurant.save();
+
+        // Send the password to the restaurant's email
+        await sendEmail(newRestaurant.email, 'Your Restaurant Account Password', `Welcome to Byte! Your login password is: ${password}`);
+
+        return response.status(201).json({
+            message: 'Restaurant registered successfully. Check your email for the password.',
+            restaurant: {
+                id: newRestaurant._id,
+                name: newRestaurant.name,
+                email: newRestaurant.email,
+                location: newRestaurant.location,
+                contactNumber: newRestaurant.contactNumber,
+            }
+        });
     } catch (error) {
         console.error(error);
-        response.status(500).json({ message: 'Internal server error' });
+        return response.status(500).json({ message: 'Server error. Please try again later.' });
     }
 };
 
