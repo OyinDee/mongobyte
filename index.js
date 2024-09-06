@@ -6,6 +6,7 @@ const userRoutes = require('./routes/userRoutes');
 const authRoutes = require('./routes/authRoutes');
 const restaurantRoutes = require('./routes/restaurantRoutes');
 const mealRoutes = require('./routes/mealRoutes');
+const paymentRoutes = require('./routes/paymentRoutes')
 const connectDB = require('./configs/database');
 const router = express.Router();
 
@@ -25,7 +26,7 @@ app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/restaurants', restaurantRoutes);
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/meals', mealRoutes);
-
+app.use('/api/v1/pay', paymentRoutes);
 // Start the server
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {

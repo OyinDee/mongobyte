@@ -4,6 +4,7 @@ const User = require('../models/User');
 const Restaurant = require('../models/Restaurants');
 
 const authenticate = async (request, response, next) => {
+
     const token = request.headers['authorization']?.split(' ')[1]; // Extract token from Authorization header
 
     if (!token) {
@@ -12,7 +13,6 @@ const authenticate = async (request, response, next) => {
 
     try {
         // Verify the token
-
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
         // Find user or restaurant by ID from token payload

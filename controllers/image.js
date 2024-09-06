@@ -18,7 +18,7 @@ exports.uploadImage = async (request, response) => {
       ],
     });
 
-    console.log('Cloudinary upload result:', result);
+
     response.status(200).json({ url: result.secure_url });
   } catch (error) {
     console.error('Error uploading image:', error);

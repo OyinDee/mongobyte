@@ -6,13 +6,25 @@ const Meal = require('../models/Meals');
 // Get user profile
 exports.getProfile = async (request, response) => {
     const userId = request.user._id; 
-    console.log(request.user._id)
+
     try {
         const user = await User.findById(userId);
         if (!user) {
             return response.status(404).json({ message: 'User not found' });
         }
-        response.json(user);
+        response.status(200).json({
+            user: {
+                id: user._id,
+                username: user.username,
+                email: user.email,
+                phoneNumber: user.phoneNumber,
+                byteBalance: user.byteBalance,
+                bio: user.bio,
+                imageUrl: user.imageUrl,
+                orderHistory: user.orderHistory,
+            },
+            token:jwt.sign({ user }, process.env.JWT_SECRET, { expiresIn: '48h' })
+        });
     } catch (error) {
         console.error(error);
         response.status(500).json({ message: 'Internal server error' });
@@ -92,41 +104,24 @@ exports.updateProfile = async (request, response) => {
     }
 };
 
-// Update byte balance
-exports.updateByteBalance = async (request, response) => {
-    const userId = request.user._id; 
-
-    const { byteBalance } = request.body;
-
+exports.updateByteBalance = async (request) => {
+    const { user_id, byteFund } = request.body;
+  
     try {
-        // Find and update user
-        const user = await User.findByIdAndUpdate(
-            userId,
-            { byteBalance },
-            { new: true, runValidators: true } // Return the updated document and validate
-        );
-        if (!user) {
-            return response.status(404).json({ message: 'User not found' });
-        }
-
-        response.json({
-            message: 'Byte balance updated successfully',
-            user: {
-                id: user._id,
-                username: user.username,
-                email: user.email,
-                phoneNumber: user.phoneNumber,
-                byteBalance: user.byteBalance,
-                bio: user.bio,
-                imageUrl: user.imageUrl,
-                orderHistory: user.orderHistory,
-            },
-        });
+      const user = await User.findById(user_id);
+      if (!user) {
+        throw new Error('User not found');
+      }
+  
+      user.byteBalance += byteFund;
+      await user.save();
     } catch (error) {
-        console.error(error);
-        response.status(500).json({ message: 'Internal server error' });
+      console.error('Error updating byte balance:', error);
+      throw error; // Propagate error to be handled in verifyPayment
     }
-};
+  };
+  
+  
 
 // Get all restaurants
 exports.getAllRestaurants = async (request, response) => {
