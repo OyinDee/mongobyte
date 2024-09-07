@@ -70,18 +70,16 @@ const verifyPayment = async (request, response) => {
     });
 
     if (result.data.data.status === 'success') {
-      const amountInNaira = payment.amount;
-      const feePercentage = 0.03; 
-      const fee = amountInNaira * feePercentage;
-      const amountAfterFee = amountInNaira - fee;
+      const totalAmountReceived = Number(payment.amount);  
+const feePercentage = 0.03;
+const fundAmount = totalAmountReceived / (1 + feePercentage);  
+
+const amountInBytes = fundAmount / 10; 
 
 
-      const amountInBytes = amountAfterFee / 10;
-
-      await updateByteBalance({
-        body: { user_id: payment.user_id, byteFund: amountInBytes },
-      });
-
+await updateByteBalance({
+  body: { user_id: payment.user_id, byteFund: amountInBytes },
+});
       payment.status = 'credited';
       await payment.save();
       response.send('Payment successful!');
