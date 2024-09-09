@@ -73,7 +73,6 @@ exports.updateProfile = async (request, response) => {
     const { bio, imageUrl } = request.body;
 
     try {
-        // Find and update user
         const user = await User.findByIdAndUpdate(
             userId,
             { bio, imageUrl },
