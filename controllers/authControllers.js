@@ -72,12 +72,7 @@ exports.login = async (request, response) => {
         const token = jwt.sign({ user }, process.env.JWT_SECRET, { expiresIn: '48h' });
 
 
-        response.cookie('token', token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production', 
-            sameSite: 'Lax', 
-            maxAge: 48 * 60 * 60 * 1000
-        });
+
 
         response.status(202).json({
             message: 'Login successful!',
@@ -200,12 +195,6 @@ exports.loginRestaurant = async (request, response) => {
 
         const token = jwt.sign({ restaurant }, process.env.JWT_SECRET, { expiresIn: '48h' });
 
-        response.cookie('token', token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'Lax',
-            maxAge: 48 * 60 * 60 * 1000 
-        });
 
         response.status(200).json({
             message: 'Login successful!',
@@ -216,7 +205,8 @@ exports.loginRestaurant = async (request, response) => {
                 location: restaurant.location,
                 meals: restaurant.meals,
                 contactNumber: restaurant.contactNumber,
-            }
+            },
+            token: token
         });
     } catch (error) {
         console.error(error);

@@ -5,7 +5,7 @@ const Restaurant = require('../models/Restaurants');
 
 const authenticate = async (request, response, next) => {
 
-    const token = request.cookies.token;
+    const token = request.headers['authorization']?.split(' ')[1]; 
 
     if (!token) {
         return response.status(401).json({ message: 'No token provided' });
@@ -26,8 +26,8 @@ const authenticate = async (request, response, next) => {
         }
 
         if (restaurant) {
-            request.restaurant = restaurant; // Attach restaurant info to request object
-            request.userType = 'restaurant'; // Specify user type
+            request.restaurant = restaurant; 
+            request.userType = 'restaurant'; 
             return response.status(403).json({ message: 'Access denied for restaurants' });
         }
 
