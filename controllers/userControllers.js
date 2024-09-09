@@ -23,7 +23,7 @@ exports.getProfile = async (request, response) => {
                 imageUrl: user.imageUrl,
                 orderHistory: user.orderHistory,
             },
-            token:jwt.sign({ user }, process.env.JWT_SECRET, { expiresIn: '48h' })
+            token: jwt.sign({ user }, process.env.JWT_SECRET, { expiresIn: '48h' })
         });
     } catch (error) {
         console.error(error);

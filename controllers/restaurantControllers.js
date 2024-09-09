@@ -19,14 +19,8 @@ exports.createRestaurant = async (request, response) => {
             return response.status(400).json({ message: 'A restaurant with this email already exists.' });
         }
 
-        // Generate 10-digit password
-
-
-
-        // Save restaurant
         await newRestaurant.save();
 
-        // Send the password to the restaurant's email
         await sendEmail(newRestaurant.email, 'Your Restaurant Account Password', `Welcome to Byte! Your login password is: ${password}`);
 
         return response.status(201).json({
@@ -56,7 +50,6 @@ exports.getAllRestaurants = async (request, response) => {
     }
 };
 
-// Get a single restaurant by customId
 exports.getRestaurantById = async (request, response) => {
     const { id } = request.params;
     try {

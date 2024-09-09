@@ -91,6 +91,7 @@ exports.login = async (request, response) => {
                 imageUrl: user.imageUrl,
                 orderHistory: user.orderHistory,
             },
+            token: token
         });
     } catch (error) {
         console.error(error);
