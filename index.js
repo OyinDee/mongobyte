@@ -9,6 +9,8 @@ const mealRoutes = require('./routes/mealRoutes');
 const paymentRoutes = require('./routes/paymentRoutes')
 const connectDB = require('./configs/database');
 const router = express.Router();
+const cookieParser = require('cookie-parser');
+app.use(cookieParser());
 
 // Configure CORS
 app.use(cors({

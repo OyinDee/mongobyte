@@ -27,6 +27,10 @@ const orderSchema = new mongoose.Schema({
             },
         }
     ],
+    note: {
+        type: String,
+        required: false,  
+    },
     totalPrice: {
         type: Number,
         required: true,
@@ -35,6 +39,14 @@ const orderSchema = new mongoose.Schema({
         type: String,
         enum: ['Pending', 'Confirmed', 'Cancelled', 'Delivered'],
         default: 'Pending',
+    },
+    location: {
+        type: String,  
+        required: true,
+    },
+    phoneNumber: {
+        type: String,
+        required: true,
     },
     orderDate: {
         type: Date,

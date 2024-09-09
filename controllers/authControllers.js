@@ -2,7 +2,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const sendEmail = require('../configs/nodemailer');
-
+const Restaurant = require('../models/Restaurants')
 // Generate a 5-digit code
 const generateVerificationCode = () => {
     return Math.floor(100000 + Math.random() * 900000).toString();
@@ -41,7 +41,6 @@ exports.register = async (request, response) => {
     }
 };
 
-// Login user
 exports.login = async (request, response) => {
     const { username, password } = request.body;
 
@@ -58,35 +57,30 @@ exports.login = async (request, response) => {
 
         // Check if email is verified
         if (!user.isVerified) {
-            // Generate new verification code
             const newVerificationCode = generateVerificationCode();
-
-            // Update user record with the new verification code
             user.verificationCode = newVerificationCode;
             await user.save();
 
-            // Send verification email with the new 5-digit code
             await sendEmail(user.email, 'Verify your email and start to byte!', `Here's your new code: ${newVerificationCode}.`);
 
             return response.status(200).json({
                 message: 'Login successful, but email verification is pending. A new verification code has been sent to your email.',
                 isVerified: false,
-                user: {
-                    id: user._id,
-                    username: user.username,
-                    email: user.email,
-                    phoneNumber: user.phoneNumber,
-                }
             });
         }
 
-        // Generate JWT token for verified users
         const token = jwt.sign({ user }, process.env.JWT_SECRET, { expiresIn: '48h' });
+
+
+        response.cookie('token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production', 
+            sameSite: 'Lax', 
+            maxAge: 48 * 60 * 60 * 1000
+        });
 
         response.status(202).json({
             message: 'Login successful!',
-            token,
-            isVerified: true,
             user: {
                 id: user._id,
                 username: user.username,
@@ -103,6 +97,7 @@ exports.login = async (request, response) => {
         response.status(500).json({ message: 'Internal server error' });
     }
 };
+
 
 // Verify email using verification code
 exports.verifyEmail = async (request, response) => {
@@ -192,36 +187,33 @@ exports.loginRestaurant = async (request, response) => {
     const { email, password } = request.body;
 
     try {
-        // Find restaurant by email
-        const restaurant = await Restaurant.findOne({ email });
+        var restaurant = await Restaurant.findOne({ email });
         if (!restaurant) {
-            return response.status(401).json({ message: 'Invalid email or password.' });
+            return response.status(401).json({ message: 'Invalid email.' });
         }
 
-        // Compare password
         const isMatch = await restaurant.comparePassword(password);
         if (!isMatch) {
-            return response.status(401).json({ message: 'Invalid email or password.' });
+            return response.status(401).json({ message: 'Invalid password.' });
         }
 
-        // Check if email is verified
-        if (!restaurant.isVerified) {
-            return response.status(403).json({
-                message: 'Email not verified. Please verify your email to proceed.',
-            });
-        }
+        const token = jwt.sign({ restaurant }, process.env.JWT_SECRET, { expiresIn: '48h' });
 
-        // Generate a JWT token
-        const token = jwt.sign({ id: restaurant._id }, process.env.JWT_SECRET);
+        response.cookie('token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'Lax',
+            maxAge: 48 * 60 * 60 * 1000 
+        });
 
-        return response.status(200).json({
+        response.status(200).json({
             message: 'Login successful!',
-            token,
             restaurant: {
-                id: restaurant._id,
+                id: restaurant.customId,
                 name: restaurant.name,
                 email: restaurant.email,
                 location: restaurant.location,
+                meals: restaurant.meals,
                 contactNumber: restaurant.contactNumber,
             }
         });
@@ -231,3 +223,12 @@ exports.loginRestaurant = async (request, response) => {
     }
 };
 
+
+exports.logout = (request, response) => {
+    response.clearCookie('token', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'Strict',
+    });
+    response.status(200).json({ message: 'Logout successful!' });
+};

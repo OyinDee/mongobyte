@@ -5,7 +5,7 @@ const Restaurant = require('../models/Restaurants');
 
 const authenticate = async (request, response, next) => {
 
-    const token = request.headers['authorization']?.split(' ')[1]; // Extract token from Authorization header
+    const token = request.cookies.token;
 
     if (!token) {
         return response.status(401).json({ message: 'No token provided' });
