@@ -12,9 +12,9 @@ const router = express.Router();
 const cookieParser = require('cookie-parser');
 app.use(cookieParser());
 
-// Configure CORS
+
 app.use(cors({
-    origin: 'http://localhost:3000', 
+    origin: ['http://localhost:3000', 'https://yumbyte.netlify.app'],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true
