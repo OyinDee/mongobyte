@@ -14,18 +14,18 @@ const authenticate = async (request, response, next) => {
     try {
 
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        console.log(decoded)
+        
         if (decoded.user) {
             const user = await User.findById(decoded.user._id);
-            req.user = user; 
-            req.userType = 'user'; 
-            return res.status(403).json({ message: 'Access denied for users' });
+            request.user = user; 
+            request.userType = 'user'; 
+            return response.status(403).json({ message: 'Access denied for users' });
         }
         
         if (decoded.restaurant) {
             const restaurant = await Restaurant.findById(decoded.restaurant._id);
-            req.restaurant = restaurant;
-            req.userType = 'restaurant'; 
+            request.restaurant = restaurant;
+            request.userType = 'restaurant'; 
             return next();
         }
 
