@@ -10,9 +10,9 @@ exports.createMeal = async (request, response) => {
         if (!restaurant) {
             return response.status(404).json({ message: 'Restaurant not found' });
         }
+        const meal = new Meal({ ...request.body, restaurant: restaurant._id });
         restaurant.meals.push(meal._id);
         await restaurant.save();
-        const meal = new Meal({ ...request.body, restaurant: restaurant._id });
         await meal.save();
         response.status(201).json({ message: 'Meal created successfully!', meal });
     } catch (error) {
