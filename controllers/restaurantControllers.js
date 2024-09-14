@@ -1,11 +1,11 @@
 const Restaurant = require('../models/Restaurants');
 const crypto = require('crypto')
 const sendEmail = require('../configs/nodemailer');
-
+const Meal = require('../models/Meals')
 function generatePassword() {
-    return crypto.randomBytes(5).toString('hex'); // Generates a 10-character random password
+    return crypto.randomBytes(5).toString('hex');
 }
-// Create a new restaurant
+
 exports.createRestaurant = async (request, response) => {
     const password = generatePassword();
     const newRestaurant = new Restaurant({
@@ -13,7 +13,6 @@ exports.createRestaurant = async (request, response) => {
         password
     });
     try {
-        // Check if restaurant already exists
         const existingRestaurant = await Restaurant.findOne({ email:request.body.email });
         if (existingRestaurant) {
             return response.status(400).json({ message: 'A restaurant with this email already exists.' });
@@ -39,7 +38,7 @@ exports.createRestaurant = async (request, response) => {
     }
 };
 
-// Get all restaurants
+
 exports.getAllRestaurants = async (request, response) => {
     try {
         const restaurants = await Restaurant.find().populate('meals');
@@ -64,7 +63,7 @@ exports.getRestaurantById = async (request, response) => {
     }
 };
 
-// Update a restaurant
+
 exports.updateRestaurant = async (request, response) => {
     const { id } = request.params;
     try {
@@ -79,7 +78,7 @@ exports.updateRestaurant = async (request, response) => {
     }
 };
 
-// Delete a restaurant
+
 exports.deleteRestaurant = async (request, response) => {
     const { id } = request.params;
     try {
@@ -95,7 +94,7 @@ exports.deleteRestaurant = async (request, response) => {
 };
 
 
-// Update order status
+
 exports.updateOrderStatus = async (request, response) => {
     const { orderId } = request.params;
     const { status } = request.body;
@@ -109,6 +108,27 @@ exports.updateOrderStatus = async (request, response) => {
             message: 'Order status updated successfully',
             order,
         });
+    } catch (error) {
+        console.error(error);
+        response.status(500).json({ message: 'Internal server error' });
+    }
+};
+
+exports.getMealsByRestaurant = async (request, response) => {
+    const { customId } = request.params;
+
+    try {
+        const restaurant = await Restaurant.findOne({ customId }).populate('meals');
+        if (!restaurant) {
+            return response.status(404).json({ message: 'Restaurant not found' });
+        }
+
+        const meals = await Meal.find({ restaurant: restaurant._id }); 
+        if (!meals.length) {
+            return response.status(404).json({ message: 'No meals found for this restaurant' });
+        }
+
+        response.json(meals);
     } catch (error) {
         console.error(error);
         response.status(500).json({ message: 'Internal server error' });

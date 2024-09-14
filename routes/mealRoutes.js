@@ -1,10 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const mealController = require('../controllers/mealControllers');
-const authenticate = require('../middlewares/authenticateRestaurant'); // Custom middleware to check if user is a restaurant
+const authenticate = require('../middlewares/authenticateRestaurant');
 
-
-router.post('/restaurant/:restaurantId/create', authenticate, mealController.createMeal);
+router.post('/:customId/create', mealController.createMeal);
 
 router.get('/', mealController.getAllMeals);
 

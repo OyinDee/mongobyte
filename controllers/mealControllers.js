@@ -1,11 +1,12 @@
 const Meal = require('../models/Meals');
 const Restaurant = require('../models/Restaurants');
 
-// Create a new meal
+
 exports.createMeal = async (request, response) => {
-    const { restaurantId } = request.params;
+    const { customId } = request.params;
+    console.log(customId)
     try {
-        const restaurant = await Restaurant.findOne({ customId: restaurantId });
+        const restaurant = await Restaurant.findOne({ customId:customId });
         if (!restaurant) {
             return response.status(404).json({ message: 'Restaurant not found' });
         }
@@ -14,12 +15,12 @@ exports.createMeal = async (request, response) => {
         await meal.save();
         response.status(201).json({ message: 'Meal created successfully!', meal });
     } catch (error) {
-        console.error(error);
+        console.log(error);
         response.status(500).json({ message: 'Internal server error' });
     }
 };
 
-// Get all meals
+
 exports.getAllMeals = async (request, response) => {
     try {
         const meals = await Meal.find().populate('restaurant');
@@ -30,7 +31,7 @@ exports.getAllMeals = async (request, response) => {
     }
 };
 
-// Get a single meal by customId
+
 exports.getMealById = async (request, response) => {
     const { id } = request.params;
     try {
@@ -45,26 +46,23 @@ exports.getMealById = async (request, response) => {
     }
 };
 
-// Update a meal
+
 exports.updateMeal = async (request, response) => {
-    const { id } = request.params; // This is the meal's customId
-    const { restaurantId } = request.body; // This should be the restaurant's customId from the request body
+    const { id } = request.params; 
+    const { restaurantId } = request.restaurant.customId; 
 
     try {
-        // Find the meal by its customId
         const meal = await Meal.findOne({ customId: id }).populate('restaurant');
 
         if (!meal) {
             return response.status(404).json({ message: 'Meal not found' });
         }
 
-        // Check if the meal belongs to the restaurant trying to update it
         const restaurant = await Restaurant.findOne({ customId: restaurantId });
         if (!restaurant || !meal.restaurant.equals(restaurant._id)) {
             return response.status(403).json({ message: 'Unauthorized: You do not own this meal' });
         }
 
-        // Proceed to update the meal
         const updatedMeal = await Meal.findOneAndUpdate(
             { customId: id },
             request.body,
@@ -79,13 +77,18 @@ exports.updateMeal = async (request, response) => {
 };
 
 
-// Delete a meal
 exports.deleteMeal = async (request, response) => {
     const { id } = request.params;
+    const { restaurantId } = request.restaurant.customId; 
+
     try {
         const meal = await Meal.findOneAndDelete({ customId: id });
         if (!meal) {
             return response.status(404).json({ message: 'Meal not found' });
+        }
+        const restaurant = await Restaurant.findOne({ customId: restaurantId });
+        if (!restaurant || !meal.restaurant.equals(restaurant._id)) {
+            return response.status(403).json({ message: 'Unauthorized: You do not own this meal' });
         }
         response.json({ message: 'Meal deleted successfully!' });
     } catch (error) {
@@ -94,7 +97,7 @@ exports.deleteMeal = async (request, response) => {
     }
 };
 
-// Add batch meals
+
 exports.addBatchMeals = async (request, response) => {
     const { restaurantId } = request.params;
     const meals = request.body;

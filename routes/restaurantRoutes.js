@@ -5,7 +5,7 @@ const authenticateAdmin = require('../middlewares/authenticate.js')
 const authenticate = require('../middlewares/authenticateRestaurant.js');
 const authController = require('../controllers/authControllers');
 
-
+router.get('/mymeals/:customId', restaurantController.getMealsByRestaurant)
 router.post('/create', authenticateAdmin, restaurantController.createRestaurant);
 
 router.post('/login', authController.loginRestaurant)

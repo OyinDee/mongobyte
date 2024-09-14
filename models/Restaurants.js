@@ -36,6 +36,11 @@ const restaurantSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    walletBalance: {
+        type: Number,
+        requred: true,
+        default: 0
+    },
     isVerified: {
         type: Boolean,
         default: false,
@@ -52,7 +57,7 @@ const restaurantSchema = new mongoose.Schema({
     timestamps: true,
 });
 
-// Hash password before saving the restaurant
+
 restaurantSchema.pre('save', async function (next) {
     if (!this.isModified('password')) return next();
     this.password = await bcrypt.hash(this.password, 10); // Hash the password
