@@ -19,14 +19,14 @@ const authenticate = async (request, response, next) => {
             const user = await User.findById(decoded.user._id);
             request.user = user; 
             request.userType = 'user'; 
-            return response.status(403).json({ message: 'Access denied for users' });
+            return next()
         }
         
         if (decoded.restaurant) {
             const restaurant = await Restaurant.findById(decoded.restaurant._id);
             request.restaurant = restaurant;
             request.userType = 'restaurant'; 
-            return next();
+            return response.status(403).json({ message: 'Access denied for restaurants' });
         }
 
 
