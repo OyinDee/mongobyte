@@ -49,7 +49,7 @@ exports.getMealById = async (request, response) => {
 
 exports.updateMeal = async (request, response) => {
     const { id } = request.params; 
-    const { restaurantId } = request.restaurant.customId; 
+    const restaurantId  = request.restaurant.customId; 
 
     try {
         const meal = await Meal.findOne({ customId: id }).populate('restaurant');
@@ -79,16 +79,18 @@ exports.updateMeal = async (request, response) => {
 
 exports.deleteMeal = async (request, response) => {
     const { id } = request.params;
-    const { restaurantId } = request.restaurant.customId; 
+    const restaurantId  = request.restaurant._id; 
+    console.log(restaurantId )
 
     try {
+        const restaurant = await Restaurant.findOne({ _id: restaurantId });
+        console.log(restaurant)
         const meal = await Meal.findOneAndDelete({ customId: id });
-        if (!meal) {
-            return response.status(404).json({ message: 'Meal not found' });
-        }
-        const restaurant = await Restaurant.findOne({ customId: restaurantId });
         if (!restaurant || !meal.restaurant.equals(restaurant._id)) {
             return response.status(403).json({ message: 'Unauthorized: You do not own this meal' });
+        }
+        if (!meal) {
+            return response.status(404).json({ message: 'Meal not found' });
         }
         response.json({ message: 'Meal deleted successfully!' });
     } catch (error) {

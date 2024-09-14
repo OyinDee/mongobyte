@@ -15,21 +15,20 @@ const authenticate = async (request, response, next) => {
 
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-
-        const user = await User.findById(decoded.user._id);
-        const restaurant = await Restaurant.findById(decoded.restaurant._id);
-
-        if (user) {
-            request.user = user;
-            request.userType = 'user'; 
+        if (decoded.user) {
+            const user = await User.findById(decoded.user._id);
+            req.user = user; 
+            req.userType = 'user'; 
+            return res.status(403).json({ message: 'Access denied for users' });
+        }
+        
+        if (decoded.restaurant) {
+            const restaurant = await Restaurant.findById(decoded.restaurant._id);
+            req.restaurant = restaurant;
+            req.userType = 'restaurant'; 
             return next();
         }
 
-        if (restaurant) {
-            request.restaurant = restaurant; 
-            request.userType = 'restaurant'; 
-            return response.status(403).json({ message: 'Access denied for restaurants' });
-        }
 
         if(!user || !restaurant){
             return response.status(404).json({ message: 'User or restaurant not found' });

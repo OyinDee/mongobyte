@@ -12,16 +12,15 @@ const authenticate = async (req, res, next) => {
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-        const user = await User.findById(decoded.user._id);
-        const restaurant = await Restaurant.findById(decoded.restaurant._id);
-
-        if (user) {
+        if (decoded.user) {
+            const user = await User.findById(decoded.user._id);
             req.user = user; 
             req.userType = 'user'; 
             return res.status(403).json({ message: 'Access denied for users' });
         }
-
-        if (restaurant) {
+        
+        if (decoded.restaurant) {
+            const restaurant = await Restaurant.findById(decoded.restaurant._id);
             req.restaurant = restaurant;
             req.userType = 'restaurant'; 
             return next();
