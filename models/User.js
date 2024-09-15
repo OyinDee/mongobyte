@@ -64,6 +64,10 @@ const userSchema = new mongoose.Schema({
     location: {
         type: String,
         default: ''
+    },
+    nearestLandmark:{
+        type: String,
+        default: ''
     }
 }, {
     timestamps: true,

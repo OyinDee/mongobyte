@@ -22,7 +22,8 @@ exports.getProfile = async (request, response) => {
                 bio: user.bio,
                 imageUrl: user.imageUrl,
                 orderHistory: user.orderHistory,
-                location: user.location || ''
+                location: user.location || '',
+                nearestLandmark: user. nearestLandmark || ''
             },
             token: jwt.sign({ user }, process.env.JWT_SECRET, { expiresIn: '48h' })
         });
@@ -71,12 +72,13 @@ exports.getProfile = async (request, response) => {
 
 exports.updateUserProfile = async (req, res) => {
     try {
-      const { bio, location, imageUrl } = req.body;
+      const { bio, location, imageUrl,  nearestLandmark } = req.body;
       const userId = req.user._id; 
       const updateFields = {};
       if (bio !== undefined) updateFields.bio = bio;
       if (location !== undefined) updateFields.location = location;
       if (imageUrl !== undefined) updateFields.imageUrl = imageUrl;
+      if ( nearestLandmark !== undefined) updateFields. nearestLandmark =  nearestLandmark;
       const updatedUser = await User.findByIdAndUpdate(
         userId,
         { $set: updateFields },
@@ -108,7 +110,7 @@ exports.updateByteBalance = async (request) => {
       await user.save();
     } catch (error) {
       console.error('Error updating byte balance:', error);
-      throw error; // Propagate error to be handled in verifyPayment
+      throw error; //
     }
   };
   
