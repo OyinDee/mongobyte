@@ -69,40 +69,31 @@ exports.getProfile = async (request, response) => {
 // };
 
 
-exports.updateProfile = async (request, response) => {
-    const userId = request.user._id; 
-    const { bio, imageUrl } = request.body;
-
+exports.updateUserProfile = async (req, res) => {
     try {
-        const user = await User.findByIdAndUpdate(
-            userId,
-            { bio, imageUrl },
-            { new: true, runValidators: true } 
-        );
-        if (!user) {
-            return response.status(404).json({ message: 'User not found' });
-        }
-
-        response.json({
-            message: 'Profile updated successfully',
-            user: {
-                id: user._id,
-                username: user.username,
-                email: user.email,
-                phoneNumber: user.phoneNumber,
-                byteBalance: user.byteBalance,
-                bio: user.bio,
-                imageUrl: user.imageUrl,
-                orderHistory: user.orderHistory,
-            },
-            token:jwt.sign({ user }, process.env.JWT_SECRET, { expiresIn: '48h' })
-
-        });
+      const { bio, location, imageUrl } = req.body;
+      const userId = req.user._id; 
+      const updateFields = {};
+      if (bio !== undefined) updateFields.bio = bio;
+      if (location !== undefined) updateFields.location = location;
+      if (imageUrl !== undefined) updateFields.imageUrl = imageUrl;
+      const updatedUser = await User.findByIdAndUpdate(
+        userId,
+        { $set: updateFields },
+        { new: true } 
+      );
+  
+      if (!updatedUser) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+  
+      res.status(200).json({ message: 'Profile updated successfully', user: updatedUser });
     } catch (error) {
-        console.error(error);
-        response.status(500).json({ message: 'Internal server error' });
+      console.error('Error updating user profile:', error);
+      res.status(500).json({ message: 'Server error' });
     }
-};
+  };
+  
 
 exports.updateByteBalance = async (request) => {
     const { user_id, byteFund } = request.body;

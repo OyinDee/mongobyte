@@ -7,7 +7,7 @@ const { uploadImage } = require('../controllers/image');
 router.post('/upload', uploadImage);
 
 router.get('/getProfile', authenticate, userControllers.getProfile);
-router.post('/updateProfile', authenticate, userControllers.updateProfile);
+router.post('/updateProfile', authenticate, userControllers.updateUserProfile);
 router.post('/updateByteBalance', authenticate, userControllers.updateByteBalance);
 router.get('/restaurants', userControllers.getAllRestaurants);
 
