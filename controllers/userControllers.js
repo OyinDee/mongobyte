@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const Order = require('../models/Orders');
 const Meal = require('../models/Meals');
 
-// Get user profile
+
 exports.getProfile = async (request, response) => {
     const userId = request.user._id; 
 
@@ -22,6 +22,7 @@ exports.getProfile = async (request, response) => {
                 bio: user.bio,
                 imageUrl: user.imageUrl,
                 orderHistory: user.orderHistory,
+                location: user.location || ''
             },
             token: jwt.sign({ user }, process.env.JWT_SECRET, { expiresIn: '48h' })
         });
@@ -67,7 +68,7 @@ exports.getProfile = async (request, response) => {
 //     }
 // };
 
-// Update user profile
+
 exports.updateProfile = async (request, response) => {
     const userId = request.user._id; 
     const { bio, imageUrl } = request.body;
@@ -76,7 +77,7 @@ exports.updateProfile = async (request, response) => {
         const user = await User.findByIdAndUpdate(
             userId,
             { bio, imageUrl },
-            { new: true, runValidators: true } // Return the updated document and validate
+            { new: true, runValidators: true } 
         );
         if (!user) {
             return response.status(404).json({ message: 'User not found' });
