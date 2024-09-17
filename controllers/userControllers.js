@@ -2,7 +2,7 @@ const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const Order = require('../models/Orders');
 const Meal = require('../models/Meals');
-
+const Restaurant = require('../models/Restaurants')
 
 exports.getProfile = async (request, response) => {
     const userId = request.user._id; 
@@ -163,3 +163,44 @@ exports.createOrder = async (request, response) => {
         response.status(500).json({ message: 'Internal server error' });
     }
 };
+
+exports.transferBytes = async (request, response) => {
+  const { recipientUsername, amount } = request.body;  // 
+  const senderId = request.user._id;  
+
+  try {
+      if (amount <= 0) {
+          return response.status(400).json({ message: 'Transfer amount must be greater than zero' });
+      }
+
+      const sender = await User.findById(senderId);
+      if (!sender) {
+          return response.status(404).json({ message: 'Sender not found' });
+      }
+
+      const recipient = await User.findOne({ username: recipientUsername });
+      if (!recipient) {
+          return response.status(404).json({ message: 'Recipient not found' });
+      }
+
+      if (sender.byteBalance < amount) {
+          return response.status(400).json({ message: 'Insufficient byte balance' });
+      }
+
+      sender.byteBalance -= amount; 
+      recipient.byteBalance += amount;  
+
+      await sender.save();
+      await recipient.save();
+
+      response.status(200).json({
+          message: `Successfully transferred ${amount} bytes to ${recipient.username}`,
+          sender: { username: sender.username, byteBalance: sender.byteBalance },
+          recipient: { username: recipient.username, byteBalance: recipient.byteBalance },
+      });
+  } catch (error) {
+      console.error('Error during byte transfer:', error);
+      response.status(500).json({ message: 'Internal server error' });
+  }
+};
+

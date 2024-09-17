@@ -50,7 +50,7 @@ exports.getAllRestaurants = async (request, response) => {
 };
 
 exports.getRestaurantById = async (request, response) => {
-    const { id } = request.params;
+    const  id  = request.params.id;
     try {
         const restaurant = await Restaurant.findOne({ customId: id }).populate('meals');
         if (!restaurant) {
