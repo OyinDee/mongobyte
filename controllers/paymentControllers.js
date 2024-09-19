@@ -1,4 +1,4 @@
-// controllers/payment.controller.js
+
 const axios = require('axios');
 require('dotenv').config();
 const Payment = require('../models/payments');
@@ -15,9 +15,9 @@ const initiatePayment = async (request, response) => {
     const result = await axios.post(
       'https://api.paystack.co/transaction/initialize',
       {
-        amount: amount * 100, // Convert to kobo
+        amount: amount * 100, 
         email: request.user.email,
-        callback_url: 'http://localhost:3000/user/fund/callback', 
+        callback_url: 'https://bytego.vercel.app/user/fund/callback', 
       },
       {
         headers: {
@@ -29,7 +29,7 @@ const initiatePayment = async (request, response) => {
 
     const { authorization_url, reference } = result.data.data;
 
-    // Save payment using the reference from Paystack
+
     const newPayment = new Payment({
       reference, 
       amount,
