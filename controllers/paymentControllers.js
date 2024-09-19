@@ -17,7 +17,7 @@ const initiatePayment = async (request, response) => {
       {
         amount: amount * 100, // Convert to kobo
         email: request.user.email,
-        callback_url: 'https://yumbyte.netlify.app/user/fund/callback', 
+        callback_url: 'http://localhost:3000/user/fund/callback', 
       },
       {
         headers: {
