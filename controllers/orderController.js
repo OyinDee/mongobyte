@@ -3,21 +3,6 @@ const Restaurant = require('../models/Restaurants');
 const sendEmail = require('../configs/nodemailer');
 const User = require('../models/User');
 
-exports.getUserOrderHistory = async (request, response) => {
-    const { userId } = request.params;
-
-    try {
-        const user = await User.findById(userId).populate('orderHistory');
-        if (!user) {
-            return response.status(404).json({ message: 'User not found' });
-        }
-
-        return response.json(user.orderHistory);
-    } catch (error) {
-        console.error(error);
-        return response.status(500).json({ message: 'Internal server error' });
-    }
-};
 
 exports.createOrder = async (request, response) => {
     const { user, meals, note, totalPrice, location, phoneNumber, restaurantCustomId } = request.body;
@@ -29,13 +14,25 @@ exports.createOrder = async (request, response) => {
             return response.status(404).json({ message: 'Restaurant not found' });
         }
 
+
+        const mealDetails = await Promise.all(
+            meals.map(async ({ mealCustomId, quantity }) => {
+                const meal = await Meal.findOne({ customId: mealCustomId });
+                if (!meal) {
+                    throw new Error(`Meal with customId ${mealCustomId} not found`);
+                }
+                return { meal: meal._id, quantity }; 
+            })
+        );
+
         const newOrder = new Order({
             user,
-            meals,
+            meals: mealDetails, 
             note,
             totalPrice,
             location,
             phoneNumber,
+            restaurant: restaurant._id, 
         });
 
         await newOrder.save();
@@ -59,7 +56,7 @@ exports.createOrder = async (request, response) => {
         });
     } catch (error) {
         console.error(error);
-        return response.status(500).json({ message: 'Internal server error' });
+        return response.status(500).json({ message: 'Internal server error', error: error.message });
     }
 };
 

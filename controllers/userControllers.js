@@ -164,6 +164,22 @@ exports.createOrder = async (request, response) => {
     }
 };
 
+exports.getUserOrderHistory = async (request, response) => {
+    const { userId } = request.params;
+
+    try {
+        const user = await User.findById(userId).populate('orderHistory');
+        if (!user) {
+            return response.status(404).json({ message: 'User not found' });
+        }
+
+        return response.json(user.orderHistory);
+    } catch (error) {
+        console.error(error);
+        return response.status(500).json({ message: 'Internal server error' });
+    }
+};
+
 exports.transferBytes = async (request, response) => {
   const { recipientUsername, amount } = request.body;  // 
   const senderId = request.user._id;  
