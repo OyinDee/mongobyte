@@ -88,7 +88,7 @@ exports.updateUserProfile = async (req, res) => {
       if (!updatedUser) {
         return res.status(404).json({ message: 'User not found' });
       }
-      const token = jwt.sign({ updatedUser }, process.env.JWT_SECRET, { expiresIn: '48h' })
+      const token = jwt.sign({ user: updatedUser }, process.env.JWT_SECRET, { expiresIn: '48h' })
       res.status(200).json({ message: 'Profile updated successfully', user: updatedUser, token:token });
     } catch (error) {
       console.error('Error updating user profile:', error);
