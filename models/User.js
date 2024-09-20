@@ -26,14 +26,10 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
-    orderHistory: {
-        type: [
-            {
-                type: mongoose.Schema.Types.Mixed,
-            },
-        ],
-        default: [],
-    },
+    orderHistory: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Order',
+    }],
     byteBalance: {
         type: Number,
         default: 0.0,
@@ -65,7 +61,7 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: ''
     },
-    nearestLandmark:{
+    nearestLandmark: {
         type: String,
         default: ''
     }
@@ -73,7 +69,6 @@ const userSchema = new mongoose.Schema({
     timestamps: true,
 });
 
-// Password hashing middleware
 userSchema.pre('save', async function (next) {
     if (!this.isModified('password')) {
         return next();
@@ -83,7 +78,6 @@ userSchema.pre('save', async function (next) {
     next();
 });
 
-// Method to compare passwords
 userSchema.methods.comparePassword = async function (enteredPassword) {
     return await bcrypt.compare(enteredPassword, this.password);
 };

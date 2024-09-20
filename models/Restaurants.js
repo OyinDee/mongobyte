@@ -38,8 +38,8 @@ const restaurantSchema = new mongoose.Schema({
     },
     walletBalance: {
         type: Number,
-        requred: true,
-        default: 0
+        required: true,
+        default: 0,
     },
     isVerified: {
         type: Boolean,
@@ -53,18 +53,21 @@ const restaurantSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Meal',
     }],
+
+    orders: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Order',
+    }],
 }, {
     timestamps: true,
 });
 
-
 restaurantSchema.pre('save', async function (next) {
     if (!this.isModified('password')) return next();
-    this.password = await bcrypt.hash(this.password, 10); // Hash the password
+    this.password = await bcrypt.hash(this.password, 10);
     next();
 });
 
-// Method to compare passwords
 restaurantSchema.methods.comparePassword = function (candidatePassword) {
     return bcrypt.compare(candidatePassword, this.password);
 };

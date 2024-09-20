@@ -7,6 +7,7 @@ const authRoutes = require('./routes/authRoutes');
 const restaurantRoutes = require('./routes/restaurantRoutes');
 const mealRoutes = require('./routes/mealRoutes');
 const paymentRoutes = require('./routes/paymentRoutes')
+const orderRoutes = require('./routes/orderRoutes')
 const connectDB = require('./configs/database');
 const router = express.Router();
 const cookieParser = require('cookie-parser');
@@ -28,6 +29,8 @@ app.use('/api/v1/restaurants', restaurantRoutes);
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/meals', mealRoutes);
 app.use('/api/v1/pay', paymentRoutes);
+app.use('/api/v1/orders', orderRoutes);
+
 
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
