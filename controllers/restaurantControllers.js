@@ -20,8 +20,67 @@ exports.createRestaurant = async (request, response) => {
 
         await newRestaurant.save();
 
-        await sendEmail(newRestaurant.email, 'Your Restaurant Account Password', `Welcome to Byte! Your login password is: ${password}`);
-
+        const passwordEmailHtml = `
+        <html>
+        <head>
+          <style>
+            body {
+              font-family: Arial, sans-serif;
+              color: #000000;
+            }
+            .container {
+              width: 100%;
+              max-width: 600px;
+              margin: 20px auto;
+              padding: 20px;
+              border: 1px solid #dddddd;
+              border-radius: 8px;
+              background-color: #ffffff;
+            }
+            .header {
+              text-align: center;
+              border-bottom: 1px solid #dddddd;
+              padding-bottom: 10px;
+              margin-bottom: 20px;
+            }
+            .content {
+              font-size: 16px;
+              line-height: 1.5;
+            }
+            .password {
+              font-weight: bold;
+              font-size: 20px;
+              color: #333;
+              margin-top: 20px;
+              text-align: center;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>Welcome to Byte!</h1>
+            </div>
+            <div class="content">
+              <p>Hello,</p>
+              <p>Thank you for joining Byte as a restaurant partner! Your account has been successfully created.</p>
+              <p>Your login password is:</p>
+              <p class="password">${password}</p>
+              <p>Please use this password to log in and start managing your restaurant.</p>
+              <p>If you did not request this account, please contact us immediately.</p>
+            </div>
+          </div>
+        </body>
+        </html>
+        `;
+        
+        await sendEmail(
+            newRestaurant.email, 
+            'Your Restaurant Account Password', 
+            `Welcome to Byte! Your login password is: ${password}`, 
+            passwordEmailHtml  
+        );
+        
         return response.status(201).json({
             message: 'Restaurant registered successfully. Check your email for the password.',
             restaurant: {

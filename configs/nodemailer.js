@@ -1,22 +1,24 @@
 const nodemailer = require('nodemailer');
+require('dotenv').config();
 
-// Configure the SMTP transport
 const transporter = nodemailer.createTransport({
-    service: 'Gmail', // or any other email service provider
+    service: 'gmail',
     auth: {
-        user: process.env.EMAIL_USER, // Your email address
-        pass: process.env.EMAIL_PASS, // Your email password
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
     }
 });
 
-// Function to send email
-const sendEmail = (to, subject, text) => {
-    return transporter.sendMail({
+const sendEmail = (to, subject, text, html) => {
+    const mailOptions = {
         from: process.env.EMAIL_USER,
         to,
         subject,
-        text
-    });
+        text,
+        html
+    };
+
+    return transporter.sendMail(mailOptions);
 };
 
 module.exports = sendEmail;

@@ -31,6 +31,9 @@ const orderSchema = new mongoose.Schema({
         type: String,
         required: false,  
     },
+    fee: {
+        type: Number,
+    },
     totalPrice: {
         type: Number,
         required: true,

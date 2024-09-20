@@ -19,21 +19,69 @@ exports.register = async (request, response) => {
         const newUser = new User({
             username,
             email,
-            password,  // Password will be hashed by the pre-save hook
+            password, 
             phoneNumber,
             verificationCode,
         });
 
         await newUser.save();
 
-        await sendEmail(email, 'Verify your email and start to byte!', `Ofc, not literally, haha.\nHere you go: ${verificationCode}.`);
-
+        const emailHtml = `
+        <html>
+        <head>
+          <style>
+            body {
+              font-family: Arial, sans-serif;
+              color: #000000;
+            }
+            .container {
+              width: 100%;
+              max-width: 600px;
+              margin: 20px auto;
+              padding: 20px;
+              border: 1px solid #dddddd;
+              border-radius: 8px;
+              background-color: #ffffff;
+            }
+            .header {
+              text-align: center;
+              border-bottom: 1px solid #dddddd;
+              padding-bottom: 10px;
+              margin-bottom: 20px;
+            }
+            .content {
+              font-size: 16px;
+              line-height: 1.5;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>Welcome!</h1>
+            </div>
+            <div class="content">
+              <p>Thank you for joining us. Please verify your email using the following code:</p>
+              <p><strong>${verificationCode}</strong></p>
+            </div>
+          </div>
+        </body>
+        </html>
+        `;
+        
+        await sendEmail(
+            email,
+            'Verify your email and start to byte!',
+            null,
+            emailHtml
+        );
+        
         response.status(201).json({ message: 'Registration successful!' });
     } catch (error) {
         console.error(error.message);
 
-        if (error.code === 11000) {  // MongoDB duplicate key error code
-            const field = Object.keys(error.keyValue)[0]; // Get the field that caused the error (e.g., 'email' or 'username')
+        if (error.code === 11000) {  
+            const field = Object.keys(error.keyValue)[0]; 
             response.status(400).json({ message: `${field} already exists` });
         } else {
             response.status(500).json({ message: 'Internal server error' });
@@ -55,14 +103,71 @@ exports.login = async (request, response) => {
             return response.status(401).json({ message: 'Invalid password, chief!' });
         }
 
-        // Check if email is verified
+
         if (!user.isVerified) {
             const newVerificationCode = generateVerificationCode();
             user.verificationCode = newVerificationCode;
             await user.save();
 
-            await sendEmail(user.email, 'Verify your email and start to byte!', `Here's your new code: ${newVerificationCode}.`);
-
+            const emailHtml = `
+            <html>
+            <head>
+              <style>
+                body {
+                  font-family: Arial, sans-serif;
+                  color: #000000;
+                }
+                .container {
+                  width: 85%;
+                  max-width: 600px;
+                  margin: 20px auto;
+                  padding: 20px;
+                  border: 1px solid #dddddd;
+                  border-radius: 8px;
+                  background-color: #ffffff;
+                }
+                .header {
+                  text-align: center;
+                  border-bottom: 1px solid #dddddd;
+                  padding-bottom: 10px;
+                  margin-bottom: 20px;
+                }
+                .content {
+                  font-size: 16px;
+                  line-height: 1.5;
+                }
+                .code {
+                  font-weight: bold;
+                  font-size: 24px;
+                  margin-top: 20px;
+                  text-align: center;
+                  color: #333;
+                }
+              </style>
+            </head>
+            <body>
+              <div class="container">
+                <div class="header">
+                  <h1>Verify Your Email</h1>
+                </div>
+                <div class="content">
+                  <p>Hello,</p>
+                  <p>Please use the following code to verify your email address:</p>
+                  <p class="code">${newVerificationCode}</p>
+                  <p>If you did not request this, please ignore this message.</p>
+                </div>
+              </div>
+            </body>
+            </html>
+            `;
+            
+            await sendEmail(
+                user.email, 
+                'Verify your email and start to byte!',
+                `Here's your new code: ${newVerificationCode}.`, 
+                emailHtml 
+            );
+            
             return response.status(200).json({
                 message: 'Login successful, but email verification is pending. A new verification code has been sent to your email.',
                 isVerified: false,
@@ -95,20 +200,20 @@ exports.login = async (request, response) => {
 };
 
 
-// Verify email using verification code
+
 exports.verifyEmail = async (request, response) => {
     const { code } = request.query;
 
     try {
-        // Find user by verification code
+
         const user = await User.findOne({ verificationCode: code });
         if (!user) {
             return response.status(404).json({ message: 'Invalid or expired verification code' });
         }
 
-        // Mark user as verified
+
         user.isVerified = true;
-        user.verificationCode = null;  // Clear the verification code
+        user.verificationCode = null; 
         await user.save();
 
         response.json({ message: 'Email verified successfully' });
@@ -118,7 +223,7 @@ exports.verifyEmail = async (request, response) => {
     }
 };
 
-// Forgot password
+
 exports.forgotPassword = async (request, response) => {
     const { email } = request.body;
 
@@ -130,14 +235,70 @@ exports.forgotPassword = async (request, response) => {
 
         const resetCode = generateVerificationCode();
 
-        // Save the reset code with the user
         user.resetCode = resetCode;
-        user.resetCodeExpires = Date.now() + 3600000;  // Code expires in 1 hour
+        user.resetCodeExpires = Date.now() + 3600000; 
         await user.save();
 
-        // Send email with reset code
-        await sendEmail(email, 'Password Reset Code', `Here is your password reset code: ${resetCode}`);
-
+        const passwordResetEmailHtml = `
+        <html>
+        <head>
+          <style>
+            body {
+              font-family: Arial, sans-serif;
+              color: #000000;
+            }
+            .container {
+              width: 85%;
+              max-width: 600px;
+              margin: 20px auto;
+              padding: 20px;
+              border: 1px solid #dddddd;
+              border-radius: 8px;
+              background-color: #ffffff;
+            }
+            .header {
+              text-align: center;
+              border-bottom: 1px solid #dddddd;
+              padding-bottom: 10px;
+              margin-bottom: 20px;
+            }
+            .content {
+              font-size: 16px;
+              line-height: 1.5;
+            }
+            .reset-code {
+              font-weight: bold;
+              font-size: 24px;
+              color: #333;
+              margin-top: 20px;
+              text-align: center;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>Password Reset Request</h1>
+            </div>
+            <div class="content">
+              <p>Hello,</p>
+              <p>We received a request to reset your password. Use the code below to proceed with resetting your password:</p>
+              <p class="reset-code">${resetCode}</p>
+              <p>If you did not request a password reset, please ignore this email or contact support immediately.</p>
+              <p>Thank you!</p>
+            </div>
+          </div>
+        </body>
+        </html>
+        `;
+        
+        await sendEmail(
+            email, 
+            'Password Reset Code', 
+            `Here is your password reset code: ${resetCode}`, 
+            passwordResetEmailHtml 
+        );
+        
         response.status(200).json({ message: 'Password reset code sent to your email' });
     } catch (error) {
         console.error(error);
@@ -145,7 +306,7 @@ exports.forgotPassword = async (request, response) => {
     }
 };
 
-// Reset password
+
 exports.resetPassword = async (request, response) => {
     const { email, resetCode, newPassword } = request.body;
 
@@ -156,13 +317,13 @@ exports.resetPassword = async (request, response) => {
             return response.status(404).json({ message: 'Invalid email or reset code' });
         }
 
-        // Check if reset code is expired
+
         if (Date.now() > user.resetCodeExpires) {
             return response.status(400).json({ message: 'Reset code has expired' });
         }
 
-        // Hash the new password
-        user.password = newPassword; // Password will be hashed by the pre-save hook
+
+        user.password = newPassword; 
         user.resetCode = null;
         user.resetCodeExpires = null;
         await user.save();
