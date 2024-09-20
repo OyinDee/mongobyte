@@ -5,7 +5,7 @@ const User = require('../models/User');
 
 
 exports.createOrder = async (request, response) => {
-    const { user, meals, note, totalPrice, location, phoneNumber, restaurantCustomId } = request.body;
+    const { user, meals, note, totalPrice, location, phoneNumber, restaurantCustomId, nearestLandmark } = request.body;
 
     try {
 
@@ -47,7 +47,7 @@ exports.createOrder = async (request, response) => {
         await sendEmail(
             restaurant.email,
             'New Order Received',
-            `You have received a new order. Order details: \nTotal Price: ${totalPrice} \nLocation: ${location} \nPhone: ${phoneNumber} \nNote: ${note || 'No special notes'}`
+            `You have received a new order. Order details: \nTotal Price: ${totalPrice} \nLocation: ${location}, around ${nearestLandmark|| "..."} \nPhone: ${phoneNumber} \nNote: ${note || 'No special notes'}`
         );
 
         return response.status(201).json({
