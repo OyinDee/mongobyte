@@ -1,4 +1,4 @@
-const Order = require('../models/Order');
+const Order = require('../models/Orders');
 const Restaurant = require('../models/Restaurants');
 const sendEmail = require('../configs/nodemailer');
 const User = require('../models/User');
