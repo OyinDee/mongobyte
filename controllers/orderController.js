@@ -179,7 +179,7 @@ exports.getOrderById = async (request, response) => {
 
 exports.orderConfirmation = async (request, response) => {
   const { orderId } = request.params;
-  const { status, additionalFee, requestDescription } = request.body;
+  const { additionalFee, requestDescription } = request.body;
 
   try {
     var order = await Order.find({customId: orderId})
@@ -204,6 +204,8 @@ exports.orderConfirmation = async (request, response) => {
         order.totalPrice += parsedFee
         order.status = 'Confirmed';
       } else {
+        order.status = 'Fee Requested';
+
         const user = await User.findById(order.user._id);
         if (user && user.email) {
           const emailHtml = `

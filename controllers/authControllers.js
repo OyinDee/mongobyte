@@ -115,7 +115,7 @@ exports.login = async (request, response) => {
             });
         }
 
-        const token = jwt.sign({ user }, process.env.JWT_SECRET, { expiresIn: '48h' });
+        const token = jwt.sign({ user }, process.env.JWT_SECRET);
 
         response.status(202).json({
             message: 'Login successful!',
@@ -290,7 +290,7 @@ exports.loginRestaurant = async (request, response) => {
             return response.status(401).json({ message: 'Invalid password.' });
         }
 
-        const token = jwt.sign({ restaurant }, process.env.JWT_SECRET, { expiresIn: '48h' });
+        const token = jwt.sign({ restaurant }, process.env.JWT_SECRET);
 
 
         response.status(200).json({
