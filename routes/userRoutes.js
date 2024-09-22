@@ -13,4 +13,6 @@ router.post('/updateByteBalance', authenticate, userControllers.updateByteBalanc
 router.get('/restaurants', userControllers.getAllRestaurants);
 router.post('/transfer', authenticate, userControllers.transferBytes)
 router.get('/restdetails/:id', restaurantControllers.getRestaurantById)
+router.get('/notifications', authenticateBoth, userControllers.fetchNotifications);
+
 module.exports = router;

@@ -3,7 +3,7 @@ const axios = require('axios');
 require('dotenv').config();
 const Payment = require('../models/payments');
 const { updateByteBalance } = require('./userControllers');
-
+const Notifications = require('../models/Notifications')
 const initiatePayment = async (request, response) => {
   const { amount } = request.body;
 
@@ -83,8 +83,21 @@ await updateByteBalance({
       payment.status = 'credited';
       await payment.save();
       response.send('Payment successful!');
+      const userNotification = new Notification({
+        userId: payment.user_id,
+        message: `Your payment of ${payment.amount} was successful!`,
+      });
+
+      await userNotification.save();
+
     } else {
       response.send('Payment failed.');
+      const userNotification = new Notification({
+        userId: payment.user_id,
+        message: `Your payment with reference ${reference} failed. Please try again.`,
+      });
+      
+      await userNotification.save();
     }
   } catch (error) {
     console.error('Error verifying payment:', error);

@@ -2,26 +2,24 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const sendEmail = require('../configs/nodemailer');
-const Restaurant = require('../models/Restaurants')
-// Generate a 5-digit code
-const generateVerificationCode = () => {
-    return Math.floor(100000 + Math.random() * 900000).toString();
-};
+const Restaurant = require('../models/Restaurants');
+const Nofifications = require('../models/Notifications')
 
-// Register a new user
+const generateVerificationCode = () => Math.floor(100000 + Math.random() * 900000).toString();
+
 exports.register = async (request, response) => {
     const { username, email, password, phoneNumber } = request.body;
 
     try {
         const verificationCode = generateVerificationCode();
 
-        // Create new user with the verification code
         const newUser = new User({
             username,
             email,
-            password, 
+            password,
             phoneNumber,
             verificationCode,
+            notifications: ['Your registration was successful. Please check your email to verify your account.'],
         });
 
         await newUser.save();
@@ -30,36 +28,15 @@ exports.register = async (request, response) => {
         <html>
         <head>
           <style>
-            body {
-              font-family: Arial, sans-serif;
-              color: #000000;
-            }
-            .container {
-              width: 100%;
-              max-width: 600px;
-              margin: 20px auto;
-              padding: 20px;
-              border: 1px solid #dddddd;
-              border-radius: 8px;
-              background-color: #ffffff;
-            }
-            .header {
-              text-align: center;
-              border-bottom: 1px solid #dddddd;
-              padding-bottom: 10px;
-              margin-bottom: 20px;
-            }
-            .content {
-              font-size: 16px;
-              line-height: 1.5;
-            }
+            body { font-family: Arial, sans-serif; color: #000000; }
+            .container { width: 100%; max-width: 600px; margin: 20px auto; padding: 20px; border: 1px solid #dddddd; border-radius: 8px; background-color: #ffffff; }
+            .header { text-align: center; border-bottom: 1px solid #dddddd; padding-bottom: 10px; margin-bottom: 20px; }
+            .content { font-size: 16px; line-height: 1.5; }
           </style>
         </head>
         <body>
           <div class="container">
-            <div class="header">
-              <h1>Welcome!</h1>
-            </div>
+            <div class="header"><h1>Welcome!</h1></div>
             <div class="content">
               <p>Thank you for joining us. Please verify your email using the following code:</p>
               <p><strong>${verificationCode}</strong></p>
@@ -68,20 +45,14 @@ exports.register = async (request, response) => {
         </body>
         </html>
         `;
-        
-        await sendEmail(
-            email,
-            'Verify your email and start to byte!',
-            null,
-            emailHtml
-        );
-        
-        response.status(201).json({ message: 'Registration successful!' });
+
+        await sendEmail(email, 'Verify your email and start to byte!', null, emailHtml);
+
+        response.status(201).json({ message: 'Registration successful! Please check your email to verify your account.' });
     } catch (error) {
         console.error(error.message);
-
-        if (error.code === 11000) {  
-            const field = Object.keys(error.keyValue)[0]; 
+        if (error.code === 11000) {
+            const field = Object.keys(error.keyValue)[0];
             response.status(400).json({ message: `${field} already exists` });
         } else {
             response.status(500).json({ message: 'Internal server error' });
@@ -103,7 +74,6 @@ exports.login = async (request, response) => {
             return response.status(401).json({ message: 'Invalid password, chief!' });
         }
 
-
         if (!user.isVerified) {
             const newVerificationCode = generateVerificationCode();
             user.verificationCode = newVerificationCode;
@@ -113,43 +83,16 @@ exports.login = async (request, response) => {
             <html>
             <head>
               <style>
-                body {
-                  font-family: Arial, sans-serif;
-                  color: #000000;
-                }
-                .container {
-                  width: 85%;
-                  max-width: 600px;
-                  margin: 20px auto;
-                  padding: 20px;
-                  border: 1px solid #dddddd;
-                  border-radius: 8px;
-                  background-color: #ffffff;
-                }
-                .header {
-                  text-align: center;
-                  border-bottom: 1px solid #dddddd;
-                  padding-bottom: 10px;
-                  margin-bottom: 20px;
-                }
-                .content {
-                  font-size: 16px;
-                  line-height: 1.5;
-                }
-                .code {
-                  font-weight: bold;
-                  font-size: 24px;
-                  margin-top: 20px;
-                  text-align: center;
-                  color: #333;
-                }
+                body { font-family: Arial, sans-serif; color: #000000; }
+                .container { width: 85%; max-width: 600px; margin: 20px auto; padding: 20px; border: 1px solid #dddddd; border-radius: 8px; background-color: #ffffff; }
+                .header { text-align: center; border-bottom: 1px solid #dddddd; padding-bottom: 10px; margin-bottom: 20px; }
+                .content { font-size: 16px; line-height: 1.5; }
+                .code { font-weight: bold; font-size: 24px; margin-top: 20px; text-align: center; color: #333; }
               </style>
             </head>
             <body>
               <div class="container">
-                <div class="header">
-                  <h1>Verify Your Email</h1>
-                </div>
+                <div class="header"><h1>Verify Your Email</h1></div>
                 <div class="content">
                   <p>Hello,</p>
                   <p>Please use the following code to verify your email address:</p>
@@ -160,14 +103,12 @@ exports.login = async (request, response) => {
             </body>
             </html>
             `;
-            
-            await sendEmail(
-                user.email, 
-                'Verify your email and start to byte!',
-                `Here's your new code: ${newVerificationCode}.`, 
-                emailHtml 
-            );
-            
+
+            await sendEmail(user.email, 'Verify your email and start to byte!', `Here's your new code: ${newVerificationCode}.`, emailHtml);
+
+            user.notifications.push('Login successful, but your email is not verified. A new verification code has been sent to your email.');
+            await user.save();
+
             return response.status(200).json({
                 message: 'Login successful, but email verification is pending. A new verification code has been sent to your email.',
                 isVerified: false,
@@ -175,9 +116,6 @@ exports.login = async (request, response) => {
         }
 
         const token = jwt.sign({ user }, process.env.JWT_SECRET, { expiresIn: '48h' });
-
-
-
 
         response.status(202).json({
             message: 'Login successful!',
@@ -191,7 +129,7 @@ exports.login = async (request, response) => {
                 imageUrl: user.imageUrl,
                 orderHistory: user.orderHistory,
             },
-            token: token
+            token,
         });
     } catch (error) {
         console.error(error);
@@ -199,21 +137,18 @@ exports.login = async (request, response) => {
     }
 };
 
-
-
 exports.verifyEmail = async (request, response) => {
     const { code } = request.query;
 
     try {
-
         const user = await User.findOne({ verificationCode: code });
         if (!user) {
             return response.status(404).json({ message: 'Invalid or expired verification code' });
         }
 
-
         user.isVerified = true;
-        user.verificationCode = null; 
+        user.verificationCode = null;
+        user.notifications.push('Email verified successfully.');
         await user.save();
 
         response.json({ message: 'Email verified successfully' });
@@ -222,7 +157,6 @@ exports.verifyEmail = async (request, response) => {
         response.status(400).json({ message: 'Invalid or expired verification code' });
     }
 };
-
 
 exports.forgotPassword = async (request, response) => {
     const { email } = request.body;
@@ -236,50 +170,23 @@ exports.forgotPassword = async (request, response) => {
         const resetCode = generateVerificationCode();
 
         user.resetCode = resetCode;
-        user.resetCodeExpires = Date.now() + 3600000; 
+        user.resetCodeExpires = Date.now() + 3600000;
         await user.save();
 
         const passwordResetEmailHtml = `
         <html>
         <head>
           <style>
-            body {
-              font-family: Arial, sans-serif;
-              color: #000000;
-            }
-            .container {
-              width: 85%;
-              max-width: 600px;
-              margin: 20px auto;
-              padding: 20px;
-              border: 1px solid #dddddd;
-              border-radius: 8px;
-              background-color: #ffffff;
-            }
-            .header {
-              text-align: center;
-              border-bottom: 1px solid #dddddd;
-              padding-bottom: 10px;
-              margin-bottom: 20px;
-            }
-            .content {
-              font-size: 16px;
-              line-height: 1.5;
-            }
-            .reset-code {
-              font-weight: bold;
-              font-size: 24px;
-              color: #333;
-              margin-top: 20px;
-              text-align: center;
-            }
+            body { font-family: Arial, sans-serif; color: #000000; }
+            .container { width: 85%; max-width: 600px; margin: 20px auto; padding: 20px; border: 1px solid #dddddd; border-radius: 8px; background-color: #ffffff; }
+            .header { text-align: center; border-bottom: 1px solid #dddddd; padding-bottom: 10px; margin-bottom: 20px; }
+            .content { font-size: 16px; line-height: 1.5; }
+            .reset-code { font-weight: bold; font-size: 24px; color: #333; margin-top: 20px; text-align: center; }
           </style>
         </head>
         <body>
           <div class="container">
-            <div class="header">
-              <h1>Password Reset Request</h1>
-            </div>
+            <div class="header"><h1>Password Reset Request</h1></div>
             <div class="content">
               <p>Hello,</p>
               <p>We received a request to reset your password. Use the code below to proceed with resetting your password:</p>
@@ -291,14 +198,12 @@ exports.forgotPassword = async (request, response) => {
         </body>
         </html>
         `;
-        
-        await sendEmail(
-            email, 
-            'Password Reset Code', 
-            `Here is your password reset code: ${resetCode}`, 
-            passwordResetEmailHtml 
-        );
-        
+
+        await sendEmail(email, 'Password Reset Code', `Here is your password reset code: ${resetCode}`, passwordResetEmailHtml);
+
+        user.notifications.push('Password reset code sent to your email.');
+        await user.save();
+
         response.status(200).json({ message: 'Password reset code sent to your email' });
     } catch (error) {
         console.error(error);
@@ -306,38 +211,69 @@ exports.forgotPassword = async (request, response) => {
     }
 };
 
-
 exports.resetPassword = async (request, response) => {
     const { email, resetCode, newPassword } = request.body;
 
     try {
-        const user = await User.findOne({ email, resetCode });
-
+        const user = await User.findOne({ email, resetCode, resetCodeExpires: { $gt: Date.now() } });
         if (!user) {
-            return response.status(404).json({ message: 'Invalid email or reset code' });
+            return response.status(400).json({ message: 'Invalid or expired reset code' });
         }
 
-
-        if (Date.now() > user.resetCodeExpires) {
-            return response.status(400).json({ message: 'Reset code has expired' });
-        }
-
-
-        user.password = newPassword; 
+        user.password = await bcrypt.hash(newPassword, 10);
         user.resetCode = null;
         user.resetCodeExpires = null;
+        user.notifications.push('Password reset successfully.');
         await user.save();
 
-        response.status(200).json({ message: 'Password reset successful' });
+        response.json({ message: 'Password reset successfully' });
     } catch (error) {
         console.error(error);
         response.status(500).json({ message: 'Internal server error' });
     }
 };
 
+exports.updateUser = async (request, response) => {
+    const userId = request.user.id;
+    const { bio, imageUrl } = request.body;
 
+    try {
+        const user = await User.findById(userId);
+        if (!user) {
+            return response.status(404).json({ message: 'User not found' });
+        }
 
+        if (bio) user.bio = bio;
+        if (imageUrl) user.imageUrl = imageUrl;
 
+        await user.save();
+
+        response.json({ message: 'User updated successfully', user });
+    } catch (error) {
+        console.error(error);
+        response.status(500).json({ message: 'Internal server error' });
+    }
+};
+
+exports.addRestaurant = async (request, response) => {
+    const userId = request.user.id;
+    const { name, address, phoneNumber } = request.body;
+
+    try {
+        const user = await User.findById(userId);
+        if (!user || !user.isAdmin) {
+            return response.status(403).json({ message: 'Access denied' });
+        }
+
+        const newRestaurant = new Restaurant({ name, address, phoneNumber });
+        await newRestaurant.save();
+
+        response.status(201).json({ message: 'Restaurant added successfully', restaurant: newRestaurant });
+    } catch (error) {
+        console.error(error);
+        response.status(500).json({ message: 'Internal server error' });
+    }
+};
 
 
 exports.loginRestaurant = async (request, response) => {
@@ -376,11 +312,3 @@ exports.loginRestaurant = async (request, response) => {
 };
 
 
-exports.logout = (request, response) => {
-    response.clearCookie('token', {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'Strict',
-    });
-    response.status(200).json({ message: 'Logout successful!' });
-};

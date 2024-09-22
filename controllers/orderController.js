@@ -3,7 +3,7 @@ const Restaurant = require('../models/Restaurants');
 const sendEmail = require('../configs/nodemailer');
 const User = require('../models/User');
 const Meal = require('../models/Meals')
-
+const Nofifications = require('../models/Notifications')
 
 exports.createOrder = async (request, response) => {
     const { user, meals, note, totalPrice, location, phoneNumber, restaurantCustomId, nearestLandmark, fee } = request.body[0];
@@ -42,7 +42,13 @@ exports.createOrder = async (request, response) => {
         }
         userDoc.orderHistory.push(newOrder._id);
         await userDoc.save();
-
+        const restaurantNotification = new Notification({
+          restaurantId: restaurant._id,
+          message: `You have received a new order with ID: ${newOrder._id}.`,
+      });
+      await restaurantNotification.save();
+      restaurant.notifications.push(restaurantNotification._id);
+      await restaurant.save();
         const emailHtml = `
         <html>
         <head>
@@ -283,9 +289,24 @@ exports.orderConfirmation = async (request, response) => {
 
 
     await order.save();
+    const restaurantNotification = new Notification({
+      restaurantId: restaurant._id,
+      message: `Order ${order.customId} has been confirmed and should be delivered soon.`,
+  });
+  await restaurantNotification.save();
+  restaurant.notifications.push(restaurantNotification._id);
+  await restaurant.save();
+
+  const userNotification = new Notification({
+      userId: order.user._id,
+      message: `Your order ${order.customId} has been confirmed and will reach you soon!`,
+  });
+  await userNotification.save();
+  const user = await User.findById(order.user._id);
+  user.notifications.push(userNotification._id);
+  await user.save();
 
 
-    const user = await User.findById(order.user._id);
     if (user && user.email) {
       const emailHtml = `
 <html>

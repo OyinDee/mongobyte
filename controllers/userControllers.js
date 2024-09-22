@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const Order = require('../models/Orders');
 const Meal = require('../models/Meals');
 const Restaurant = require('../models/Restaurants')
+const Notification = require('../models/Notifications');
 
 exports.getProfile = async (request, response) => {
     const userId = request.user._id; 
@@ -180,43 +181,109 @@ exports.getUserOrderHistory = async (request, response) => {
     }
 };
 
+
 exports.transferBytes = async (request, response) => {
-  const { recipientUsername, amount } = request.body;  // 
-  const senderId = request.user._id;  
+  const { recipientUsername, amount } = request.body;
+  const senderId = request.user._id;
 
   try {
-      if (amount <= 0) {
-          return response.status(400).json({ message: 'Transfer amount must be greater than zero' });
+    if (amount <= 0) {
+      return response.status(400).json({ message: 'Transfer amount must be greater than zero' });
+    }
+
+    const sender = await User.findById(senderId);
+    if (!sender) {
+      return response.status(404).json({ message: 'Sender not found' });
+    }
+
+    const recipient = await User.findOne({ username: recipientUsername });
+    if (!recipient) {
+      return response.status(404).json({ message: 'Recipient not found' });
+    }
+
+    if (sender.byteBalance < amount) {
+      return response.status(400).json({ message: 'Insufficient byte balance' });
+    }
+
+    sender.byteBalance -= amount;
+    recipient.byteBalance += amount;
+
+    await sender.save();
+    await recipient.save();
+
+
+    response.status(200).json({
+      message: `Successfully transferred ${amount} bytes to ${recipient.username}`,
+      sender: { username: sender.username, byteBalance: sender.byteBalance },
+      recipient: { username: recipient.username, byteBalance: recipient.byteBalance },
+    });
+
+    setImmediate(async () => {
+      try {
+        const senderNotification = new Notification({
+          userId: sender._id,
+          message: `You successfully transferred ${amount} bytes to ${recipient.username}.`,
+        });
+        await senderNotification.save();
+
+        const recipientNotification = new Notification({
+          userId: recipient._id,
+          message: `You have received ${amount} bytes from ${sender.username}.`,
+        });
+        await recipientNotification.save();
+      } catch (error) {
+        console.error('Error creating notifications:', error);
       }
+    });
 
-      const sender = await User.findById(senderId);
-      if (!sender) {
-          return response.status(404).json({ message: 'Sender not found' });
-      }
-
-      const recipient = await User.findOne({ username: recipientUsername });
-      if (!recipient) {
-          return response.status(404).json({ message: 'Recipient not found' });
-      }
-
-      if (sender.byteBalance < amount) {
-          return response.status(400).json({ message: 'Insufficient byte balance' });
-      }
-
-      sender.byteBalance -= amount; 
-      recipient.byteBalance += amount;  
-
-      await sender.save();
-      await recipient.save();
-
-      response.status(200).json({
-          message: `Successfully transferred ${amount} bytes to ${recipient.username}`,
-          sender: { username: sender.username, byteBalance: sender.byteBalance },
-          recipient: { username: recipient.username, byteBalance: recipient.byteBalance },
-      });
   } catch (error) {
-      console.error('Error during byte transfer:', error);
-      response.status(500).json({ message: 'Internal server error' });
+    console.error('Error during byte transfer:', error);
+    response.status(500).json({ message: 'Internal server error' });
   }
 };
 
+
+const jwt = require('jsonwebtoken');
+const Notification = require('../models/Notification'); 
+
+exports.fetchNotifications = async (request, response) => {
+  const token = request.headers.authorization?.split(' ')[1]; // Extract token from the Authorization header
+
+  if (!token) {
+    return response.status(401).json({ message: 'No token provided' });
+  }
+
+  try {
+
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+
+    let userId;
+    let restaurantId;
+
+    if (decodedToken.user) {
+      userId = decodedToken.user._id; 
+    } else if (decodedToken.restaurant) {
+      restaurantId = decodedToken.restaurant._id; 
+    }
+
+    if (!userId && !restaurantId) {
+      return response.status(400).json({ message: 'Invalid token data' });
+    }
+
+
+    const notifications = await Notification.find(userId ? { userId } : { restaurantId })
+      .sort({ createdAt: -1 })
+      .limit(10) 
+      .skip((request.query.page - 1) * 10); 
+
+    response.status(200).json({
+      message: 'Notifications fetched successfully',
+      notifications,
+    });
+  } catch (error) {
+    console.error('Error fetching notifications:', error);
+    response.status(500).json({ message: 'Error fetching notifications' });
+  }
+};
+
+  

@@ -64,7 +64,11 @@ const userSchema = new mongoose.Schema({
     nearestLandmark: {
         type: String,
         default: ''
-    }
+    },
+    notifications: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Notification',
+    }],
 }, {
     timestamps: true,
 });

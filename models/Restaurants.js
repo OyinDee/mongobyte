@@ -53,7 +53,10 @@ const restaurantSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Meal',
     }],
-
+    notifications: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Notification',
+    }],
     orders: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Order',
