@@ -243,11 +243,8 @@ exports.transferBytes = async (request, response) => {
 };
 
 
-const jwt = require('jsonwebtoken');
-const Notification = require('../models/Notification'); 
-
 exports.fetchNotifications = async (request, response) => {
-  const token = request.headers.authorization?.split(' ')[1]; // Extract token from the Authorization header
+  const token = request.headers.authorization?.split(' ')[1]; 
 
   if (!token) {
     return response.status(401).json({ message: 'No token provided' });
