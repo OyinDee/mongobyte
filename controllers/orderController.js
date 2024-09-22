@@ -180,7 +180,7 @@ exports.getOrderById = async (request, response) => {
 exports.orderConfirmation = async (request, response) => {
   const { orderId } = request.params;
   const { additionalFee, requestDescription } = request.body;
-
+console.log(request.body)
   try {
     var order = await Order.find({customId: orderId})
       .populate('user meals.meal restaurant');
@@ -205,8 +205,10 @@ exports.orderConfirmation = async (request, response) => {
         order.status = 'Confirmed';
       } else {
         order.status = 'Fee Requested';
-
+        // console.log(order)
         const user = await User.findById(order.user._id);
+        console.log(order)
+        await order.save();
         if (user && user.email) {
           const emailHtml = `
 <html>
@@ -270,7 +272,7 @@ exports.orderConfirmation = async (request, response) => {
     <div class="fee-info">
       <p>Additional Fee Requested: <span class="highlight">₦${parsedFee}</span></p>
       <p>Permitted Fee: ₦${order.fee}</p>
-      <p>Note: ${order.requestDescription || "Nill"}</p>
+      <p>Note: ${requestDescription || "Nill"}</p>
     </div>
 
     <p>Please log in to approve or contact support if you have any questions.</p>
@@ -281,16 +283,14 @@ exports.orderConfirmation = async (request, response) => {
   </div>
 </body>
 </html>
-
           `;
           await sendEmail(user.email, 'Order Additional Fee Request', 'Your order has a fee request that requires approval.', emailHtml);
         }
+
         return response.status(400).json({ message: 'Additional fee exceeds allowed limit. User notified to log in and approve.' });
       }
     }
 
-
-    await order.save();
     const restaurantNotification = new Notification({
       restaurantId: restaurant._id,
       message: `Order ${order.customId} has been confirmed and should be delivered soon.`,
