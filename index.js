@@ -15,8 +15,8 @@ app.use(cookieParser());
 
 
 app.use(cors({
-    origin: ['http://localhost:3000', 'https://yumbyte.netlify.app', 'https://bytego.vercel.app'],
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    origin: ['http://localhost:3000', 'http://localhost:3000/',  'https://yumbyte.netlify.app', 'https://yumbyte.netlify.app/', 'https://bytego.vercel.app', 'https://bytego.vercel.app/'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true
 }));

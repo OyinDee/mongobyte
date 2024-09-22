@@ -33,6 +33,13 @@ const orderSchema = new mongoose.Schema({
     },
     fee: {
         type: Number,
+        default: 600,
+    },
+    requestedFee:{
+        type: Number,
+    },
+    requestDescription:{
+        type: String
     },
     totalPrice: {
         type: Number,
@@ -40,7 +47,7 @@ const orderSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['Pending', 'Confirmed', 'Cancelled', 'Delivered'],
+        enum: ['Pending', 'Confirmed', 'Cancelled', 'Fee Requested'],
         default: 'Pending',
     },
     location: {
