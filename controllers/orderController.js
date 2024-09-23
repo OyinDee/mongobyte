@@ -180,12 +180,10 @@ exports.getOrderById = async (request, response) => {
 exports.orderConfirmation = async (request, response) => {
   const { orderId } = request.params;
   const { additionalFee, requestDescription } = request.body;
-console.log(request.body)
-  try {
-    var order = await Order.find({customId: orderId})
-      .populate('user meals.meal restaurant');
 
-    order = order[0]
+  try {
+    const order = await Order.findOne({ customId: orderId }).populate('user meals.meal restaurant');
+
     if (!order) {
       return response.status(404).json({ message: 'Order not found' });
     }
@@ -194,23 +192,124 @@ console.log(request.body)
     if (!restaurant) {
       return response.status(404).json({ message: 'Restaurant not found' });
     }
+
     if (requestDescription) {
       order.requestDescription = requestDescription;
     }
-    if (additionalFee) {
-      const parsedFee = parseFloat(additionalFee)
 
-      if ((parsedFee/10) <= order.fee) {
-        order.totalPrice += parsedFee
+    if (additionalFee) {
+      const parsedFee = parseFloat(additionalFee);
+
+      if ((parsedFee / 10) <= order.fee) {
+        order.totalPrice += (parsedFee / 10);
         order.status = 'Confirmed';
+        order.fee = (parsedFee / 10);
       } else {
         order.status = 'Fee Requested';
-        // console.log(order)
+
         const user = await User.findById(order.user._id);
-        console.log(order)
-        await order.save();
         if (user && user.email) {
           const emailHtml = `
+          <html>
+          <head>
+            <style>
+              body {
+                font-family: Arial, sans-serif;
+                background-color: #f5f5f5;
+                color: #333333;
+                margin: 0;
+                padding: 0;
+              }
+              .email-container {
+                width: 95%;
+                max-width: 600px;
+                margin: 0 auto;
+                background-color: #ffffff;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                overflow: hidden;
+                padding: 20px;
+                box-sizing: border-box;
+              }
+              h1 {
+                color: #333333;
+                font-size: 24px;
+                margin-bottom: 20px;
+              }
+              p {
+                color: #666666;
+                font-size: 16px;
+                line-height: 1.6;
+                margin-bottom: 15px;
+              }
+              .fee-info {
+                background-color: #f8f8f8;
+                padding: 15px;
+                border-radius: 8px;
+                margin-bottom: 20px;
+              }
+              .fee-info p {
+                color: #333333;
+                font-weight: bold;
+              }
+              .footer {
+                text-align: center;
+                font-size: 12px;
+                color: #999999;
+                margin-top: 20px;
+              }
+              .highlight {
+                color: #d9534f;
+              }
+            </style>
+          </head>
+          <body>
+            <div class="email-container">
+              <h1>Order Fee Request</h1>
+              <p>Your order with ID <strong>${order.customId}</strong> has a fee request that exceeds the permitted limit.</p>
+              
+              <div class="fee-info">
+                <p>Additional Fee Requested: <span class="highlight">₦${parsedFee}</span></p>
+                <p>Permitted Fee: ₦${(order.fee)*10}</p>
+                <p>Note: ${requestDescription || "Nill"}</p>
+              </div>
+
+              <p>Please log in to approve or contact support if you have any questions.</p>
+
+              <div class="footer">
+                <p>&copy; ${new Date().getFullYear()} Byte. All rights reserved.</p>
+              </div>
+            </div>
+          </body>
+          </html>
+          `;
+          await sendEmail(user.email, 'Order Additional Fee Request', 'Your order has a fee request that requires approval.', emailHtml);
+        }
+        await order.save();
+
+        return response.status(400).json({ message: 'Additional fee exceeds allowed limit. User notified to log in and approve.' });
+      }
+    }
+
+    const user = await User.findById(order.user._id);
+    if (!user) {
+      return response.status(404).json({ message: 'User not found' });
+    }
+
+    if (user.byteBalance < order.totalPrice) {
+      order.status = 'Cancelled';
+      await order.save();
+
+      const userNotification = new Notification({
+        userId: user._id,
+        message: `Order ${order.customId} has been cancelled due to insufficient balance.`,
+      });
+      await userNotification.save();
+      
+      user.notifications.push(userNotification._id);
+      await user.save();
+
+      const emailHtml = `
 <html>
 <head>
   <style>
@@ -222,7 +321,7 @@ console.log(request.body)
       padding: 0;
     }
     .email-container {
-      width: 85%;
+      width: 95%;
       max-width: 600px;
       margin: 0 auto;
       background-color: #ffffff;
@@ -243,13 +342,13 @@ console.log(request.body)
       line-height: 1.6;
       margin-bottom: 15px;
     }
-    .fee-info {
+    .order-info {
       background-color: #f8f8f8;
       padding: 15px;
       border-radius: 8px;
       margin-bottom: 20px;
     }
-    .fee-info p {
+    .order-info p {
       color: #333333;
       font-weight: bold;
     }
@@ -259,23 +358,20 @@ console.log(request.body)
       color: #999999;
       margin-top: 20px;
     }
-    .highlight {
-      color: #d9534f;
-    }
   </style>
 </head>
 <body>
   <div class="email-container">
-    <h1>Order Fee Request</h1>
-    <p>Your order with ID <strong>${order.customId}</strong> has a fee request that exceeds the permitted limit.</p>
+    <h1>Order Cancelled</h1>
+    <p>Your order has been cancelled due to insufficient balance.</p>
     
-    <div class="fee-info">
-      <p>Additional Fee Requested: <span class="highlight">₦${parsedFee}</span></p>
-      <p>Permitted Fee: ₦${order.fee}</p>
-      <p>Note: ${requestDescription || "Nill"}</p>
+    <div class="order-info">
+      <p>Order ID: ${order.customId}</p>
+      <p>Status: ${order.status}</p>
+      <p>Total Price: ₦${(order.totalPrice * 10).toFixed(2)} (including any additional fees)</p>
     </div>
 
-    <p>Please log in to approve or contact support if you have any questions.</p>
+    <p>Please top up your balance and place the order again if you wish.</p>
 
     <div class="footer">
       <p>&copy; ${new Date().getFullYear()} Byte. All rights reserved.</p>
@@ -283,31 +379,32 @@ console.log(request.body)
   </div>
 </body>
 </html>
-          `;
-          await sendEmail(user.email, 'Order Additional Fee Request', 'Your order has a fee request that requires approval.', emailHtml);
-        }
+      `;
+      await sendEmail(user.email, 'Order Cancelled', 'Your order has been cancelled due to insufficient balance.', emailHtml);
 
-        return response.status(400).json({ message: 'Additional fee exceeds allowed limit. User notified to log in and approve.' });
-      }
+      return response.status(400).json({ message: 'Insufficient balance. Order has been cancelled.' });
     }
+
+    order.status = 'Confirmed';
+    restaurant.walletBalance += Number(order.totalPrice * 10);
 
     const restaurantNotification = new Notification({
       restaurantId: restaurant._id,
       message: `Order ${order.customId} has been confirmed and should be delivered soon.`,
-  });
-  await restaurantNotification.save();
-  restaurant.notifications.push(restaurantNotification._id);
-  await restaurant.save();
-
-  const userNotification = new Notification({
+    });
+    await restaurantNotification.save();
+    restaurant.notifications.push(restaurantNotification._id);
+    await restaurant.save();
+    
+    const userNotification = new Notification({
       userId: order.user._id,
       message: `Your order ${order.customId} has been confirmed and will reach you soon!`,
-  });
-  await userNotification.save();
-  const user = await User.findById(order.user._id);
-  user.notifications.push(userNotification._id);
-  await user.save();
-
+    });
+    await userNotification.save();
+    
+    user.byteBalance -= order.totalPrice;
+    user.notifications.push(userNotification._id);
+    await user.save();
 
     if (user && user.email) {
       const emailHtml = `
@@ -322,7 +419,7 @@ console.log(request.body)
       padding: 0;
     }
     .email-container {
-      width: 85%;
+      width: 95%;
       max-width: 600px;
       margin: 0 auto;
       background-color: #ffffff;
@@ -380,14 +477,131 @@ console.log(request.body)
   </div>
 </body>
 </html>
-
       `;
       await sendEmail(user.email, 'Order Confirmed', 'Your order status has been updated.', emailHtml);
     }
 
+    await order.save();
+
     return response.status(200).json({ message: 'Order updated successfully!', order });
+
   } catch (error) {
-    console.error(error);
+    console.error('Error in order confirmation:', error);
+    return response.status(500).json({ message: 'Internal server error', error: error.message });
+  }
+};
+
+
+exports.markOrderAsDelivered = async (request, response) => {
+  const { orderId } = request.params;
+
+  try {
+    const order = await Order.findOne({ customId: orderId }).populate('user restaurant');
+
+    if (!order) {
+      return response.status(404).json({ message: 'Order not found' });
+    }
+
+
+    order.status = 'Delivered';
+    await order.save();
+
+    const userNotification = new Notification({
+      userId: order.user._id,
+      message: `Your order ${order.customId} has been delivered!`,
+    });
+    await userNotification.save();
+    
+    const user = await User.findById(order.user._id);
+    if (user && user.email) {
+      const emailHtml = `
+<html>
+<head>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+      color: #333333;
+      margin: 0;
+      padding: 0;
+    }
+    .email-container {
+      width: 95%;
+      max-width: 600px;
+      margin: 0 auto;
+      background-color: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    h1 {
+      color: #333333;
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+    p {
+      color: #666666;
+      font-size: 16px;
+      line-height: 1.6;
+      margin-bottom: 15px;
+    }
+    .order-info {
+      background-color: #f8f8f8;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+    .order-info p {
+      color: #333333;
+      font-weight: bold;
+    }
+    .footer {
+      text-align: center;
+      font-size: 12px;
+      color: #999999;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="email-container">
+    <h1>Order Almost At Your Door!</h1>
+    <p>Your order with ID <strong>${order.customId}</strong> has been sent out for delivery!</p>
+    
+    <div class="order-info">
+      <p>Order ID: ${order.customId}</p>
+      <p>Status: Delivered</p>
+      <p>Total Price: ₦${(order.totalPrice * 10).toFixed(2)}</p>
+    </div>
+
+    <p>Thank you for using our service. If you have any questions or need assistance, feel free to contact us.</p>
+
+    <div class="footer">
+      <p>&copy; ${new Date().getFullYear()} Byte. All rights reserved.</p>
+    </div>
+  </div>
+</body>
+</html>
+      `;
+      await sendEmail(user.email, 'Knock, Knock!', 'Your order has been sent out for delivery!.', emailHtml);
+    }
+
+    const restaurantNotification = new Notification({
+      restaurantId: order.restaurant._id,
+      message: `Order ${order.customId} has been delivered.`,
+    });
+    await restaurantNotification.save();
+    
+    const restaurant = await Restaurant.findById(order.restaurant._id);
+    restaurant.notifications.push(restaurantNotification._id);
+    await restaurant.save();
+
+    return response.status(200).json({ message: 'Order marked as delivered successfully!', order });
+    
+  } catch (error) {
+    console.error('Error marking order as delivered:', error);
     return response.status(500).json({ message: 'Internal server error', error: error.message });
   }
 };

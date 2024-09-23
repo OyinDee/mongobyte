@@ -330,6 +330,7 @@ exports.loginRestaurant = async (request, response) => {
                 location: restaurant.location,
                 meals: restaurant.meals,
                 contactNumber: restaurant.contactNumber,
+                walletBalance: restaurant.walletBalance
             },
             token: token
         });

@@ -14,4 +14,6 @@ router.get('/:userId/order-history', userControllers.getUserOrderHistory);
 
 router.patch('/:orderId', orderController.orderConfirmation);
 
+router.patch('/deliver/:orderId',  orderController.markOrderAsDelivered);
+
 module.exports = router;

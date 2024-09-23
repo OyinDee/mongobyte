@@ -3,7 +3,7 @@ const axios = require('axios');
 require('dotenv').config();
 const Payment = require('../models/payments');
 const { updateByteBalance } = require('./userControllers');
-const Notifications = require('../models/Notifications')
+const Notification = require('../models/Notifications')
 const initiatePayment = async (request, response) => {
   const { amount } = request.body;
 
