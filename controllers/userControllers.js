@@ -272,7 +272,8 @@ exports.fetchNotifications = async (request, response) => {
       .sort({ createdAt: -1 })
       .limit(10) 
       .skip((request.query.page - 1) * 10); 
-
+      
+      console.log(notifications)
     response.status(200).json({
       message: 'Notifications fetched successfully',
       notifications,
