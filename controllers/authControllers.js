@@ -3,23 +3,19 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const sendEmail = require('../configs/nodemailer');
 const Restaurant = require('../models/Restaurants');
-const Nofifications = require('../models/Notifications')
-
+const Notification = require('../models/Notifications');
 const generateVerificationCode = () => Math.floor(100000 + Math.random() * 900000).toString();
 
 exports.register = async (request, response) => {
     const { username, email, password, phoneNumber } = request.body;
-
     try {
         const verificationCode = generateVerificationCode();
-
         const newUser = new User({
             username,
             email,
             password,
             phoneNumber,
-            verificationCode,
-            notifications: ['Your registration was successful. Please check your email to verify your account.'],
+            verificationCode
         });
 
         await newUser.save();
@@ -49,8 +45,15 @@ exports.register = async (request, response) => {
         await sendEmail(email, 'Verify your email and start to byte!', null, emailHtml);
 
         response.status(201).json({ message: 'Registration successful! Please check your email to verify your account.' });
+
+        const userNotification = new Notification({
+            userId: newUser._id,
+            message: 'Your registration was successful. Please check your email to verify your account.'
+        });
+        await userNotification.save();
+        newUser.notifications.push(userNotification._id);
+        await newUser.save();
     } catch (error) {
-        console.error(error.message);
         if (error.code === 11000) {
             const field = Object.keys(error.keyValue)[0];
             response.status(400).json({ message: `${field} already exists` });
@@ -62,7 +65,6 @@ exports.register = async (request, response) => {
 
 exports.login = async (request, response) => {
     const { username, password } = request.body;
-
     try {
         const user = await User.findOne({ username });
         if (!user) {
@@ -106,13 +108,19 @@ exports.login = async (request, response) => {
 
             await sendEmail(user.email, 'Verify your email and start to byte!', `Here's your new code: ${newVerificationCode}.`, emailHtml);
 
-            user.notifications.push('Login successful, but your email is not verified. A new verification code has been sent to your email.');
-            await user.save();
-
-            return response.status(200).json({
+            response.status(200).json({
                 message: 'Login successful, but email verification is pending. A new verification code has been sent to your email.',
                 isVerified: false,
             });
+
+            const userNotification = new Notification({
+                userId: user._id,
+                message: 'Login successful, but your email is not verified. A new verification code has been sent to your email.'
+            });
+            await userNotification.save();
+            user.notifications.push(userNotification._id);
+            await user.save();
+            return;
         }
 
         const token = jwt.sign({ user }, process.env.JWT_SECRET);
@@ -131,15 +139,21 @@ exports.login = async (request, response) => {
             },
             token,
         });
+
+        const userNotification = new Notification({
+            userId: user._id,
+            message: 'Login successful!'
+        });
+        await userNotification.save();
+        user.notifications.push(userNotification._id);
+        await user.save();
     } catch (error) {
-        console.error(error);
         response.status(500).json({ message: 'Internal server error' });
     }
 };
 
 exports.verifyEmail = async (request, response) => {
     const { code } = request.query;
-
     try {
         const user = await User.findOne({ verificationCode: code });
         if (!user) {
@@ -148,19 +162,24 @@ exports.verifyEmail = async (request, response) => {
 
         user.isVerified = true;
         user.verificationCode = null;
-        user.notifications.push('Email verified successfully.');
         await user.save();
 
         response.json({ message: 'Email verified successfully' });
+
+        const userNotification = new Notification({
+            userId: user._id,
+            message: 'Email verified successfully.'
+        });
+        await userNotification.save();
+        user.notifications.push(userNotification._id);
+        await user.save();
     } catch (error) {
-        console.error(error);
         response.status(400).json({ message: 'Invalid or expired verification code' });
     }
 };
 
 exports.forgotPassword = async (request, response) => {
     const { email } = request.body;
-
     try {
         const user = await User.findOne({ email });
         if (!user) {
@@ -168,7 +187,6 @@ exports.forgotPassword = async (request, response) => {
         }
 
         const resetCode = generateVerificationCode();
-
         user.resetCode = resetCode;
         user.resetCodeExpires = Date.now() + 3600000;
         await user.save();
@@ -201,34 +219,44 @@ exports.forgotPassword = async (request, response) => {
 
         await sendEmail(email, 'Password Reset Code', `Here is your password reset code: ${resetCode}`, passwordResetEmailHtml);
 
-        user.notifications.push('Password reset code sent to your email.');
-        await user.save();
-
         response.status(200).json({ message: 'Password reset code sent to your email' });
+
+        const userNotification = new Notification({
+            userId: user._id,
+            message: 'Password reset code sent to your email.'
+        });
+        await userNotification.save();
+        user.notifications.push(userNotification._id);
+        await user.save();
     } catch (error) {
-        console.error(error);
         response.status(500).json({ message: 'Internal server error' });
     }
 };
 
+
 exports.resetPassword = async (request, response) => {
     const { email, resetCode, newPassword } = request.body;
-
     try {
         const user = await User.findOne({ email, resetCode, resetCodeExpires: { $gt: Date.now() } });
         if (!user) {
             return response.status(400).json({ message: 'Invalid or expired reset code' });
         }
 
-        user.password = await bcrypt.hash(newPassword, 10);
+        user.password = newPassword;
         user.resetCode = null;
         user.resetCodeExpires = null;
-        user.notifications.push('Password reset successfully.');
         await user.save();
 
-        response.json({ message: 'Password reset successfully' });
+        response.status(200).json({ message: 'Password reset successfully' });
+
+        const userNotification = new Notification({
+            userId: user._id,
+            message: 'Your password has been reset successfully.'
+        });
+        await userNotification.save();
+        user.notifications.push(userNotification._id);
+        await user.save();
     } catch (error) {
-        console.error(error);
         response.status(500).json({ message: 'Internal server error' });
     }
 };

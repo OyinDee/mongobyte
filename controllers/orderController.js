@@ -3,7 +3,7 @@ const Restaurant = require('../models/Restaurants');
 const sendEmail = require('../configs/nodemailer');
 const User = require('../models/User');
 const Meal = require('../models/Meals')
-const Nofifications = require('../models/Notifications')
+const Nofification = require('../models/Notifications')
 
 exports.createOrder = async (request, response) => {
     const { user, meals, note, totalPrice, location, phoneNumber, restaurantCustomId, nearestLandmark, fee } = request.body[0];
