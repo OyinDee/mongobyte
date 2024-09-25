@@ -741,7 +741,7 @@ exports.handleOrderStatus = async (request, response) => {
 </html>
         `;
         await sendEmail(user.email, 'Order Confirmation', 'Your order has been confirmed!', emailHtml);
-        await sendEmail(Restaurant.email, 'Order Confirmation after fee review', 'Order has been confirmed, wallet has been credited! Check dashboard and deliver...', emailHtml);
+        await sendEmail(restaurant.email, 'Order Confirmation after fee review', 'Order has been confirmed, wallet has been credited! Check dashboard and deliver...', emailHtml);
       }
 
     } else if (action === 'cancel') {
