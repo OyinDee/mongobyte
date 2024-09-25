@@ -168,12 +168,19 @@ exports.getUserOrderHistory = async (request, response) => {
     const { username } = request.params;
 
     try {
-        const user = await User.findOne({username});
+const user = await User.findOne({ username })
+  .populate({
+    path: 'orderHistory',
+    populate: {
+      path: 'meals.meal',
+      model: 'Meal',
+    }
+  });
         if (!user) {
             return response.status(404).json({ message: 'User not found' });
         }
-        const orderHistory = await User.findById(user.orderHistory);
-        return response.json(orderHistory);
+        
+        return response.json(user.orderHistory);
     } catch (error) {
         console.error(error);
         return response.status(500).json({ message: 'Internal server error' });
