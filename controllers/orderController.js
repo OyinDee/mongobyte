@@ -201,9 +201,9 @@ exports.orderConfirmation = async (request, response) => {
       const parsedFee = parseFloat(additionalFee);
 
       order.totalPrice += (parsedFee / 10);
+      order.fee = (parsedFee / 10);
       if ((parsedFee / 10) <= order.fee) {
         order.status = 'Confirmed';
-        order.fee = (parsedFee / 10);
       } else {
         order.status = 'Fee Requested';
 
@@ -270,7 +270,7 @@ exports.orderConfirmation = async (request, response) => {
               
               <div class="fee-info">
                 <p>Additional Fee Requested: <span class="highlight">₦${parsedFee}</span></p>
-                <p>Permitted Fee: ₦${(order.fee)*10}</p>
+                <p>Permitted Fee: ₦${(order.fee-parsedFee)*10}</p>
                 <p>Note: ${requestDescription || "No attatched description"}</p>
               </div>
 
