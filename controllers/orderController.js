@@ -638,7 +638,7 @@ exports.handleOrderStatus = async (request, response) => {
         await userNotification.save();
 
         const restaurantNotification = new Notification({
-          userId: restaurant._id,
+          restaurantId: restaurant._id,
           message: `Order ${order.customId} has been cancelled due to user's insufficient balance.`,
         });
         await restaurantNotification.save();
@@ -663,7 +663,7 @@ exports.handleOrderStatus = async (request, response) => {
 
 
       const restaurantNotification = new Notification({
-        userId: restaurant._id,
+        restaurantId: restaurant._id,
         message: `Order ${order.customId} has been confirmed!`,
       });
       await restaurantNotification.save();
@@ -723,12 +723,12 @@ exports.handleOrderStatus = async (request, response) => {
 <body>
   <div class="email-container">
     <h1>Order Confirmed!</h1>
-    <p>Your order with ID <strong>${order.customId}</strong> has been confirmed!</p>
+    <p>Order with ID <strong>${order.customId}</strong> has just  been confirmed!</p>
     
     <div class="order-info">
       <p>Order ID: ${order.customId}</p>
       <p>Status: Confirmed</p>
-      <p>Total Price: ₦${order.totalPrice.toFixed(2)}</p>
+      <p>Total Price: ₦${(order.totalPrice*10).toFixed(2)}</p>
     </div>
 
     <p>Thank you for using our service. If you have any questions or need assistance, feel free to contact us.</p>
@@ -741,6 +741,7 @@ exports.handleOrderStatus = async (request, response) => {
 </html>
         `;
         await sendEmail(user.email, 'Order Confirmation', 'Your order has been confirmed!', emailHtml);
+        await sendEmail(Restaurant.email, 'Order Confirmation after fee review', 'Order has been confirmed, wallet has been credited! Check dashboard and deliver...', emailHtml);
       }
 
     } else if (action === 'cancel') {
@@ -759,7 +760,7 @@ exports.handleOrderStatus = async (request, response) => {
       await userNotification.save();
 
       const restaurantNotification = new Notification({
-        userId: restaurant._id,
+        restaurantId: restaurant._id,
         message: `Order ${order.customId} has been canceled.`,
       });
       await restaurantNotification.save();
@@ -819,12 +820,12 @@ exports.handleOrderStatus = async (request, response) => {
 <body>
   <div class="email-container">
     <h1>Order Canceled</h1>
-    <p>Your order with ID <strong>${order.customId}</strong> has been canceled.</p>
+    <p>Order with ID <strong>${order.customId}</strong> has been canceled.</p>
     
     <div class="order-info">
       <p>Order ID: ${order.customId}</p>
       <p>Status: Canceled</p>
-      <p>Total Price: ₦${order.totalPrice.toFixed(2)}</p>
+      <p>Total Price: ₦${(order.totalPrice*10).toFixed(2)}</p>
     </div>
 
     <p>We apologize for the inconvenience. If you have any questions or need assistance, feel free to contact us.</p>
@@ -837,6 +838,8 @@ exports.handleOrderStatus = async (request, response) => {
 </html>
         `;
         await sendEmail(user.email, 'Order Canceled', 'Your order has been canceled', emailHtml);
+        await sendEmail(restaurant.email, 'Order Canceled', 'Order has been canceled', emailHtml);
+
       }
     }
 
