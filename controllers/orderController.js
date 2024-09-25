@@ -619,25 +619,29 @@ exports.handleOrderStatus = async (request, response) => {
     const order = await Order.findOne({ customId: orderId }).populate('restaurant').populate('user');
     if (!order) return response.status(404).json({ message: 'Order not found' });
 
+    const user = await User.findById(order.user._id);
+    const restaurant = await Restaurant.findById(order.restaurant._id);
+
     if (action === 'accept') {
       if (order.status !== 'Fee Requested') {
         return response.status(400).json({ message: 'Order cannot be accepted at this stage' });
       }
 
-      const user = await User.findById(order.user._id);
-      if (user.byteBalance < (order.totalPrice/10)) {
+      if (user.byteBalance < (order.totalPrice)) {
         order.status = 'Canceled';
         await order.save();
+
         const userNotification = new Notification({
           userId: user._id,
           message: `Order ${order.customId} has been cancelled due to insufficient balance.`,
         });
+        await userNotification.save();
+
         const restaurantNotification = new Notification({
           userId: restaurant._id,
-          message: `Order ${order.customId} has been cancelled due to user's  insufficient balance.`,
+          message: `Order ${order.customId} has been cancelled due to user's insufficient balance.`,
         });
-          userNotification.save();
-          restaurantNotification.save();
+        await restaurantNotification.save();
 
         return response.status(400).json({ message: 'Insufficient balance, order has been canceled, sorry...' });
       }
@@ -645,14 +649,100 @@ exports.handleOrderStatus = async (request, response) => {
       user.byteBalance -= order.totalPrice;
       await user.save();
 
-      const restaurant = await Restaurant.findById(order.restaurant._id);
       restaurant.walletBalance += Number(order.totalPrice * 10);
       await restaurant.save();
 
       order.status = 'Confirmed';
       await order.save();
 
-      await notifyAndEmail(order, user, restaurant, 'Order Accepted', 'Your order has been confirmed!');
+      const userNotification = new Notification({
+        userId: user._id,
+        message: `Your order ${order.customId} has been confirmed!`,
+      });
+      await userNotification.save();
+
+
+      const restaurantNotification = new Notification({
+        userId: restaurant._id,
+        message: `Order ${order.customId} has been confirmed!`,
+      });
+      await restaurantNotification.save();
+
+      if (user.email) {
+        const emailHtml = `
+<html>
+<head>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+      color: #333333;
+      margin: 0;
+      padding: 0;
+    }
+    .email-container {
+      width: 95%;
+      max-width: 600px;
+      margin: 0 auto;
+      background-color: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    h1 {
+      color: #333333;
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+    p {
+      color: #666666;
+      font-size: 16px;
+      line-height: 1.6;
+      margin-bottom: 15px;
+    }
+    .order-info {
+      background-color: #f8f8f8;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+    .order-info p {
+      color: #333333;
+      font-weight: bold;
+    }
+    .footer {
+      text-align: center;
+      font-size: 12px;
+      color: #999999;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="email-container">
+    <h1>Order Confirmed!</h1>
+    <p>Your order with ID <strong>${order.customId}</strong> has been confirmed!</p>
+    
+    <div class="order-info">
+      <p>Order ID: ${order.customId}</p>
+      <p>Status: Confirmed</p>
+      <p>Total Price: ₦${order.totalPrice.toFixed(2)}</p>
+    </div>
+
+    <p>Thank you for using our service. If you have any questions or need assistance, feel free to contact us.</p>
+
+    <div class="footer">
+      <p>&copy; ${new Date().getFullYear()} Byte. All rights reserved.</p>
+    </div>
+  </div>
+</body>
+</html>
+        `;
+        await sendEmail(user.email, 'Order Confirmation', 'Your order has been confirmed!', emailHtml);
+      }
+
     } else if (action === 'cancel') {
       if (order.status !== 'Fee Requested') {
         return response.status(400).json({ message: 'Order cannot be canceled at this stage' });
@@ -661,7 +751,93 @@ exports.handleOrderStatus = async (request, response) => {
       order.status = 'Canceled';
       await order.save();
 
-      await notifyAndEmail(order, order.user, order.restaurant, 'Order Canceled', 'Your order has been canceled.');
+
+      const userNotification = new Notification({
+        userId: user._id,
+        message: `Your order ${order.customId} has been canceled.`,
+      });
+      await userNotification.save();
+
+      const restaurantNotification = new Notification({
+        userId: restaurant._id,
+        message: `Order ${order.customId} has been canceled.`,
+      });
+      await restaurantNotification.save();
+
+      if (user.email) {
+        const emailHtml = `
+<html>
+<head>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+      color: #333333;
+      margin: 0;
+      padding: 0;
+    }
+    .email-container {
+      width: 95%;
+      max-width: 600px;
+      margin: 0 auto;
+      background-color: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    h1 {
+      color: #333333;
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+    p {
+      color: #666666;
+      font-size: 16px;
+      line-height: 1.6;
+      margin-bottom: 15px;
+    }
+    .order-info {
+      background-color: #f8f8f8;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+    .order-info p {
+      color: #333333;
+      font-weight: bold;
+    }
+    .footer {
+      text-align: center;
+      font-size: 12px;
+      color: #999999;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="email-container">
+    <h1>Order Canceled</h1>
+    <p>Your order with ID <strong>${order.customId}</strong> has been canceled.</p>
+    
+    <div class="order-info">
+      <p>Order ID: ${order.customId}</p>
+      <p>Status: Canceled</p>
+      <p>Total Price: ₦${order.totalPrice.toFixed(2)}</p>
+    </div>
+
+    <p>We apologize for the inconvenience. If you have any questions or need assistance, feel free to contact us.</p>
+
+    <div class="footer">
+      <p>&copy; ${new Date().getFullYear()} Byte. All rights reserved.</p>
+    </div>
+  </div>
+</body>
+</html>
+        `;
+        await sendEmail(user.email, 'Order Canceled', 'Your order has been canceled', emailHtml);
+      }
     }
 
     return response.status(200).json({ message: `Order ${action}ed successfully`, order });
@@ -672,109 +848,5 @@ exports.handleOrderStatus = async (request, response) => {
 };
 
 
-const notifyAndEmail = async (order, user, restaurant, statusMessage, emailSubject) => {
-  const userNotification = new Notification({
-    userId: user._id,
-    message: `Your order ${order.customId} has been ${statusMessage.toLowerCase()}.`,
-  });
-  await userNotification.save();
 
-  if (user.email) {
-    const emailHtml = `
-<html>
-<head>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f5f5f5;
-      color: #333333;
-    }
-    .email-container {
-      width: 90%;
-      max-width: 600px;
-      margin: 0 auto;
-      background-color: #ffffff;
-      padding: 20px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    }
-    h1 {
-      font-size: 24px;
-      margin-bottom: 20px;
-    }
-    p {
-      font-size: 16px;
-      margin-bottom: 10px;
-    }
-    .footer {
-      text-align: center;
-      font-size: 12px;
-      margin-top: 20px;
-    }
-  </style>
-</head>
-<body>
-  <div class="email-container">
-    <h1>${statusMessage}</h1>
-    <p>Your order with ID <strong>${order.customId}</strong> has been ${statusMessage.toLowerCase()}.</p>
-    <p>Thank you for using our service!</p>
-    <div class="footer">&copy; ${new Date().getFullYear()} Byte. All rights reserved.</div>
-  </div>
-</body>
-</html>
-    `;
-    await sendEmail(user.email, emailSubject, emailHtml);
-  }
-
-  const restaurantNotification = new Notification({
-    userId: restaurant._id, 
-    message: `Order ${order.customId} has been ${statusMessage.toLowerCase()}.`,
-  });
-  await restaurantNotification.save();
-
-  if (restaurant.email) {
-    const emailHtml2 = `
-    <html>
-    <head>
-      <style>
-        body {
-          font-family: Arial, sans-serif;
-          background-color: #f5f5f5;
-          color: #333333;
-        }
-        .email-container {
-          width: 90%;
-          max-width: 600px;
-          margin: 0 auto;
-          background-color: #ffffff;
-          padding: 20px;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-        h1 {
-          font-size: 24px;
-          margin-bottom: 20px;
-        }
-        p {
-          font-size: 16px;
-          margin-bottom: 10px;
-        }
-        .footer {
-          text-align: center;
-          font-size: 12px;
-          margin-top: 20px;
-        }
-      </style>
-    </head>
-    <body>
-      <div class="email-container">
-        <h1>${statusMessage}</h1>
-        <p>Order with ID <strong>${order.customId}</strong> has been ${statusMessage.toLowerCase()}.</p>
-        <p>Should be available on your dashboard.</p>
-        <div class="footer">&copy; ${new Date().getFullYear()} Byte. All rights reserved.</div>
-      </div>
-    </body>
-    </html>
-        `;
-    await sendEmail(restaurant.email, emailSubject, emailHtml2);
-  }
-};
 
