@@ -16,4 +16,6 @@ router.patch('/:orderId', orderController.orderConfirmation);
 
 router.patch('/deliver/:orderId',  orderController.markOrderAsDelivered);
 
+router.post('/:orderId/status', orderController.handleOrderStatus);
+
 module.exports = router;

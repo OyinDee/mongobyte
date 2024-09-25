@@ -609,3 +609,120 @@ exports.markOrderAsDelivered = async (request, response) => {
     return response.status(500).json({ message: 'Internal server error', error: error.message });
   }
 };
+
+
+const handleOrderStatus = async (request, response) => {
+  try {
+    const { orderId } = request.params;
+    const { action } = request.body; 
+
+    const order = await Order.findOne({ customId: orderId }).populate('restaurant').populate('user');
+    if (!order) return response.status(404).json({ message: 'Order not found' });
+
+    if (action === 'accept') {
+      if (order.status !== 'Fee Requested') {
+        return response.status(400).json({ message: 'Order cannot be accepted at this stage' });
+      }
+
+      const user = await User.findById(order.user._id);
+      if (user.byteBalance < order.totalPrice) {
+        order.status = 'Canceled';
+        await order.save();
+        return response.status(400).json({ message: 'Insufficient balance, order has been canceled, sorry...' });
+      }
+
+      user.byteBalance -= order.totalPrice;
+      await user.save();
+
+      const restaurant = await Restaurant.findById(order.restaurant._id);
+      restaurant.walletBalance += Number(order.totalPrice * 10);
+      await restaurant.save();
+
+      order.status = 'Confirmed';
+      await order.save();
+
+      await notifyAndEmail(order, user, restaurant, 'Order Accepted', 'Your order has been confirmed!');
+    } else if (action === 'cancel') {
+      if (order.status !== 'Fee Requested') {
+        return response.status(400).json({ message: 'Order cannot be canceled at this stage' });
+      }
+
+      order.status = 'Canceled';
+      await order.save();
+
+      await notifyAndEmail(order, order.user, order.restaurant, 'Order Canceled', 'Your order has been canceled.');
+    }
+
+    return response.status(200).json({ message: `Order ${action}ed successfully`, order });
+  } catch (error) {
+    console.error('Error handling order:', error);
+    return response.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+
+const notifyAndEmail = async (order, user, restaurant, statusMessage, emailSubject) => {
+  const userNotification = new Notification({
+    userId: user._id,
+    message: `Your order ${order.customId} has been ${statusMessage.toLowerCase()}.`,
+  });
+  await userNotification.save();
+
+  if (user.email) {
+    const emailHtml = `
+<html>
+<head>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+      color: #333333;
+    }
+    .email-container {
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+      background-color: #ffffff;
+      padding: 20px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+    p {
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+    .footer {
+      text-align: center;
+      font-size: 12px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="email-container">
+    <h1>${statusMessage}</h1>
+    <p>Your order with ID <strong>${order.customId}</strong> has been ${statusMessage.toLowerCase()}.</p>
+    <p>Thank you for using our service!</p>
+    <div class="footer">&copy; ${new Date().getFullYear()} Byte. All rights reserved.</div>
+  </div>
+</body>
+</html>
+    `;
+    await sendEmail(user.email, emailSubject, emailHtml);
+  }
+
+  const restaurantNotification = new Notification({
+    userId: restaurant._id, 
+    message: `Order ${order.customId} has been ${statusMessage.toLowerCase()}.`,
+  });
+  await restaurantNotification.save();
+
+  if (restaurant.email) {
+    await sendEmail(restaurant.email, emailSubject, `Order ${order.customId} has been ${statusMessage.toLowerCase()}. Check for it in your confirmed orders...`);
+  }
+};
+
+module.exports = { handleOrderStatus };
