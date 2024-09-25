@@ -611,7 +611,7 @@ exports.markOrderAsDelivered = async (request, response) => {
 };
 
 
-const handleOrderStatus = async (request, response) => {
+exports.handleOrderStatus = async (request, response) => {
   try {
     const { orderId } = request.params;
     const { action } = request.body; 
@@ -679,7 +679,7 @@ const notifyAndEmail = async (order, user, restaurant, statusMessage, emailSubje
       color: #333333;
     }
     .email-container {
-      width: 100%;
+      width: 90%;
       max-width: 600px;
       margin: 0 auto;
       background-color: #ffffff;
@@ -721,8 +721,49 @@ const notifyAndEmail = async (order, user, restaurant, statusMessage, emailSubje
   await restaurantNotification.save();
 
   if (restaurant.email) {
-    await sendEmail(restaurant.email, emailSubject, `Order ${order.customId} has been ${statusMessage.toLowerCase()}. Check for it in your confirmed orders...`);
+    const emailHtml2 = `
+    <html>
+    <head>
+      <style>
+        body {
+          font-family: Arial, sans-serif;
+          background-color: #f5f5f5;
+          color: #333333;
+        }
+        .email-container {
+          width: 90%;
+          max-width: 600px;
+          margin: 0 auto;
+          background-color: #ffffff;
+          padding: 20px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+          font-size: 24px;
+          margin-bottom: 20px;
+        }
+        p {
+          font-size: 16px;
+          margin-bottom: 10px;
+        }
+        .footer {
+          text-align: center;
+          font-size: 12px;
+          margin-top: 20px;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="email-container">
+        <h1>${statusMessage}</h1>
+        <p>Order with ID <strong>${order.customId}</strong> has been ${statusMessage.toLowerCase()}.</p>
+        <p>Should be available on your dashboard.</p>
+        <div class="footer">&copy; ${new Date().getFullYear()} Byte. All rights reserved.</div>
+      </div>
+    </body>
+    </html>
+        `;
+    await sendEmail(restaurant.email, emailSubject, emailHtml2);
   }
 };
 
-module.exports = { handleOrderStatus };

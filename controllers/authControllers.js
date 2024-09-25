@@ -25,7 +25,7 @@ exports.register = async (request, response) => {
         <head>
           <style>
             body { font-family: Arial, sans-serif; color: #000000; }
-            .container { width: 100%; max-width: 600px; margin: 20px auto; padding: 20px; border: 1px solid #dddddd; border-radius: 8px; background-color: #ffffff; }
+            .container { width: 90%; max-width: 600px; margin: 20px auto; padding: 20px; border: 1px solid #dddddd; border-radius: 8px; background-color: #ffffff; }
             .header { text-align: center; border-bottom: 1px solid #dddddd; padding-bottom: 10px; margin-bottom: 20px; }
             .content { font-size: 16px; line-height: 1.5; }
           </style>
@@ -86,7 +86,7 @@ exports.login = async (request, response) => {
             <head>
               <style>
                 body { font-family: Arial, sans-serif; color: #000000; }
-                .container { width: 85%; max-width: 600px; margin: 20px auto; padding: 20px; border: 1px solid #dddddd; border-radius: 8px; background-color: #ffffff; }
+                .container { width: 90%; max-width: 600px; margin: 20px auto; padding: 20px; border: 1px solid #dddddd; border-radius: 8px; background-color: #ffffff; }
                 .header { text-align: center; border-bottom: 1px solid #dddddd; padding-bottom: 10px; margin-bottom: 20px; }
                 .content { font-size: 16px; line-height: 1.5; }
                 .code { font-weight: bold; font-size: 24px; margin-top: 20px; text-align: center; color: #333; }
