@@ -14,5 +14,6 @@ router.get('/restaurants', userControllers.getAllRestaurants);
 router.post('/transfer', authenticate, userControllers.transferBytes)
 router.get('/restdetails/:id', restaurantControllers.getRestaurantById)
 router.get('/notifications', userControllers.fetchNotifications);
+router.get('/orders', userControllers.getUserOrderHistory);
 
 module.exports = router;

@@ -111,13 +111,13 @@ exports.updateByteBalance = async (request) => {
       await user.save();
     } catch (error) {
       console.error('Error updating byte balance:', error);
-      throw error; //
+      throw error; 
     }
   };
   
   
 
-// Get all restaurants
+
 exports.getAllRestaurants = async (request, response) => {
     try {
         const restaurants = await Restaurant.find().populate('meals');
@@ -129,47 +129,46 @@ exports.getAllRestaurants = async (request, response) => {
 };
 
 
-// Create a new order
 exports.createOrder = async (request, response) => {
-    const userId = request.user._id; // Assuming user ID is available in request after authentication
-    const { meals } = request.body;
+    // const userId = request.user._id;
+    // const { meals } = request.body;
 
-    try {
-        // Calculate total price and validate meals
-        let totalPrice = 0;
-        const mealDetails = await Promise.all(meals.map(async (mealItem) => {
-            const meal = await Meal.findById(mealItem.meal);
-            if (!meal) {
-                throw new Error('Meal not found');
-            }
-            totalPrice += meal.price * mealItem.quantity;
-            return { meal: meal._id, quantity: mealItem.quantity };
-        }));
+    // try {
 
-        // Create a new order
-        const newOrder = new Order({
-            user: userId,
-            meals: mealDetails,
-            totalPrice,
-        });
+    //     let totalPrice = 0;
+    //     const mealDetails = await Promise.all(meals.map(async (mealItem) => {
+    //         const meal = await Meal.findById(mealItem.meal);
+    //         if (!meal) {
+    //             throw new Error('Meal not found');
+    //         }
+    //         totalPrice += meal.price * mealItem.quantity;
+    //         return { meal: meal._id, quantity: mealItem.quantity };
+    //     }));
 
-        await newOrder.save();
+    //     // Create a new order
+    //     const newOrder = new Order({
+    //         user: userId,
+    //         meals: mealDetails,
+    //         totalPrice,
+    //     });
 
-        response.status(201).json({
-            message: 'Order placed successfully!',
-            order: newOrder,
-        });
-    } catch (error) {
-        console.error(error);
-        response.status(500).json({ message: 'Internal server error' });
-    }
+    //     await newOrder.save();
+
+    //     response.status(201).json({
+    //         message: 'Order placed successfully!',
+    //         order: newOrder,
+    //     });
+    // } catch (error) {
+    //     console.error(error);
+    //     response.status(500).json({ message: 'Internal server error' });
+    // }
 };
 
 exports.getUserOrderHistory = async (request, response) => {
-    const { userId } = request.params;
+    const { username } = request.params;
 
     try {
-        const user = await User.findById(userId).populate('orderHistory');
+        const user = await User.findOne(username).populate('orderHistory');
         if (!user) {
             return response.status(404).json({ message: 'User not found' });
         }

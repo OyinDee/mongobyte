@@ -44,7 +44,7 @@ exports.createOrder = async (request, response) => {
         await userDoc.save();
         const restaurantNotification = new Notification({
           restaurantId: restaurant._id,
-          message: `You have received a new order with ID: ${newOrder._id}.`,
+          message: `You have received a new order with ID: ${newOrder.customId}.`,
       });
       await restaurantNotification.save();
       restaurant.notifications.push(restaurantNotification._id);
@@ -271,10 +271,10 @@ exports.orderConfirmation = async (request, response) => {
               <div class="fee-info">
                 <p>Additional Fee Requested: <span class="highlight">₦${parsedFee}</span></p>
                 <p>Permitted Fee: ₦${(order.fee)*10}</p>
-                <p>Note: ${requestDescription || "Nill"}</p>
+                <p>Note: ${requestDescription || "No attatched description"}</p>
               </div>
 
-              <p>Please log in to approve or contact support if you have any questions.</p>
+              <p>Please log in and check your order history to approve or cancel this order or contact support if you have any questions.</p>
 
               <div class="footer">
                 <p>&copy; ${new Date().getFullYear()} Byte. All rights reserved.</p>
@@ -369,6 +369,8 @@ exports.orderConfirmation = async (request, response) => {
       <p>Order ID: ${order.customId}</p>
       <p>Status: ${order.status}</p>
       <p>Total Price: ₦${(order.totalPrice * 10).toFixed(2)} (including any additional fees)</p>
+                <p>Note: ${requestDescription || "No attatched description"}</p>
+
     </div>
 
     <p>Please top up your balance and place the order again if you wish.</p>
@@ -390,7 +392,7 @@ exports.orderConfirmation = async (request, response) => {
 
     const restaurantNotification = new Notification({
       restaurantId: restaurant._id,
-      message: `Order ${order.customId} has been confirmed and should be delivered soon.`,
+      message: `Order ${order.customId} has been confirmed, ₦${order.totalPrice*10} has been added to your wallet,  and order should be delivered soon.`,
     });
     await restaurantNotification.save();
     restaurant.notifications.push(restaurantNotification._id);
@@ -467,6 +469,8 @@ exports.orderConfirmation = async (request, response) => {
       <p>Order ID: ${order.customId}</p>
       <p>Status: ${order.status}</p>
       <p>Total Price: ₦${(order.totalPrice * 10).toFixed(2)} (including any additional fees)</p>
+                <p>Note: ${requestDescription || "No attatched description"}</p>
+
     </div>
 
     <p>Thank you for your order. If you have any questions or concerns, feel free to reach out to our support team.</p>
