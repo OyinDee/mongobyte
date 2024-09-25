@@ -168,7 +168,7 @@ exports.getUserOrderHistory = async (request, response) => {
     const { username } = request.params;
 
     try {
-        const user = await User.findOne(username).populate('orderHistory');
+        const user = await User.findOne({username}).populate('orderHistory');
         if (!user) {
             return response.status(404).json({ message: 'User not found' });
         }
