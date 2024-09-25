@@ -200,8 +200,8 @@ exports.orderConfirmation = async (request, response) => {
     if (additionalFee) {
       const parsedFee = parseFloat(additionalFee);
 
+      order.totalPrice += (parsedFee / 10);
       if ((parsedFee / 10) <= order.fee) {
-        order.totalPrice += (parsedFee / 10);
         order.status = 'Confirmed';
         order.fee = (parsedFee / 10);
       } else {
@@ -625,9 +625,20 @@ exports.handleOrderStatus = async (request, response) => {
       }
 
       const user = await User.findById(order.user._id);
-      if (user.byteBalance < order.totalPrice) {
+      if (user.byteBalance < (order.totalPrice/10)) {
         order.status = 'Canceled';
         await order.save();
+        const userNotification = new Notification({
+          userId: user._id,
+          message: `Order ${order.customId} has been cancelled due to insufficient balance.`,
+        });
+        const restaurantNotification = new Notification({
+          userId: restaurant._id,
+          message: `Order ${order.customId} has been cancelled due to user's  insufficient balance.`,
+        });
+          userNotification.save();
+          restaurantNotification.save();
+
         return response.status(400).json({ message: 'Insufficient balance, order has been canceled, sorry...' });
       }
 
