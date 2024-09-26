@@ -4,7 +4,7 @@ const Restaurant = require('../models/Restaurants');
 
 exports.createMeal = async (request, response) => {
     const { customId } = request.params;
-    console.log(customId)
+
     try {
         const restaurant = await Restaurant.findOne({ customId:customId });
         if (!restaurant) {
@@ -81,11 +81,10 @@ exports.updateMeal = async (request, response) => {
 exports.deleteMeal = async (request, response) => {
     const { id } = request.params;
     const restaurantId  = request.restaurant._id; 
-    console.log(restaurantId )
+
 
     try {
         const restaurant = await Restaurant.findOne({ _id: restaurantId });
-        console.log(restaurant)
         const meal = await Meal.findOneAndDelete({ customId: id });
         if (!restaurant || !meal.restaurant.equals(restaurant._id)) {
             return response.status(403).json({ message: 'Unauthorized: You do not own this meal' });

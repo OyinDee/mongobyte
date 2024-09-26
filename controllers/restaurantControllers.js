@@ -3,6 +3,7 @@ const crypto = require('crypto')
 const sendEmail = require('../configs/nodemailer');
 const Meal = require('../models/Meals')
 const Withdrawal = require('../models/Withdrawals');
+const Notification = require('../models/Notifications')
 
 function generatePassword() {
     return crypto.randomBytes(5).toString('hex');
