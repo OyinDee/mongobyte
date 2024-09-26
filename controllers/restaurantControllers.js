@@ -15,11 +15,14 @@ exports.createRestaurant = async (request, response) => {
         ...request.body,
         password
     });
+
     try {
-        const existingRestaurant = await Restaurant.findOne({ email:request.body.email });
+
+        const existingRestaurant = await Restaurant.findOne({ email: request.body.email });
         if (existingRestaurant) {
             return response.status(400).json({ message: 'A restaurant with this email already exists.' });
         }
+
 
         await newRestaurant.save();
 
@@ -32,7 +35,7 @@ exports.createRestaurant = async (request, response) => {
               color: #000000;
             }
             .container {
-              width: 100%;
+              width: 90%;
               max-width: 600px;
               margin: 20px auto;
               padding: 20px;
@@ -76,14 +79,15 @@ exports.createRestaurant = async (request, response) => {
         </body>
         </html>
         `;
-        
+
         await sendEmail(
             newRestaurant.email, 
             'Your Restaurant Account Password', 
             `Welcome to Byte! Your login password is: ${password}`, 
-            passwordEmailHtml  
+            passwordEmailHtml
         );
-        
+
+
         return response.status(201).json({
             message: 'Restaurant registered successfully. Check your email for the password.',
             restaurant: {
@@ -96,7 +100,10 @@ exports.createRestaurant = async (request, response) => {
         });
     } catch (error) {
         console.error(error);
-        return response.status(500).json({ message: 'Server error. Please try again later.' });
+
+        if (!response.headersSent) {
+            return response.status(500).json({ message: 'Server error. Please try again later.' });
+        }
     }
 };
 

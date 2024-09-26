@@ -149,9 +149,9 @@ exports.getOrdersByRestaurant = async (request, response) => {
         .populate('user')
         .populate('meals.meal');
       
-        if (!orders.length) {
-            return response.status(404).json({ message: 'No orders found for this restaurant' });
-        }
+        // if (!orders.length) {
+        //     return response.status(404).json({ message: 'No orders found for this restaurant' });
+        // }
 
         response.json(orders);
     } catch (error) {
