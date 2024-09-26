@@ -46,7 +46,6 @@ const restaurantSchema = new mongoose.Schema({
     },
     password: {
         type: String,
-        required: true,
     },
     walletBalance: {
         type: Number,
