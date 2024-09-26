@@ -8,6 +8,7 @@ const authRoutes = require('./routes/authRoutes');
 const restaurantRoutes = require('./routes/restaurantRoutes');
 const mealRoutes = require('./routes/mealRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
+const superAdminRoutes = require('./routes/superAdminRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const connectDB = require('./configs/database');
 const cookieParser = require('cookie-parser');
@@ -34,7 +35,7 @@ app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/meals', mealRoutes);
 app.use('/api/v1/pay', paymentRoutes);
 app.use('/api/v1/orders', orderRoutes);
-
+app.use('/api/superadmin', superAdminRoutes);
 const PORT = process.env.PORT || 8080;
 server.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);

@@ -1,6 +1,6 @@
+const Restaurant = require('../models/Restaurants')
+const Order = require('../models/Orders')
 
-
-// Delete a restaurant
 exports.deleteRestaurant = async (request, response) => {
     const { id } = request.params;
     try {
@@ -15,7 +15,7 @@ exports.deleteRestaurant = async (request, response) => {
     }
 };
 
-// Create a new restaurant
+
 exports.createRestaurant = async (request, response) => {
     try {
         const restaurant = new Restaurant(request.body);
@@ -28,7 +28,7 @@ exports.createRestaurant = async (request, response) => {
 };
 
 
-// Get a single restaurant by customId
+
 exports.getRestaurantById = async (request, response) => {
     const { id } = request.params;
     try {
@@ -43,7 +43,7 @@ exports.getRestaurantById = async (request, response) => {
     }
 };
 
-// Get user's orders
+
 exports.getUserOrders = async (request, response) => {
     const userId = request.user.id;
 
@@ -56,7 +56,7 @@ exports.getUserOrders = async (request, response) => {
     }
 };
 
-// Update order status
+
 exports.updateOrderStatus = async (request, response) => {
     const { orderId } = request.params;
     const { status } = request.body;
@@ -83,7 +83,6 @@ exports.updateOrderStatus = async (request, response) => {
 };
 
 
-// Get all orders
 exports.getAllOrders = async (request, response) => {
     try {
         const orders = await Order.find().populate('user', 'username email').populate('meals.meal');
@@ -94,7 +93,6 @@ exports.getAllOrders = async (request, response) => {
     }
 };
 
-// Get a specific order by ID
 exports.getOrderById = async (request, response) => {
     const { orderId } = request.params;
 
@@ -110,7 +108,6 @@ exports.getOrderById = async (request, response) => {
     }
 };
 
-// Delete an order
 exports.deleteOrder = async (request, response) => {
     const { orderId } = request.params;
 

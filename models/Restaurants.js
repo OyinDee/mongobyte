@@ -14,6 +14,18 @@ const restaurantSchema = new mongoose.Schema({
         required: true,
         unique: true,
     },
+    bankName: {
+        type: String,
+        required: true,
+      },
+      accountNumber: {
+        type: String,
+        required: true,
+      },
+      accountHolder: {
+        type: String,
+        required: true,
+      },
     email: {
         type: String,
         required: true,

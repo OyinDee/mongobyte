@@ -2,6 +2,8 @@ const Restaurant = require('../models/Restaurants');
 const crypto = require('crypto')
 const sendEmail = require('../configs/nodemailer');
 const Meal = require('../models/Meals')
+const Withdrawal = require('../models/Withdrawals');
+
 function generatePassword() {
     return crypto.randomBytes(5).toString('hex');
 }
@@ -193,3 +195,184 @@ exports.getMealsByRestaurant = async (request, response) => {
         response.status(500).json({ message: 'Internal server error' });
     }
 };
+
+exports.createWithdrawal = async (req, res) => {
+    const { restaurantName, amount } = req.body;
+
+    try {
+        const restaurant = await Restaurant.findOne({ name: restaurantName });
+        if (!restaurant) {
+            return res.status(404).json({ message: 'Restaurant not found' });
+        }
+
+        if (restaurant.walletBalance < amount) {
+            return res.status(400).json({ message: 'Insufficient wallet balance for withdrawal' });
+        }
+
+        const withdrawal = new Withdrawal({ restaurantName, amount });
+        await withdrawal.save();
+
+        const restaurantNotification = new Notification({
+            restaurantId: restaurant._id,
+            message: `A withdrawal request of ₦${amount.toFixed(2)} has been created. Your wallet balance has been updated.`,
+        });
+        await restaurantNotification.save();
+        restaurant.notifications.push(restaurantNotification._id);
+        await restaurant.save();
+
+        restaurant.walletBalance -= Number(amount);
+        await restaurant.save();
+
+        const restaurantEmailHtml = `
+<html>
+<head>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+      color: #333333;
+      margin: 0;
+      padding: 0;
+    }
+    .email-container {
+      width: 95%;
+      max-width: 600px;
+      margin: 0 auto;
+      background-color: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    h1 {
+      color: #333333;
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+    p {
+      color: #666666;
+      font-size: 16px;
+      line-height: 1.6;
+      margin-bottom: 15px;
+    }
+    .order-info {
+      background-color: #f8f8f8;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+    .order-info p {
+      color: #333333;
+      font-weight: bold;
+    }
+    .footer {
+      text-align: center;
+      font-size: 12px;
+      color: #999999;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="email-container">
+    <h1>Withdrawal Request Received</h1>
+    <p>Your withdrawal request has been successfully sent!</p>
+    
+    <div class="order-info">
+      <p>Restaurant Name: ${restaurantName}</p>
+      <p>Withdrawal Amount: ₦${amount.toFixed(2)}</p>
+      <p>Updated Wallet Balance: ₦${restaurant.walletBalance.toFixed(2)}</p>
+    </div>
+
+    <p>If you have any questions or concerns, please contact our support team.</p>
+
+    <div class="footer">
+      <p>&copy; ${new Date().getFullYear()} Byte. All rights reserved.</p>
+    </div>
+  </div>
+</body>
+</html>
+        `;
+        
+        await sendEmail(restaurant.email, 'Withdrawal Request Received', 'Your withdrawal request has been processed.', restaurantEmailHtml);
+
+        const adminEmailHtml = `
+<html>
+<head>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+      color: #333333;
+      margin: 0;
+      padding: 0;
+    }
+    .email-container {
+      width: 95%;
+      max-width: 600px;
+      margin: 0 auto;
+      background-color: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    h1 {
+      color: #333333;
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+    p {
+      color: #666666;
+      font-size: 16px;
+      line-height: 1.6;
+      margin-bottom: 15px;
+    }
+    .withdrawal-info {
+      background-color: #f8f8f8;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+    .footer {
+      text-align: center;
+      font-size: 12px;
+      color: #999999;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="email-container">
+    <h1>New Withdrawal Request</h1>
+    <p>A new withdrawal request has been created.</p>
+    
+    <div class="withdrawal-info">
+      <p>Restaurant Name: ${restaurantName}</p>
+      <p>Withdrawal Amount: ₦${amount.toFixed(2)}</p>
+      <p>Bank Name: ${restaurant.bankName}</p>
+      <p>Account Number: ${restaurant.accountNumber}</p>
+      <p>Holder's Name: ${restaurant.accountHolder}</p>
+    </div>
+
+    <p>Please review the request.</p>
+
+    <div class="footer">
+      <p>&copy; ${new Date().getFullYear()} Byte. All rights reserved.</p>
+    </div>
+  </div>
+</body>
+</html>
+        `;
+        
+        await sendEmail('ajalaoyinda@gmail.com', 'New Withdrawal Request', 'A new withdrawal request has been created.', adminEmailHtml);
+
+        res.status(201).json({ message: 'Withdrawal created successfully!', withdrawal });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error', error: error.message });
+    }
+};
+
