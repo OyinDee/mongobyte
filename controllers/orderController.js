@@ -206,7 +206,7 @@ exports.orderConfirmation = async (request, response) => {
         order.status = 'Confirmed';
         order.fee = (parsedFee / 10);
       } else {
-        
+       
         order.status = 'Fee Requested';
 
         const user = await User.findById(order.user._id);

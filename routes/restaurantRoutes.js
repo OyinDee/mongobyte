@@ -7,7 +7,7 @@ const authController = require('../controllers/authControllers');
 
 router.get('/mymeals/:customId', authenticateAdmin, restaurantController.getMealsByRestaurant)
 router.post('/create', authenticateAdmin, restaurantController.createRestaurant);
-router.post('/withdraw', authenticateAdmin, restaurantController.createWithdrawal)
+router.post('/withdraw', authenticate, restaurantController.createWithdrawal)
 router.post('/login', authController.loginRestaurant)
 router.get('/', restaurantController.getAllRestaurants);
 router.get('/:id', restaurantController.getRestaurantById);

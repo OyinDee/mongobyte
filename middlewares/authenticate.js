@@ -11,13 +11,13 @@ const authenticate = async (request, response, next) => {
     try {
 
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        if (!decoded.user.superAdmin) {
-
-            return response.status(403).json({ message: 'Access denied. Only super admins can perform this action.' });
+        if (decoded.user && decoded.user.superAdmin) {
+            request.user = decoded;
+            next();
         }
-        request.user = decoded;
+        
+        return response.status(403).json({ message: 'Access denied. Only super admins can perform this action.' });
 
-        next();
     } catch (error) {
         console.error(error);
         response.status(401).json({ message: 'Invalid token' });
