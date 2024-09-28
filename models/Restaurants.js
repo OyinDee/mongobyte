@@ -16,15 +16,15 @@ const restaurantSchema = new mongoose.Schema({
     },
     bankName: {
         type: String,
-        required: true,
+        // required: true,
       },
       accountNumber: {
         type: String,
-        required: true,
+        // required: true,
       },
       accountHolder: {
         type: String,
-        required: true,
+        // required: true,
       },
     email: {
         type: String,
