@@ -300,7 +300,7 @@ exports.orderConfirmation = async (request, response) => {
     }
 
     if (user.byteBalance < order.totalPrice) {
-      order.status = 'Cancelled';
+      order.status = 'Canceled';
       await order.save();
 
       const userNotification = new Notification({
