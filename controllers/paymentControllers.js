@@ -74,11 +74,11 @@ const verifyPayment = async (request, response) => {
 const feePercentage = 0.05;
 const fundAmount = totalAmountReceived / (1 + feePercentage);  
 
-const amountInBytes = fundAmount / 10; 
+const byteFund = fundAmount / 10; 
 
 
 await updateByteBalance({
-  body: { user_id: payment.user_id, byteFund: amountInBytes },
+  body: { user_id: payment.user_id, byteFund },
 });
       payment.status = 'credited';
       await payment.save();
