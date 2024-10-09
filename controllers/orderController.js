@@ -110,7 +110,7 @@ exports.createOrder = async (request, response) => {
             <div class="content">
               <p>You have received a new order.</p>
               <p><strong>Order Details:</strong></p>
-              <p>Total Price: ${totalPrice}0 naira</p>
+              <p>Total Price: ${totalPrice} naira</p>
               <p>Location: ${location}, around ${nearestLandmark || '...'}</p>
               <p>Phone: ${phoneNumber}</p>
               <p>Please check the dashboard for meal details.</p>
