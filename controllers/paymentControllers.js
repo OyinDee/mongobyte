@@ -73,8 +73,7 @@ const verifyPayment = async (request, response) => {
       const totalAmountReceived = Number(payment.amount);  
 const feePercentage = 0.05;
 const fundAmount = totalAmountReceived / (1 + feePercentage);  
-
-const byteFund = fundAmount / 10; 
+const byteFund = fundAmount; 
 
 
 await updateByteBalance({

@@ -40,6 +40,13 @@ exports.createOrder = async (request, response) => {
         if (!userDoc) {
             return response.status(404).json({ message: 'User not found' });
         }
+        const userNotification = new Notification({
+          userId: userDoc._id,
+          message: `You must be hungry, you placed a new order! It has an ID of ${newOrder.customId}. Watch out for it!`,
+        });
+        await userNotification.save();
+        
+        userDoc.notifications.push(userNotification._id);
         userDoc.orderHistory.push(newOrder._id);
         await userDoc.save();
         const restaurantNotification = new Notification({
@@ -200,11 +207,11 @@ exports.orderConfirmation = async (request, response) => {
     if (additionalFee) {
       const parsedFee = parseFloat(additionalFee);
 
-      order.totalPrice += (parsedFee / 10);
+      order.totalPrice += (parsedFee);
       
-      if ((parsedFee / 10) <= order.fee) {
+      if ((parsedFee) <= order.fee) {
         order.status = 'Confirmed';
-        order.fee = (parsedFee / 10);
+        order.fee = (parsedFee);
       } else {
        
         order.status = 'Fee Requested';
@@ -269,10 +276,10 @@ exports.orderConfirmation = async (request, response) => {
             <div class="email-container">
               <h1>Order Fee Request</h1>
               <p>Your order with ID <strong>${order.customId}</strong> has a fee request that exceeds the permitted limit.</p>
-              
+            
               <div class="fee-info">
                 <p>Additional Fee Requested: <span class="highlight">₦${parsedFee}</span></p>
-                <p>Permitted Fee: ₦${(order.fee)*10}</p>
+                <p>Permitted Fee: ₦${order.fee}</p>
                 <p>Note: ${requestDescription || "No attatched description"}</p>
               </div>
 
@@ -285,11 +292,19 @@ exports.orderConfirmation = async (request, response) => {
           </body>
           </html>
           `;
-          await sendEmail(user.email, 'Order Additional Fee Request', 'Your order has a fee request that requires approval.', emailHtml);
-           order.fee = (parsedFee / 10);
+          await sendEmail(user.email, 'Order Additional Fee Request', 'Your order has a fee request that requires approval.', emailHtml); 
+           order.fee = (parsedFee);
         }
         await order.save();
-
+        const userNotification = new Notification({
+          userId: user._id,
+          message: `For order ${order.customId}, requested fee is higher than permitted fee, check your order history! .`,
+        });
+        await userNotification.save();
+        
+        user.notifications.push(userNotification._id);
+        await user.save();
+  
         return response.status(400).json({ message: 'Additional fee exceeds allowed limit. User notified to log in and approve.' });
       }
     }
@@ -371,7 +386,7 @@ exports.orderConfirmation = async (request, response) => {
     <div class="order-info">
       <p>Order ID: ${order.customId}</p>
       <p>Status: ${order.status}</p>
-      <p>Total Price: ₦${(order.totalPrice * 10).toFixed(2)} (including any additional fees)</p>
+      <p>Total Price: ₦${(order.totalPrice).toFixed(2)} (including any additional fees)</p>
                 <p>Note: ${requestDescription || "No attatched description"}</p>
 
     </div>
@@ -391,11 +406,11 @@ exports.orderConfirmation = async (request, response) => {
     }
 
     order.status = 'Confirmed';
-    restaurant.walletBalance += Number(order.totalPrice * 10);
+    restaurant.walletBalance += Number(order.totalPrice);
 
     const restaurantNotification = new Notification({
       restaurantId: restaurant._id,
-      message: `Order ${order.customId} has been confirmed, ₦${order.totalPrice*10} has been added to your wallet,  and order should be delivered soon.`,
+      message: `Order ${order.customId} has been confirmed, ₦${order.totalPrice} has been added to your wallet,  and order should be delivered soon.`,
     });
     await restaurantNotification.save();
     restaurant.notifications.push(restaurantNotification._id);
@@ -471,7 +486,7 @@ exports.orderConfirmation = async (request, response) => {
     <div class="order-info">
       <p>Order ID: ${order.customId}</p>
       <p>Status: ${order.status}</p>
-      <p>Total Price: ₦${(order.totalPrice * 10).toFixed(2)} (including any additional fees)</p>
+      <p>Total Price: ₦${(order.totalPrice).toFixed(2)} (including any additional fees)</p>
                 <p>Note: ${requestDescription || "No attatched description"}</p>
 
     </div>
@@ -580,7 +595,7 @@ exports.markOrderAsDelivered = async (request, response) => {
     <div class="order-info">
       <p>Order ID: ${order.customId}</p>
       <p>Status: Delivered</p>
-      <p>Total Price: ₦${(order.totalPrice * 10).toFixed(2)}</p>
+      <p>Total Price: ₦${(order.totalPrice).toFixed(2)}</p>
     </div>
 
     <p>Thank you for using our service. If you have any questions or need assistance, feel free to contact us.</p>
@@ -652,7 +667,7 @@ exports.handleOrderStatus = async (request, response) => {
       user.byteBalance -= order.totalPrice;
       await user.save();
 
-      restaurant.walletBalance += Number(order.totalPrice * 10);
+      restaurant.walletBalance += Number(order.totalPrice);
       await restaurant.save();
 
       order.status = 'Confirmed';
@@ -667,7 +682,7 @@ exports.handleOrderStatus = async (request, response) => {
 
       const restaurantNotification = new Notification({
         restaurantId: restaurant._id,
-        message: `Order ${order.customId} has been confirmed, , ₦${order.totalPrice*10} has been added to your wallet!`,
+        message: `Order ${order.customId} has been confirmed, , ₦${order.totalPrice} has been added to your wallet!`,
       });
       await restaurantNotification.save();
 
@@ -731,7 +746,7 @@ exports.handleOrderStatus = async (request, response) => {
     <div class="order-info">
       <p>Order ID: ${order.customId}</p>
       <p>Status: Confirmed</p>
-      <p>Total Price: ₦${(order.totalPrice*10).toFixed(2)}</p>
+      <p>Total Price: ₦${(order.totalPrice).toFixed(2)}</p>
     </div>
 
     <p>Thank you for using our service. If you have any questions or need assistance, feel free to contact us.</p>
@@ -828,7 +843,7 @@ exports.handleOrderStatus = async (request, response) => {
     <div class="order-info">
       <p>Order ID: ${order.customId}</p>
       <p>Status: Canceled</p>
-      <p>Total Price: ₦${(order.totalPrice*10).toFixed(2)}</p>
+      <p>Total Price: ₦${(order.totalPrice).toFixed(2)}</p>
     </div>
 
     <p>We apologize for the inconvenience. If you have any questions or need assistance, feel free to contact us.</p>
