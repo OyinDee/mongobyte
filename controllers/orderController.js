@@ -6,7 +6,7 @@ const Meal = require('../models/Meals')
 const Notification = require('../models/Notifications')
 
 exports.createOrder = async (request, response) => {
-    const { user, meals, note, totalPrice, location, phoneNumber, restaurantCustomId, nearestLandmark, fee } = request.body[0];
+    const { user, meals, note, totalPrice, location, phoneNumber, restaurantCustomId, nearestLandmark, fee } = request.body;
     try {
         const restaurant = await Restaurant.findOne({ customId: restaurantCustomId });
         if (!restaurant) {
