@@ -84,37 +84,24 @@ exports.deleteMeal = async (request, response) => {
 
 
     try {
-        const restaurant = await Restaurant.findOne({ _id: restaurantId });
-        const meal = await Meal.findOneAndDelete({ customId: id });
-        if (!restaurant || !meal.restaurant.equals(restaurant._id)) {
-            return response.status(403).json({ message: 'Unauthorized: You do not own this meal' });
-        }
-        if (!meal) {
-            return response.status(404).json({ message: 'Meal not found' });
-        }
-        response.json({ message: 'Meal deleted successfully!' });
-    } catch (error) {
-        console.error(error);
-        response.status(500).json({ message: 'Internal server error' });
+    const restaurant = await Restaurant.findById(restaurantId);
+    const meal = await Meal.findOne({ customId: id });
+    if (!restaurant) {
+        return response.status(404).json({ message: 'Restaurant not found' });
     }
-};
 
+    if (!meal) {
+        return response.status(404).json({ message: 'Meal not found' });
+    }
 
-exports.addBatchMeals = async (request, response) => {
-    const { restaurantId } = request.params;
-    const meals = request.body;
+    if (!meal.restaurant.equals(restaurant._id)) {
+        return response.status(403).json({ message: 'Unauthorized: You do not own this meal' });
+    }
 
-    try {
-        const restaurant = await Restaurant.findOne({ customId: restaurantId });
-        if (!restaurant) {
-            return response.status(404).json({ message: 'Restaurant not found' });
-        }
-
-        const mealDocuments = meals.map(meal => ({ ...meal, restaurant: restaurant._id }));
-        await Meal.insertMany(mealDocuments);
-
-        response.status(201).json({ message: 'Batch meals added successfully!' });
-    } catch (error) {
+    await Meal.deleteOne({ customId: id });
+    response.json({ message: 'Meal deleted successfully!' });
+} 
+catch (error) {
         console.error(error);
         response.status(500).json({ message: 'Internal server error' });
     }
