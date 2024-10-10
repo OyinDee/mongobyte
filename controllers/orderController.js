@@ -417,7 +417,7 @@ exports.orderConfirmation = async (request, response) => {
     
     const userNotification = new Notification({
       userId: order.user._id,
-      message: `Your order ${order.customId} has been confirmed and will reach you soon!`,
+      message: `Your order ${order.customId} has been confirmed and ₦${(order.totalPrice).toFixed(2)} has been deducted from your balance!`,
     });
     await userNotification.save();
     
