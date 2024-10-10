@@ -13,6 +13,4 @@ router.put('/:id', authenticate, authenticate, mealController.updateMeal);
 
 router.delete('/:id', authenticate, authenticate, mealController.deleteMeal);
 
-router.post('/restaurant/:restaurantId/batch', authenticate, mealController.addBatchMeals);
-
 module.exports = router;
