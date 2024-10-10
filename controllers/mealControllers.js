@@ -80,28 +80,27 @@ exports.updateMeal = async (request, response) => {
 
 exports.deleteMeal = async (request, response) => {
     const { id } = request.params;
-    const restaurantId  = request.restaurant._id; 
-
+    const restaurantId = request.restaurant._id;
 
     try {
-    const restaurant = await Restaurant.findById(restaurantId);
-    const meal = await Meal.findOne({ customId: id });
-    if (!restaurant) {
-        return response.status(404).json({ message: 'Restaurant not found' });
-    }
+        const restaurant = await Restaurant.findById(restaurantId);
+        const meal = await Meal.findOne({ customId: id });
 
-    if (!meal) {
-        return response.status(404).json({ message: 'Meal not found' });
-    }
+        if (!restaurant) {
+            return response.status(404).json({ message: 'Restaurant not found' });
+        }
 
-    if (!meal.restaurant.equals(restaurant._id)) {
-        return response.status(403).json({ message: 'Unauthorized: You do not own this meal' });
-    }
+        if (!meal) {
+            return response.status(404).json({ message: 'Meal not found' });
+        }
 
-    await Meal.deleteOne({ customId: id });
-    response.json({ message: 'Meal deleted successfully!' });
-} 
-catch (error) {
+        if (!meal.restaurant.equals(restaurantId)) {
+            return response.status(403).json({ message: 'Unauthorized: You do not own this meal' });
+        }
+
+        await Meal.deleteOne({ customId: id });
+        response.json({ message: 'Meal deleted successfully!' });
+    } catch (error) {
         console.error(error);
         response.status(500).json({ message: 'Internal server error' });
     }
