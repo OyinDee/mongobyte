@@ -207,7 +207,7 @@ exports.orderConfirmation = async (request, response) => {
     if (additionalFee) {
       const parsedFee = parseFloat(additionalFee);
 
-      order.totalPrice += (parsedFee);
+      order.totalPrice = (order.totalPrice-order.fee)+(parsedFee);
       
       if ((parsedFee) <= order.fee) {
         order.status = 'Confirmed';
