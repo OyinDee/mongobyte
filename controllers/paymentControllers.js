@@ -84,7 +84,7 @@ await updateByteBalance({
       response.send('Payment successful!');
       const userNotification = new Notification({
         userId: payment.user_id,
-        message: `Your payment of ${payment.amount}NGN was successful and your wallet has been funded with ${byteFund}!`,
+        message: `Your payment of ${payment.amount}NGN was successful and your wallet has been funded with ₦${byteFund}!`,
       });
 
       await userNotification.save();
