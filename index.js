@@ -41,10 +41,10 @@ app.get('/api/ping', (req, res) => {
     res.send('Server is alive');
 });
 
-cron.schedule('*/5 * * * *', () => {
+cron.schedule('*/10 * * * *', () => {
     axios.get(`http://localhost:${process.env.PORT || 8080}/api/ping`)
         .then(response => {
-            console.log('Server pinged successfully:', response.data);
+            console.log('Server pinged successfully');
         })
         .catch(error => {
             console.error('Error pinging server:', error);
