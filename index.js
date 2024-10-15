@@ -41,7 +41,7 @@ app.get('/api/ping', (req, res) => {
     res.send('Server is alive');
 });
 
-cron.schedule('*/10 * * * *', () => {
+cron.schedule('*/5 * * * *', () => {
     axios.get(`http://localhost:${process.env.PORT || 8080}/api/ping`)
         .then(response => {
             console.log('Server pinged successfully');
