@@ -10,14 +10,14 @@ const mealRoutes = require('./routes/mealRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 const superAdminRoutes = require('./routes/superAdminRoutes');
 const orderRoutes = require('./routes/orderRoutes');
-const connectDB = require('./configs/database');
 const cookieParser = require('cookie-parser');
+const cron = require('node-cron');
+const axios = require('axios');
 
 const app = express();
 const server = http.createServer(app);
 const io = socketIO(server);
 
-// Middleware
 app.use(cookieParser());
 app.use(cors({
     origin: ['http://localhost:3000', 'http://localhost:3000/', 'https://yumbyte.netlify.app', 'https://yumbyte.netlify.app/', 'https://bytego.vercel.app', 'https://bytego.vercel.app/', 'http://192.168.186.74:3000'],
@@ -25,10 +25,10 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true
 }));
+
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
-// Routes
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/restaurants', restaurantRoutes);
 app.use('/api/v1/users', userRoutes);
@@ -36,6 +36,20 @@ app.use('/api/v1/meals', mealRoutes);
 app.use('/api/v1/pay', paymentRoutes);
 app.use('/api/v1/orders', orderRoutes);
 app.use('/api/superadmin', superAdminRoutes);
+
+app.get('/api/ping', (req, res) => {
+    res.send('Server is alive');
+});
+
+cron.schedule('*/5 * * * *', () => {
+    axios.get(`http://localhost:${process.env.PORT || 8080}/api/ping`)
+        .then(response => {
+            console.log('Server pinged successfully:', response.data);
+        })
+        .catch(error => {
+            console.error('Error pinging server:', error);
+        });
+});
 
 const PORT = process.env.PORT || 8080;
 server.listen(PORT, () => {
@@ -45,16 +59,3 @@ server.listen(PORT, () => {
 mongoose.connect(`${process.env.MONGODB_URI}`, {})
     .then(() => console.log('MongoDB connected'))
     .catch(err => console.error('MongoDB connection error:', err));
-io.on('connection', (socket) => {
-    console.log('Client connected');
-
-    const keepAliveInterval = setInterval(() => {
-        console.log('Sending keep-alive ping');
-        socket.emit('ping', { message: 'keep-alive' });
-    }, 300000); // 5 minutes in milliseconds
-
-    socket.on('disconnect', () => {
-        console.log('Client disconnected');
-        clearInterval(keepAliveInterval); // Clear interval when the client disconnects
-    });
-});
