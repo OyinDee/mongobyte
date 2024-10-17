@@ -529,7 +529,7 @@ exports.markOrderAsDelivered = async (request, response) => {
 
     const userNotification = new Notification({
       userId: order.user._id,
-      message: `Your order ${order.customId} has been delivered!`,
+      message: `Your order ${order.customId} is out for delivery!`,
     });
     await userNotification.save();
     
@@ -593,7 +593,7 @@ exports.markOrderAsDelivered = async (request, response) => {
     
     <div class="order-info">
       <p>Order ID: ${order.customId}</p>
-      <p>Status: Delivered</p>
+      <p>Status: Out for delivery! </p>
       <p>Total Price: ₦${(order.totalPrice).toFixed(2)}</p>
     </div>
 
