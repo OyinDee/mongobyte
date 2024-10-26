@@ -1,14 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const restaurantController = require('../controllers/restaurantControllers');
-const authenticateAdmin = require('../middlewares/authenticate.js')
+const authenticateAdmin = require('../middlewares/authenticate.js');
 const authenticate = require('../middlewares/authenticateRestaurant.js');
 const authController = require('../controllers/authControllers');
 
-router.get('/mymeals/:customId', restaurantController.getMealsByRestaurant)
+router.get('/mymeals/:customId', restaurantController.getMealsByRestaurant);
 router.post('/create', authenticateAdmin, restaurantController.createRestaurant);
-router.post('/withdraw', authenticate, restaurantController.createWithdrawal)
-router.post('/login', authController.loginRestaurant)
+router.post('/withdraw', authenticate, restaurantController.createWithdrawal);
+router.post('/login', authController.loginRestaurant);
 router.get('/', restaurantController.getAllRestaurants);
 router.get('/:id', restaurantController.getRestaurantById);
 router.put('/:id', authenticate, (req, res, next) => {
@@ -23,6 +23,6 @@ router.delete('/:id', authenticate, (req, res, next) => {
     }
     next();
 }, restaurantController.deleteRestaurant);
-
+router.patch('/:id/toggle-active', authenticateAdmin, restaurantController.toggleRestaurantActiveStatus);
 
 module.exports = router;
