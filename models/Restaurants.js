@@ -16,16 +16,13 @@ const restaurantSchema = new mongoose.Schema({
     },
     bankName: {
         type: String,
-        // required: true,
-      },
-      accountNumber: {
+    },
+    accountNumber: {
         type: String,
-        // required: true,
-      },
-      accountHolder: {
+    },
+    accountHolder: {
         type: String,
-        // required: true,
-      },
+    },
     email: {
         type: String,
         required: true,
@@ -72,6 +69,10 @@ const restaurantSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Order',
     }],
+    isActive: { 
+        type: Boolean,
+        default: true,
+    },
 }, {
     timestamps: true,
 });
