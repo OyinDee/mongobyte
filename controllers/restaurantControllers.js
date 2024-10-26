@@ -384,3 +384,18 @@ exports.createWithdrawal = async (req, res) => {
     }
 };
 
+exports.toggleRestaurantActiveStatus = async (request, response) => {
+    const { id } = request.params;
+    try {
+        const restaurant = await Restaurant.findOne({ customId: id });
+        if (!restaurant) {
+            return response.status(404).json({ message: 'Restaurant not found' });
+        }
+        restaurant.isActive = !restaurant.isActive;
+        await restaurant.save();
+        response.status(200).json({ message: 'Status updated', isActive: restaurant.isActive });
+    } catch (error) {
+        console.error(error);
+        response.status(500).json({ message: 'Internal server error' });
+    }
+};
