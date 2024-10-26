@@ -23,6 +23,6 @@ router.delete('/:id', authenticate, (req, res, next) => {
     }
     next();
 }, restaurantController.deleteRestaurant);
-router.patch('/:id/toggle-active', authenticateAdmin, restaurantController.toggleRestaurantActiveStatus);
+router.patch('/:id/toggle-active', authenticate, restaurantController.toggleRestaurantActiveStatus);
 
 module.exports = router;
