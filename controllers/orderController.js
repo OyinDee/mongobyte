@@ -445,7 +445,22 @@ exports.orderConfirmation = async (request, response) => {
     restaurant.notifications.push(restaurantNotification._id);
     await restaurant.save();
     const smsMessage = `You have received a new order with ID: ${newOrder.customId}. Please check your dashboard for details.`;
-        sendSMS(restaurant.phoneNumber, smsMessage); 
+    function formatPhoneNumber(number) {
+    const strNumber = String(number);
+    if (strNumber.startsWith("234")) {
+        return strNumber;
+    }
+    if (strNumber.startsWith("0")) {
+        return "234" + strNumber.slice(1);
+    }
+    if (/^[789]/.test(strNumber)) {
+        return "234" + strNumber;
+    }
+    return strNumber;
+}
+
+const formattedNumber = formatPhoneNumber(restaurant.contactNumber);
+sendSMS(formattedNumber, smsMessage);
     const userNotification = new Notification({
       userId: order.user._id,
       message: `Your order ${order.customId} has been confirmed and ₦${(order.totalPrice).toFixed(2)} has been deducted from your balance!`,
