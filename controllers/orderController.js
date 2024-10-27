@@ -1,3 +1,4 @@
+require('dotenv').config();
 const Order = require('../models/Orders');
 const Restaurant = require('../models/Restaurants');
 const sendEmail = require('../configs/nodemailer');
@@ -29,13 +30,18 @@ async function sendSMS(to, message) {
         const response = await axios(options);
         console.log('SMS sent successfully:', response.data);
     } catch (error) {
-        console.error('Error sending SMS:', error.message || error);
+        console.error('Error sending SMS:', error);
     }
 }
 
 
 
 exports.createOrder = async (request, response) => {
+    const TERMII_BASE_URL = process.env.TERMII_BASE_URL;
+const TERMII_API_KEY = process.env.TERMII_API_KEY;
+const TERMII_SENDER_ID = process.env.TERMII_SENDER_ID;
+
+console.log(TERMII_BASE_URL, TERMII_API_KEY, TERMII_SENDER_ID);
     const { user, meals, note, totalPrice, location, phoneNumber, restaurantCustomId, nearestLandmark, fee } = request.body;
     try {
         const restaurant = await Restaurant.findOne({ customId: restaurantCustomId });
