@@ -4,6 +4,36 @@ const sendEmail = require('../configs/nodemailer');
 const User = require('../models/User');
 const Meal = require('../models/Meals')
 const Notification = require('../models/Notifications')
+const axios = require('axios');
+
+async function sendSMS(to, message) {
+    const data = {
+        to: to,
+        from: process.env.TERMII_SENDER_ID,
+        sms: message,
+        type: 'plain',
+        api_key: process.env.TERMII_API_KEY,
+        channel: 'generic',
+    };
+
+    const options = {
+        method: 'POST',
+        url: process.env.TERMII_BASE_URL,
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        data: data
+    };
+
+    try {
+        const response = await axios(options);
+        console.log('SMS sent successfully:', response.data);
+    } catch (error) {
+        console.error('Error sending SMS:', error.message || error);
+    }
+}
+
+
 
 exports.createOrder = async (request, response) => {
     const { user, meals, note, totalPrice, location, phoneNumber, restaurantCustomId, nearestLandmark, fee } = request.body;
@@ -414,7 +444,8 @@ exports.orderConfirmation = async (request, response) => {
     await restaurantNotification.save();
     restaurant.notifications.push(restaurantNotification._id);
     await restaurant.save();
-    
+    const smsMessage = `You have received a new order with ID: ${newOrder.customId}. Please check your dashboard for details.`;
+        sendSMS(restaurant.phoneNumber, smsMessage); 
     const userNotification = new Notification({
       userId: order.user._id,
       message: `Your order ${order.customId} has been confirmed and ₦${(order.totalPrice).toFixed(2)} has been deducted from your balance!`,
