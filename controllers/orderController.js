@@ -28,9 +28,9 @@ async function sendSMS(to, message) {
 
     try {
         const response = await axios(options);
-        console.log('SMS sent successfully:', response.data);
+        
     } catch (error) {
-        console.error('Error sending SMS:', error);
+        console.error('Error sending SMS:', error.message || error);
     }
 }
 
