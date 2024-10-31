@@ -17,7 +17,7 @@ const initiatePayment = async (request, response) => {
       {
         amount: amount * 100, 
         email: request.user.email,
-        callback_url: 'https://bytego.vercel.app/user/fund/callback', 
+        callback_url: 'https://www.yumbyte.ng/user/fund/callback', 
       },
       {
         headers: {
