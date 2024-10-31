@@ -20,7 +20,7 @@ const io = socketIO(server);
 
 app.use(cookieParser());
 app.use(cors({
-    origin: ['http://localhost:3000', 'http://localhost:3000/', 'https://yumbyte.netlify.app', 'https://yumbyte.netlify.app/', 'https://bytego.vercel.app', 'https://bytego.vercel.app/', 'http://192.168.186.74:3000'],
+    origin: ['https://www.yumbyte.ng',  'https://yumbyte.ng'],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true
