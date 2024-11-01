@@ -41,7 +41,6 @@ exports.createOrder = async (request, response) => {
 const TERMII_API_KEY = process.env.TERMII_API_KEY;
 const TERMII_SENDER_ID = process.env.TERMII_SENDER_ID;
 
-console.log(TERMII_BASE_URL, TERMII_API_KEY, TERMII_SENDER_ID);
     const { user, meals, note, totalPrice, location, phoneNumber, restaurantCustomId, nearestLandmark, fee } = request.body;
     try {
         const restaurant = await Restaurant.findOne({ customId: restaurantCustomId });
@@ -49,6 +48,9 @@ console.log(TERMII_BASE_URL, TERMII_API_KEY, TERMII_SENDER_ID);
             return response.status(404).json({ message: 'Restaurant not found' });
         }
 
+        if (!restaurant.isActive) {
+            return response.status(403).json({ message: 'Restaurant is currently closed' });
+        }
         const mealDetails = await Promise.all(
             meals.map(async ({ mealId, quantity }) => {
                 const meal = await Meal.findOne({ customId: mealId });
