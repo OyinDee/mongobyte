@@ -19,7 +19,7 @@ const io = socketIO(server);
 
 app.use(cookieParser());
 app.use(cors({
-    origin: ['https://www.yumbyte.ng',  'https://yumbyte.ng'],
+    origin: ['https://www.yumbyte.ng',  'https://yumbyte.ng', 'yumbyte.ng'],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true
