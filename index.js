@@ -11,7 +11,6 @@ const paymentRoutes = require('./routes/paymentRoutes');
 const superAdminRoutes = require('./routes/superAdminRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const cookieParser = require('cookie-parser');
-const cron = require('node-cron');
 const axios = require('axios');
 
 const app = express();
@@ -37,19 +36,6 @@ app.use('/api/v1/pay', paymentRoutes);
 app.use('/api/v1/orders', orderRoutes);
 app.use('/api/superadmin', superAdminRoutes);
 
-app.get('/api/ping', (req, res) => {
-    res.send('Server is alive');
-});
-
-cron.schedule('*/5 * * * *', () => {
-    axios.get(`http://localhost:${process.env.PORT || 8080}/api/ping`)
-        .then(response => {
-            console.log('Server pinged successfully');
-        })
-        .catch(error => {
-            console.error('Error pinging server:', error);
-        });
-});
 
 const PORT = process.env.PORT || 8080;
 server.listen(PORT, () => {
