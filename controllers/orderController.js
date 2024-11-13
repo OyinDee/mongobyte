@@ -67,6 +67,7 @@ const TERMII_SENDER_ID = process.env.TERMII_SENDER_ID;
             note,
             totalPrice,
             location,
+            nearestLandmark,
             phoneNumber,
             restaurant: restaurant._id, 
             fee
