@@ -31,6 +31,9 @@ const orderSchema = new mongoose.Schema({
         type: String,
         required: false,  
     },
+    nearestLandmark :{
+        type: String, 
+    },
     fee: {
         type: Number,
         default: 600,
