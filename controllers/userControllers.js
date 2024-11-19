@@ -274,10 +274,7 @@ exports.fetchNotifications = async (request, response) => {
     }
 
 
-    const notifications = await Notification.find(userId ? { userId } : { restaurantId })
-      .sort({ createdAt: -1 })
-      .limit(10) 
-      .skip((request.query.page - 1) * 10); 
+    const notifications = await Notification.find(userId ? { userId } : { restaurantId }) 
 
     response.status(200).json({
       message: 'Notifications fetched successfully',
