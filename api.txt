@@ -113,3 +113,96 @@
   - **Error (400):** Indicates validation errors or that the batch could not be processed.
 
 ---
+
+# Models Summary
+
+## User
+- Fields: username, email, password, phoneNumber, isVerified, orderHistory, byteBalance, bio, verificationCode, phoneVerificationCode, resetCode, resetCodeExpires, imageUrl, superAdmin, location, nearestLandmark, notifications, timestamps
+- Purpose: Represents an end user of the platform, including authentication, profile, balance, and notification info.
+
+## Restaurant
+- Fields: customId, name, bankName, accountNumber, accountHolder, email, description, location, contactNumber, imageUrl, password, walletBalance, isVerified, verificationCode, meals, notifications, orders, isActive, timestamps
+- Purpose: Represents a restaurant, including authentication, menu, orders, and wallet info.
+
+## Meal
+- Fields: customId, name, description, tag, per, price, availability, imageUrl, restaurant, timestamps
+- Purpose: Represents a meal offered by a restaurant.
+
+## Order
+- Fields: customId, user, meals (with quantity), note, nearestLandmark, fee, requestedFee, requestDescription, totalPrice, status, location, phoneNumber, orderDate, restaurant, timestamps
+- Purpose: Represents a food order placed by a user at a restaurant.
+
+## Payment
+- Fields: reference, amount, email, user_id, status, createdAt
+- Purpose: Represents a payment transaction for orders or wallet top-ups.
+
+## Withdrawal
+- Fields: restaurantName, amount, status, createdAt, updatedAt
+- Purpose: Represents a withdrawal request by a restaurant.
+
+## Notification
+- Fields: userId, restaurantId, message, isRead, timestamps
+- Purpose: Represents notifications sent to users or restaurants.
+
+---
+
+# API Endpoints (Full List)
+
+## Auth APIs
+- POST   /register                - Register a new user
+- POST   /login                   - User login
+- GET    /verify-email            - Verify user email
+- POST   /forgot-password         - Request password reset
+- POST   /reset-password          - Reset password
+
+## User APIs
+- POST   /upload                  - Upload user image
+- GET    /getProfile              - Get user profile
+- POST   /updateProfile           - Update user profile
+- POST   /updateByteBalance       - Update user byte balance
+- GET    /restaurants             - List all restaurants
+- POST   /transfer                - Transfer bytes to another user
+- GET    /restdetails/:id         - Get restaurant details by ID
+- GET    /notifications           - Get user notifications
+- GET    /orders/:username        - Get user order history
+
+## Super Admin APIs
+- POST   /restaurants             - Create a restaurant
+- DELETE /restaurants/:id         - Delete a restaurant
+- GET    /allrestaurants          - List all restaurants
+- GET    /restaurants/:id         - Get restaurant by ID
+- GET    /orders                  - List all orders
+- GET    /orders/:orderId         - Get order by ID
+
+## Payment APIs
+- POST   /pay                     - Initiate payment
+- GET    /callback                - Payment callback/verification
+
+## Order APIs
+- POST   /create                  - Create a new order
+- GET    /restaurant/:customId    - Get orders for a restaurant
+- GET    /:orderId                - Get order by ID
+- GET    /:userId/order-history   - Get user order history
+- PATCH  /:orderId                - Confirm order
+- PATCH  /deliver/:orderId        - Mark order as delivered
+- POST   /:orderId/status         - Update order status
+
+## Meal APIs
+- POST   /:customId/create        - Create a meal for a restaurant
+- GET    /                        - List all meals
+- GET    /:id                     - Get meal by ID
+- PUT    /:id                     - Update meal by ID
+- DELETE /:id                     - Delete meal by ID
+
+## Restaurant APIs
+- GET    /mymeals/:customId       - Get meals for a restaurant
+- POST   /create                  - Create a restaurant
+- POST   /withdraw                - Create a withdrawal request
+- POST   /login                   - Restaurant login
+- GET    /                        - List all restaurants
+- GET    /:id                     - Get restaurant by ID
+- PUT    /:id                     - Update restaurant by ID
+- DELETE /:id                     - Delete restaurant by ID
+- PATCH  /:id/toggle-active       - Toggle restaurant active status
+
+---

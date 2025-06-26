@@ -5,15 +5,189 @@ const userControllers = require('../controllers/userControllers');
 const restaurantControllers = require('../controllers/restaurantControllers')
 const { uploadImage } = require('../controllers/image');
 
+/**
+ * @swagger
+ * /users/upload:
+ *   post:
+ *     summary: Upload an image
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               image:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       200:
+ *         description: Image uploaded successfully
+ *       400:
+ *         description: Validation errors
+ */
+
 router.post('/upload', uploadImage);
 
+/**
+ * @swagger
+ * /users/getProfile:
+ *   get:
+ *     summary: Retrieve the profile of the logged-in user
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Returns user profile details
+ *       401:
+ *         description: Unauthorized access
+ */
+
 router.get('/getProfile', authenticate, userControllers.getProfile);
-router.post('/updateProfile', authenticate, userControllers.updateUserProfile);
-router.post('/updateByteBalance', authenticate, userControllers.updateByteBalance);
+
+/**
+ * @swagger
+ * /users/updateProfile:
+ *   put:
+ *     summary: Update user profile information
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               bio:
+ *                 type: string
+ *               imageUrl:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Returns a success message and updated user profile
+ *       400:
+ *         description: Validation errors
+ */
+
+router.put('/updateProfile', authenticate, userControllers.updateUserProfile);
+
+/**
+ * @swagger
+ * /users/updateByteBalance:
+ *   put:
+ *     summary: Update user byte balance
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               user_id:
+ *                 type: string
+ *               byteFund:
+ *                 type: number
+ *     responses:
+ *       200:
+ *         description: Byte balance updated
+ *       400:
+ *         description: Validation errors
+ */
+
+router.put('/updateByteBalance', authenticate, userControllers.updateByteBalance);
+
+/**
+ * @swagger
+ * /users/restaurants:
+ *   get:
+ *     summary: List all restaurants
+ *     responses:
+ *       200:
+ *         description: Returns a list of restaurants
+ */
+
 router.get('/restaurants', userControllers.getAllRestaurants);
+
+/**
+ * @swagger
+ * /users/transfer:
+ *   post:
+ *     summary: Transfer bytes to another user
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               recipientUsername:
+ *                 type: string
+ *               amount:
+ *                 type: number
+ *     responses:
+ *       200:
+ *         description: Transfer successful
+ *       400:
+ *         description: Validation errors
+ */
+
 router.post('/transfer', authenticate, userControllers.transferBytes)
+
+/**
+ * @swagger
+ * /users/restdetails/{id}:
+ *   get:
+ *     summary: Get restaurant details by ID
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Restaurant details
+ *       404:
+ *         description: Restaurant not found
+ */
+
 router.get('/restdetails/:id', restaurantControllers.getRestaurantById)
+
+/**
+ * @swagger
+ * /users/notifications:
+ *   get:
+ *     summary: Get user notifications
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of notifications
+ */
+
 router.get('/notifications', userControllers.fetchNotifications);
+
+/**
+ * @swagger
+ * /users/orders/{username}:
+ *   get:
+ *     summary: Get user order history
+ *     parameters:
+ *       - in: path
+ *         name: username
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: List of orders
+ */
+
 router.get('/orders/:username', userControllers.getUserOrderHistory);
 
 module.exports = router;

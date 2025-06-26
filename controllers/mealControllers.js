@@ -105,3 +105,29 @@ exports.deleteMeal = async (request, response) => {
         response.status(500).json({ message: 'Internal server error' });
     }
 };
+
+// Batch add meals to a restaurant
+exports.addBatchMeals = async (req, res) => {
+    const { restaurantId, meals } = req.body;
+    if (!restaurantId || !Array.isArray(meals) || meals.length === 0) {
+        return res.status(400).json({ message: 'restaurantId and meals array are required.' });
+    }
+    try {
+        const restaurant = await Restaurant.findOne({ customId: restaurantId });
+        if (!restaurant) {
+            return res.status(404).json({ message: 'Restaurant not found' });
+        }
+        const createdMeals = [];
+        for (const mealData of meals) {
+            const meal = new Meal({ ...mealData, restaurant: restaurant._id });
+            await meal.save();
+            restaurant.meals.push(meal._id);
+            createdMeals.push(meal);
+        }
+        await restaurant.save();
+        res.status(201).json({ message: 'Batch meals added successfully!', meals: createdMeals });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};

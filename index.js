@@ -12,6 +12,8 @@ const superAdminRoutes = require('./routes/superAdminRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const cookieParser = require('cookie-parser');
 const axios = require('axios');
+const swaggerUi = require('swagger-ui-express');
+const swaggerJsdoc = require('swagger-jsdoc');
 
 const app = express();
 const server = http.createServer(app);
@@ -27,6 +29,24 @@ app.use(cors({
 
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
+
+const swaggerOptions = {
+  definition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'Mongobyte API',
+      version: '1.0.0',
+      description: 'API documentation for Mongobyte',
+    },
+    servers: [
+      { url: 'http://localhost:8080/api/v1' },
+    ],
+  },
+  apis: ['./routes/*.js'], // Path to the API docs (JSDoc comments)
+};
+
+const swaggerSpec = swaggerJsdoc(swaggerOptions);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/restaurants', restaurantRoutes);

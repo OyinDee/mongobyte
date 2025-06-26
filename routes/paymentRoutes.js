@@ -4,7 +4,40 @@ const { initiatePayment, verifyPayment } = require('../controllers/paymentContro
 const authenticate = require('../middlewares/authenticateUser.js')
 const router = express.Router();
 
+/**
+ * @swagger
+ * /pay:
+ *   post:
+ *     summary: Initiate payment
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     responses:
+ *       200:
+ *         description: Payment initiated
+ *       400:
+ *         description: Validation error
+ */
+
 router.post('/pay', authenticate, initiatePayment);
+
+/**
+ * @swagger
+ * /pay/callback:
+ *   get:
+ *     summary: Payment callback/verification
+ *     responses:
+ *       200:
+ *         description: Payment verified
+ *       400:
+ *         description: Verification failed
+ */
+
 router.get('/callback', verifyPayment);
 
 module.exports = router;
