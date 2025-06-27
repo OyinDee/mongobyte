@@ -243,7 +243,7 @@ exports.getMealsByRestaurant = async (request, response) => {
     const { customId } = request.params;
 
     try {
-        const restaurant = await Restaurant.findOne({ customId }).populate('meals');
+        const restaurant = await exports.findRestaurantById(customId);
         if (!restaurant) {
             return response.status(404).json({ message: 'Restaurant not found' });
         }
@@ -443,7 +443,7 @@ exports.createWithdrawal = async (req, res) => {
 exports.toggleRestaurantActiveStatus = async (request, response) => {
     const { id } = request.params;
     try {
-        const restaurant = await Restaurant.findOne({ customId: id });
+        const restaurant = await exports.findRestaurantById(id);
         if (!restaurant) {
             return response.status(404).json({ message: 'Restaurant not found' });
         }

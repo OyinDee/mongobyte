@@ -66,7 +66,7 @@ const TERMII_SENDER_ID = process.env.TERMII_SENDER_ID;
 
     const { user, meals, note, totalPrice, location, phoneNumber, restaurantCustomId, nearestLandmark, fee } = request.body;
     try {
-        const restaurant = await Restaurant.findOne({ customId: restaurantCustomId });
+        const restaurant = await findRestaurantByIdHelper(restaurantCustomId);
         if (!restaurant) {
             return response.status(404).json({ message: 'Restaurant not found' });
         }
@@ -226,7 +226,7 @@ exports.getOrdersByRestaurant = async (request, response) => {
     const { customId } = request.params;
 
     try {
-        const restaurant = await Restaurant.findOne({ customId }).populate('meals');
+        const restaurant = await findRestaurantByIdHelper(customId);
         if (!restaurant) {
             return response.status(404).json({ message: 'Restaurant not found' });
         }

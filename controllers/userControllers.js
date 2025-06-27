@@ -120,25 +120,64 @@ exports.updateByteBalance = async (request) => {
 
 exports.getAllRestaurants = async (request, response) => {
     try {
-        // Get user's university from their profile
-        const user = await User.findById(request.user._id);
-        if (!user) {
-            return response.status(404).json({ message: 'User not found' });
+        let restaurants;
+        
+        // Check if user is authenticated and has university info
+        if (request.user && request.user._id) {
+            console.log('Authenticated user requesting restaurants');
+            const user = await User.findById(request.user._id);
+            
+            if (user && user.university) {
+                console.log('Filtering restaurants by university:', user.university);
+                // Filter restaurants by user's university
+                restaurants = await Restaurant.find({ 
+                    university: user.university,
+                    isActive: true 
+                }).populate('meals');
+            } else {
+                console.log('User found but no university, returning all active restaurants');
+                // User exists but no university info, return all active restaurants
+                restaurants = await Restaurant.find({ 
+                    isActive: true 
+                }).populate('meals');
+            }
+        } else {
+            console.log('No authenticated user, returning all active restaurants');
+            // No authenticated user, return all active restaurants
+            restaurants = await Restaurant.find({ 
+                isActive: true 
+            }).populate('meals');
         }
 
-        // Filter restaurants by user's university
-        const restaurants = await Restaurant.find({ 
-            university: user.university,
-            isActive: true 
-        }).populate('meals');
-
+        console.log(`Found ${restaurants.length} restaurants`);
         response.json(restaurants);
     } catch (error) {
-        console.error(error);
-        response.status(500).json({ message: 'Internal server error' });
+        console.error('Error in getAllRestaurants:', error);
+        response.status(500).json({ 
+            message: 'Internal server error',
+            error: error.message 
+        });
     }
 };
 
+// Public endpoint to get all active restaurants (no authentication required)
+exports.getAllRestaurantsPublic = async (request, response) => {
+    try {
+        console.log('Public request for all restaurants');
+        const restaurants = await Restaurant.find({ 
+            isActive: true 
+        }).populate('meals');
+
+        console.log(`Found ${restaurants.length} active restaurants`);
+        response.json(restaurants);
+    } catch (error) {
+        console.error('Error in getAllRestaurantsPublic:', error);
+        response.status(500).json({ 
+            message: 'Internal server error',
+            error: error.message 
+        });
+    }
+};
 
 exports.createOrder = async (request, response) => {
     // const userId = request.user._id;

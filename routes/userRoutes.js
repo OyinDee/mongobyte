@@ -154,11 +154,27 @@ router.put('/updateByteBalance', authenticate, userControllers.updateByteBalance
  *   get:
  *     tags: [Users]
  *     summary: List all restaurants
+ *     description: List all active restaurants. If authenticated, filters by user's university.
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Returns a list of restaurants
  */
-router.get('/restaurants', userControllers.getAllRestaurants);
+router.get('/restaurants', authenticate, userControllers.getAllRestaurants);
+
+/**
+ * @swagger
+ * /users/restaurants/public:
+ *   get:
+ *     tags: [Users]
+ *     summary: List all active restaurants (public)
+ *     description: Public endpoint to list all active restaurants without authentication
+ *     responses:
+ *       200:
+ *         description: Returns a list of active restaurants
+ */
+router.get('/restaurants/public', userControllers.getAllRestaurantsPublic);
 
 /**
  * @swagger
