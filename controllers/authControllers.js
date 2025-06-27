@@ -190,15 +190,28 @@ exports.verifyEmail = async (request, response) => {
 exports.forgotPassword = async (request, response) => {
     const { email } = request.body;
     try {
+        console.log('Forgot password request for email:', email);
+        
         const user = await User.findOne({ email });
         if (!user) {
+            console.log('User not found for email:', email);
             return response.status(404).json({ message: 'No account with that email found' });
         }
 
+        console.log('User found, generating reset code...');
         const resetCode = generateVerificationCode();
-        user.resetCode = resetCode;
-        user.resetCodeExpires = Date.now() + 3600000;
-        await user.save();
+        
+        // Use findOneAndUpdate to avoid validation issues with existing users
+        await User.findOneAndUpdate(
+            { email },
+            { 
+                resetCode: resetCode,
+                resetCodeExpires: Date.now() + 3600000
+            },
+            { runValidators: false } // Skip validation to avoid issues with existing users
+        );
+        
+        console.log('Reset code saved to user');
 
         const passwordResetEmailHtml = `
         <html>
@@ -226,19 +239,30 @@ exports.forgotPassword = async (request, response) => {
         </html>
         `;
 
+        console.log('Attempting to send email...');
         await sendEmail(email, 'Password Reset Code', `Here is your password reset code: ${resetCode}`, passwordResetEmailHtml);
+        console.log('Email sent successfully');
 
         response.status(200).json({ message: 'Password reset code sent to your email' });
 
+        console.log('Creating notification...');
         const userNotification = new Notification({
             userId: user._id,
             message: 'Password reset code sent to your email.'
         });
         await userNotification.save();
-        user.notifications.push(userNotification._id);
-        await user.save();
+        
+        // Update user notifications without triggering validation
+        await User.findOneAndUpdate(
+            { _id: user._id },
+            { $push: { notifications: userNotification._id } },
+            { runValidators: false }
+        );
+        
+        console.log('Notification created and saved');
     } catch (error) {
-        response.status(500).json({ message: 'Internal server error' });
+        console.error('Error in forgotPassword:', error);
+        response.status(500).json({ message: 'Internal server error', error: error.message });
     }
 };
 
@@ -251,10 +275,21 @@ exports.resetPassword = async (request, response) => {
             return response.status(400).json({ message: 'Invalid or expired reset code' });
         }
 
-        user.password = newPassword;
-        user.resetCode = null;
-        user.resetCodeExpires = null;
-        await user.save();
+        // Hash the new password manually since we're using findOneAndUpdate
+        const bcrypt = require('bcryptjs');
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+        // Update password and clear reset codes without triggering validation
+        await User.findOneAndUpdate(
+            { _id: user._id },
+            { 
+                password: hashedPassword,
+                resetCode: null,
+                resetCodeExpires: null
+            },
+            { runValidators: false }
+        );
 
         response.status(200).json({ message: 'Password reset successfully' });
 
@@ -263,10 +298,16 @@ exports.resetPassword = async (request, response) => {
             message: 'Your password has been reset successfully.'
         });
         await userNotification.save();
-        user.notifications.push(userNotification._id);
-        await user.save();
+        
+        // Add notification without triggering validation
+        await User.findOneAndUpdate(
+            { _id: user._id },
+            { $push: { notifications: userNotification._id } },
+            { runValidators: false }
+        );
     } catch (error) {
-        response.status(500).json({ message: 'Internal server error' });
+        console.error('Error in resetPassword:', error);
+        response.status(500).json({ message: 'Internal server error', error: error.message });
     }
 };
 
