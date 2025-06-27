@@ -24,7 +24,7 @@ exports.getProfile = async (request, response) => {
                 imageUrl: user.imageUrl,
                 orderHistory: user.orderHistory,
                 location: user.location || '',
-                nearestLandmark: user. nearestLandmark || ''
+                nearestLandmark: user.nearestLandmark || ''
             },
             token: jwt.sign({ user }, process.env.JWT_SECRET)
         });

@@ -117,23 +117,31 @@ exports.login = async (request, response) => {
 
             await sendEmail(user.email, 'Verify your email and start to byte!', `Here's your new code: ${newVerificationCode}.`, emailHtml);
 
+            // Send response first
             response.status(200).json({
                 message: 'Login successful, but email verification is pending. A new verification code has been sent to your email.',
                 isVerified: false,
             });
 
-            const userNotification = new Notification({
-                userId: user._id,
-                message: 'Login successful, but your email is not verified. A new verification code has been sent to your email.'
-            });
-            await userNotification.save();
-            user.notifications.push(userNotification._id);
-            await user.save();
+            // Handle notification creation in background (don't await to prevent blocking)
+            try {
+                const userNotification = new Notification({
+                    userId: user._id,
+                    message: 'Login successful, but your email is not verified. A new verification code has been sent to your email.'
+                });
+                await userNotification.save();
+                user.notifications.push(userNotification._id);
+                await user.save();
+            } catch (notificationError) {
+                console.error('Error creating notification:', notificationError);
+                // Don't send response here since we already sent one above
+            }
             return;
         }
 
         const token = jwt.sign({ user }, process.env.JWT_SECRET);
 
+        // Send response first
         response.status(202).json({
             message: 'Login successful!',
             user: {
@@ -149,13 +157,19 @@ exports.login = async (request, response) => {
             token,
         });
 
-        const userNotification = new Notification({
-            userId: user._id,
-            message: 'Login successful!'
-        });
-        await userNotification.save();
-        user.notifications.push(userNotification._id);
-        await user.save();
+        // Handle notification creation in background (don't await to prevent blocking)
+        try {
+            const userNotification = new Notification({
+                userId: user._id,
+                message: 'Login successful!'
+            });
+            await userNotification.save();
+            user.notifications.push(userNotification._id);
+            await user.save();
+        } catch (notificationError) {
+            console.error('Error creating notification:', notificationError);
+            // Don't send response here since we already sent one above
+        }
     } catch (error) {
         response.status(500).json({ message: 'Internal server error' });
     }
