@@ -184,6 +184,9 @@ router.post('/login', authController.loginRestaurant);
 
 router.get('/', restaurantController.getAllRestaurants);
 
+// Debug route to list all restaurants
+router.get('/debug/list', restaurantController.debugRestaurants);
+
 /**
  * @swagger
  * /restaurants/{id}:

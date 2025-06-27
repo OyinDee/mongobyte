@@ -119,16 +119,50 @@ exports.getAllRestaurants = async (request, response) => {
 };
 
 exports.getRestaurantById = async (request, response) => {
-    const  id  = request.params.id;
+    const { id } = request.params;
+    
     try {
-        const restaurant = await Restaurant.findOne({ customId: id }).populate('meals');
-        if (!restaurant) {
-            return response.status(404).json({ message: 'Restaurant not found' });
+        console.log('Searching for restaurant with ID:', id);
+        
+        let restaurant = null;
+        
+        // Check if it's a valid MongoDB ObjectId format
+        if (id.match(/^[0-9a-fA-F]{24}$/)) {
+            console.log('Trying MongoDB ObjectId search first');
+            restaurant = await Restaurant.findById(id).populate('meals');
         }
+        
+        // If not found by ObjectId or not ObjectId format, try customId
+        if (!restaurant) {
+            console.log('Trying customId search (case-insensitive)');
+            restaurant = await Restaurant.findOne({ 
+                customId: { $regex: new RegExp(`^${id}$`, 'i') } 
+            }).populate('meals');
+        }
+        
+        // If still not found, try exact case match for customId
+        if (!restaurant) {
+            console.log('Trying exact case customId match');
+            restaurant = await Restaurant.findOne({ customId: id }).populate('meals');
+        }
+        
+        if (!restaurant) {
+            console.log('Restaurant not found with any method');
+            return response.status(404).json({ 
+                message: 'Restaurant not found',
+                searchedId: id,
+                suggestions: 'Please verify the restaurant ID is correct. You can use either the MongoDB ObjectId or the custom restaurant ID.'
+            });
+        }
+        
+        console.log('Restaurant found:', restaurant.customId || restaurant._id);
         response.json(restaurant);
     } catch (error) {
-        console.error(error);
-        response.status(500).json({ message: 'Internal server error' });
+        console.error('Error in getRestaurantById:', error);
+        response.status(500).json({ 
+            message: 'Internal server error',
+            error: error.message 
+        });
     }
 };
 
@@ -136,7 +170,18 @@ exports.getRestaurantById = async (request, response) => {
 exports.updateRestaurant = async (request, response) => {
     const { id } = request.params;
     try {
-        const restaurant = await Restaurant.findOneAndUpdate({ customId: id }, request.body, { new: true });
+        let restaurant = null;
+        
+        // Check if it's a valid MongoDB ObjectId format
+        if (id.match(/^[0-9a-fA-F]{24}$/)) {
+            restaurant = await Restaurant.findByIdAndUpdate(id, request.body, { new: true });
+        }
+        
+        // If not found by ObjectId, try customId
+        if (!restaurant) {
+            restaurant = await Restaurant.findOneAndUpdate({ customId: id }, request.body, { new: true });
+        }
+        
         if (!restaurant) {
             return response.status(404).json({ message: 'Restaurant not found' });
         }
@@ -151,7 +196,18 @@ exports.updateRestaurant = async (request, response) => {
 exports.deleteRestaurant = async (request, response) => {
     const { id } = request.params;
     try {
-        const restaurant = await Restaurant.findOneAndDelete({ customId: id });
+        let restaurant = null;
+        
+        // Check if it's a valid MongoDB ObjectId format
+        if (id.match(/^[0-9a-fA-F]{24}$/)) {
+            restaurant = await Restaurant.findByIdAndDelete(id);
+        }
+        
+        // If not found by ObjectId, try customId
+        if (!restaurant) {
+            restaurant = await Restaurant.findOneAndDelete({ customId: id });
+        }
+        
         if (!restaurant) {
             return response.status(404).json({ message: 'Restaurant not found' });
         }
@@ -397,5 +453,54 @@ exports.toggleRestaurantActiveStatus = async (request, response) => {
     } catch (error) {
         console.error(error);
         response.status(500).json({ message: 'Internal server error' });
+    }
+};
+
+// Debug function to help troubleshoot restaurant lookup issues
+exports.debugRestaurants = async (request, response) => {
+    try {
+        const restaurants = await Restaurant.find({}, 'customId name email isActive');
+        response.json({
+            message: 'Debug: All restaurants in database',
+            count: restaurants.length,
+            restaurants: restaurants.map(r => ({
+                customId: r.customId,
+                name: r.name,
+                email: r.email,
+                isActive: r.isActive
+            }))
+        });
+    } catch (error) {
+        console.error('Error in debugRestaurants:', error);
+        response.status(500).json({ message: 'Internal server error' });
+    }
+};
+
+// Helper function to find restaurant by various ID formats
+exports.findRestaurantById = async (id) => {
+    try {
+        let restaurant = null;
+        
+        // Check if it's a valid MongoDB ObjectId format
+        if (id.match(/^[0-9a-fA-F]{24}$/)) {
+            restaurant = await Restaurant.findById(id);
+        }
+        
+        // If not found by ObjectId or not ObjectId format, try customId
+        if (!restaurant) {
+            restaurant = await Restaurant.findOne({ 
+                customId: { $regex: new RegExp(`^${id}$`, 'i') } 
+            });
+        }
+        
+        // If still not found, try exact case match for customId
+        if (!restaurant) {
+            restaurant = await Restaurant.findOne({ customId: id });
+        }
+        
+        return restaurant;
+    } catch (error) {
+        console.error('Error in findRestaurantById helper:', error);
+        return null;
     }
 };

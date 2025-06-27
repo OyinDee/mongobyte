@@ -34,7 +34,30 @@ async function sendSMS(to, message) {
     }
 }
 
-
+// Helper function to find restaurant by ID with fallback methods
+const findRestaurantByIdHelper = async (id) => {
+    try {
+        // First try customId (case-insensitive)
+        let restaurant = await Restaurant.findOne({ 
+            customId: { $regex: new RegExp(`^${id}$`, 'i') } 
+        });
+        
+        // If not found and looks like MongoDB ObjectId, try that
+        if (!restaurant && id.match(/^[0-9a-fA-F]{24}$/)) {
+            restaurant = await Restaurant.findById(id);
+        }
+        
+        // If still not found, try exact case match
+        if (!restaurant) {
+            restaurant = await Restaurant.findOne({ customId: id });
+        }
+        
+        return restaurant;
+    } catch (error) {
+        console.error('Error in findRestaurantByIdHelper:', error);
+        return null;
+    }
+};
 
 exports.createOrder = async (request, response) => {
     const TERMII_BASE_URL = process.env.TERMII_BASE_URL;

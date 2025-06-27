@@ -1,14 +1,44 @@
 const Meal = require('../models/Meals');
 const Restaurant = require('../models/Restaurants');
+const { findRestaurantById } = require('./restaurantControllers');
 
+// Helper function to find restaurant by ID with fallback methods
+const findRestaurantByIdHelper = async (id) => {
+    try {
+        // First try customId (case-insensitive)
+        let restaurant = await Restaurant.findOne({ 
+            customId: { $regex: new RegExp(`^${id}$`, 'i') } 
+        });
+        
+        // If not found and looks like MongoDB ObjectId, try that
+        if (!restaurant && id.match(/^[0-9a-fA-F]{24}$/)) {
+            restaurant = await Restaurant.findById(id);
+        }
+        
+        // If still not found, try exact case match
+        if (!restaurant) {
+            restaurant = await Restaurant.findOne({ customId: id });
+        }
+        
+        return restaurant;
+    } catch (error) {
+        console.error('Error in findRestaurantByIdHelper:', error);
+        return null;
+    }
+};
 
 exports.createMeal = async (request, response) => {
     const { customId } = request.params;
 
     try {
-        const restaurant = await Restaurant.findOne({ customId:customId });
+        console.log('Creating meal for restaurant ID:', customId);
+        const restaurant = await findRestaurantByIdHelper(customId);
         if (!restaurant) {
-            return response.status(404).json({ message: 'Restaurant not found' });
+            console.log('Restaurant not found for meal creation:', customId);
+            return response.status(404).json({ 
+                message: 'Restaurant not found',
+                restaurantId: customId 
+            });
         }
         const meal = new Meal({ ...request.body, restaurant: restaurant._id });
         restaurant.meals.push(meal._id);
@@ -59,7 +89,7 @@ exports.updateMeal = async (request, response) => {
             return response.status(404).json({ message: 'Meal not found' });
         }
 
-        const restaurant = await Restaurant.findOne({ customId: restaurantId });
+        const restaurant = await findRestaurantByIdHelper(restaurantId);
         if (!restaurant || !meal.restaurant.equals(restaurant._id)) {
             return response.status(403).json({ message: 'Unauthorized: You do not own this meal' });
         }
@@ -113,7 +143,7 @@ exports.addBatchMeals = async (req, res) => {
         return res.status(400).json({ message: 'restaurantId and meals array are required.' });
     }
     try {
-        const restaurant = await Restaurant.findOne({ customId: restaurantId });
+        const restaurant = await findRestaurantByIdHelper(restaurantId);
         if (!restaurant) {
             return res.status(404).json({ message: 'Restaurant not found' });
         }
