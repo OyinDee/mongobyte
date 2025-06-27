@@ -8,6 +8,7 @@ const router = express.Router();
  * @swagger
  * /pay:
  *   post:
+ *     tags: [Payments]
  *     summary: Initiate payment
  *     security:
  *       - bearerAuth: []
@@ -30,6 +31,7 @@ router.post('/pay', authenticate, initiatePayment);
  * @swagger
  * /pay/callback:
  *   get:
+ *     tags: [Payments]
  *     summary: Payment callback/verification
  *     responses:
  *       200:

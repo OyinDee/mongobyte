@@ -120,7 +120,18 @@ exports.updateByteBalance = async (request) => {
 
 exports.getAllRestaurants = async (request, response) => {
     try {
-        const restaurants = await Restaurant.find().populate('meals');
+        // Get user's university from their profile
+        const user = await User.findById(request.user._id);
+        if (!user) {
+            return response.status(404).json({ message: 'User not found' });
+        }
+
+        // Filter restaurants by user's university
+        const restaurants = await Restaurant.find({ 
+            university: user.university,
+            isActive: true 
+        }).populate('meals');
+
         response.json(restaurants);
     } catch (error) {
         console.error(error);
@@ -286,4 +297,4 @@ exports.fetchNotifications = async (request, response) => {
   }
 };
 
-  
+

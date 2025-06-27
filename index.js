@@ -22,7 +22,7 @@ const io = socketIO(server);
 
 app.use(cookieParser());
 app.use(cors({
-    origin: ['https://www.yumbyte.ng',  'https://yumbyte.ng', 'yumbyte.ng'],
+    origin: ['https://www.yumbyte.ng',  'https://yumbyte.ng', 'yumbyte.ng', 'http://localhost:3000'],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true
@@ -38,9 +38,9 @@ const swaggerOptions = {
   definition: {
     openapi: '3.0.0',
     info: {
-      title: 'Mongobyte API',
+      title: 'Byte! API',
       version: '1.0.0',
-      description: 'API documentation for Mongobyte',
+      description: 'API documentation for Byte! - A campus food delivery service',
     },
     servers: [
       { 
@@ -49,6 +49,36 @@ const swaggerOptions = {
           : 'http://localhost:8080/api/v1',
         description: process.env.NODE_ENV === 'production' ? 'Production server' : 'Development server'
       },
+    ],
+    tags: [
+      {
+        name: 'Authentication',
+        description: 'User authentication and account management endpoints'
+      },
+      {
+        name: 'Users',
+        description: 'User profile and account management operations'
+      },
+      {
+        name: 'Meals',
+        description: 'Meal creation, listing, and management endpoints'
+      },
+      {
+        name: 'Orders',
+        description: 'Order creation, tracking, and management'
+      },
+      {
+        name: 'Restaurants',
+        description: 'Restaurant registration, management, and operations'
+      },
+      {
+        name: 'Payments',
+        description: 'Payment processing and transaction management'
+      },
+      {
+        name: 'Admin',
+        description: 'Super admin operations and management'
+      }
     ],
     components: {
       securitySchemes: {
@@ -70,7 +100,7 @@ app.use('/api-docs', swaggerUi.serve);
 app.get('/api-docs', swaggerUi.setup(swaggerSpec, {
   explorer: true,
   customCss: '.swagger-ui .topbar { display: none }',
-  customSiteTitle: "Mongobyte API Documentation"
+  customSiteTitle: "Byte! API Documentation"
 }));
 
 // API routes
@@ -80,7 +110,7 @@ app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/meals', mealRoutes);
 app.use('/api/v1/pay', paymentRoutes);
 app.use('/api/v1/orders', orderRoutes);
-app.use('/api/superadmin', superAdminRoutes);
+app.use('/api/v1/superadmin', superAdminRoutes);
 
 const PORT = process.env.PORT || 8080;
 server.listen(PORT, () => {

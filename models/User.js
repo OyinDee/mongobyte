@@ -22,6 +22,14 @@ const userSchema = new mongoose.Schema({
         required: true,
         unique: true,
     },
+    university: {
+        type: String,
+        required: true,
+    },
+    address: {
+        type: String,
+        required: true,
+    },
     isVerified: {
         type: Boolean,
         default: false,

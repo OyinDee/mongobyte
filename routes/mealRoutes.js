@@ -5,59 +5,115 @@ const authenticate = require('../middlewares/authenticateRestaurant');
 
 /**
  * @swagger
+ * tags:
+ *   name: Meals
+ *   description: Meal management and operations
+ */
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Meal:
+ *       type: object
+ *       required:
+ *         - name
+ *         - price
+ *         - tag
+ *         - per
+ *       properties:
+ *         name:
+ *           type: string
+ *           description: Name of the meal
+ *         description:
+ *           type: string
+ *           description: Detailed description of the meal
+ *         price:
+ *           type: number
+ *           description: Price of the meal
+ *         tag:
+ *           type: string
+ *           description: Category or type of meal
+ *         per:
+ *           type: string
+ *           description: Serving size or quantity (e.g., "per plate", "per portion")
+ *         imageUrl:
+ *           type: string
+ *           description: URL to the meal's image
+ *       example:
+ *         name: "Jollof Rice"
+ *         description: "Spicy Nigerian jollof rice with chicken"
+ *         price: 1500
+ *         tag: "Rice"
+ *         per: "plate"
+ *         imageUrl: "https://example.com/jollof.jpg"
+ */
+
+/**
+ * @swagger
  * /meals/{customId}/create:
  *   post:
+ *     tags: [Meals]
  *     summary: Add a new meal to a restaurant
+ *     description: Create a new meal for a specific restaurant (Restaurant auth required)
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: customId
  *         required: true
  *         schema:
  *           type: string
+ *         description: Restaurant's custom ID
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               name:
- *                 type: string
- *               description:
- *                 type: string
- *               price:
- *                 type: number
- *               tag:
- *                 type: string
- *               per:
- *                 type: string
- *               imageUrl:
- *                 type: string
+ *             $ref: '#/components/schemas/Meal'
  *     responses:
  *       201:
  *         description: Meal created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 meal:
+ *                   $ref: '#/components/schemas/Meal'
  *       400:
  *         description: Validation error
+ *       401:
+ *         description: Unauthorized - Not a restaurant account
  */
-
-router.post('/:customId/create', mealController.createMeal);
+router.post('/:customId/create', authenticate, mealController.createMeal);
 
 /**
  * @swagger
  * /meals:
  *   get:
+ *     tags: [Meals]
  *     summary: List all meals
+ *     description: Retrieve a list of all available meals
  *     responses:
  *       200:
- *         description: List of meals
+ *         description: List of meals retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Meal'
  */
-
 router.get('/', mealController.getAllMeals);
 
 /**
  * @swagger
  * /meals/{id}:
  *   get:
+ *     tags: [Meals]
  *     summary: Get meal by ID
  *     parameters:
  *       - in: path
@@ -71,13 +127,13 @@ router.get('/', mealController.getAllMeals);
  *       404:
  *         description: Meal not found
  */
-
 router.get('/:id', mealController.getMealById);
 
 /**
  * @swagger
  * /meals/{id}:
  *   put:
+ *     tags: [Meals]
  *     summary: Update meal by ID
  *     security:
  *       - bearerAuth: []
@@ -112,13 +168,13 @@ router.get('/:id', mealController.getMealById);
  *       400:
  *         description: Validation error
  */
-
 router.put('/:id', authenticate, authenticate, mealController.updateMeal);
 
 /**
  * @swagger
  * /meals/{id}:
  *   delete:
+ *     tags: [Meals]
  *     summary: Delete meal by ID
  *     security:
  *       - bearerAuth: []
@@ -134,13 +190,13 @@ router.put('/:id', authenticate, authenticate, mealController.updateMeal);
  *       404:
  *         description: Meal not found
  */
-
 router.delete('/:id', authenticate, authenticate, mealController.deleteMeal);
 
 /**
  * @swagger
  * /meals/batch:
  *   post:
+ *     tags: [Meals]
  *     summary: Add multiple meals to a restaurant in a batch
  *     security:
  *       - bearerAuth: []
@@ -176,7 +232,6 @@ router.delete('/:id', authenticate, authenticate, mealController.deleteMeal);
  *       400:
  *         description: Validation error
  */
-
 router.post('/batch', authenticate, mealController.addBatchMeals);
 
 module.exports = router;

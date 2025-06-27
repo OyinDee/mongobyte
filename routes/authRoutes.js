@@ -5,130 +5,250 @@ const authController = require('../controllers/authControllers');
 
 /**
  * @swagger
+ * tags:
+ *   name: Authentication
+ *   description: User authentication and account management endpoints
+ */
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     User:
+ *       type: object
+ *       required:
+ *         - username
+ *         - email
+ *         - password
+ *         - phoneNumber
+ *         - university
+ *         - address
+ *       properties:
+ *         username:
+ *           type: string
+ *           description: Unique username for the user
+ *         email:
+ *           type: string
+ *           format: email
+ *           description: Valid email address
+ *         password:
+ *           type: string
+ *           format: password
+ *           minLength: 6
+ *           description: User password (minimum 6 characters)
+ *         phoneNumber:
+ *           type: string
+ *           description: User's phone number
+ *         university:
+ *           type: string
+ *           description: User's university/campus
+ *         address:
+ *           type: string
+ *           description: User's delivery address
+ *       example:
+ *         username: "johndoe"
+ *         email: "john@example.com"
+ *         password: "password123"
+ *         phoneNumber: "+2348012345678"
+ *         university: "University of Lagos"
+ *         address: "Block A, Room 101, Student Hostel"
+ */
+
+/**
+ * @swagger
  * /auth/register:
  *   post:
+ *     tags: [Authentication]
  *     summary: Register a new user
+ *     description: Create a new user account with verification email
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               username:
- *                 type: string
- *               email:
- *                 type: string
- *               password:
- *                 type: string
- *               phoneNumber:
- *                 type: string
+ *             $ref: '#/components/schemas/User'
  *     responses:
  *       201:
- *         description: User registered successfully
+ *         description: User registered successfully. Check email for verification code.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Registration successful! Please check your email to verify your account."
  *       400:
  *         description: Validation error or user already exists
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Email already exists"
  */
-
-// Register a new user
 router.post('/register', authController.register);
 
 /**
  * @swagger
  * /auth/login:
  *   post:
- *     summary: Authenticate a user and obtain a JWT token
+ *     tags: [Authentication]
+ *     summary: Login to user account
+ *     description: Authenticate user and get JWT token for subsequent requests
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - email
+ *               - password
  *             properties:
  *               email:
  *                 type: string
+ *                 format: email
+ *                 description: User's email address
  *               password:
  *                 type: string
+ *                 format: password
+ *                 description: User's password
  *     responses:
  *       200:
- *         description: JWT token and user details
+ *         description: Login successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
+ *                 token:
+ *                   type: string
  *       401:
- *         description: Invalid email or password
+ *         description: Invalid credentials
  */
-
-// Login user
 router.post('/login', authController.login);
 
 /**
  * @swagger
  * /auth/verify-email:
  *   get:
+ *     tags: [Authentication]
  *     summary: Verify user email
+ *     description: Verify user's email address using the verification code sent during registration
  *     parameters:
  *       - in: query
  *         name: token
+ *         required: true
  *         schema:
  *           type: string
+ *         description: Verification code received in email
  *     responses:
  *       200:
- *         description: Email verified
+ *         description: Email verified successfully
  *       400:
- *         description: Invalid or expired token
+ *         description: Invalid or expired verification code
  */
-
-// Verify email
 router.get('/verify-email', authController.verifyEmail);
 
 /**
  * @swagger
- * /auth/forgot-password:
+ * /auth/resend-verification:
  *   post:
- *     summary: Request password reset
+ *     tags: [Authentication]
+ *     summary: Resend verification email
+ *     description: Request a new verification code if the original one expired or wasn't received
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - email
  *             properties:
  *               email:
  *                 type: string
+ *                 format: email
+ *                 description: Email address to resend verification code to
  *     responses:
  *       200:
- *         description: Password reset email sent
- *       400:
- *         description: Validation error
+ *         description: New verification code sent successfully
+ *       404:
+ *         description: User not found
  */
+router.post('/resend-verification', authController.resendVerification);
 
-// Forgot password
+/**
+ * @swagger
+ * /auth/forgot-password:
+ *   post:
+ *     tags: [Authentication]
+ *     summary: Request password reset
+ *     description: Send a password reset code to user's email
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 description: Email address for password reset
+ *     responses:
+ *       200:
+ *         description: Password reset code sent to email
+ *       404:
+ *         description: User not found
+ */
 router.post('/forgot-password', authController.forgotPassword);
 
 /**
  * @swagger
  * /auth/reset-password:
  *   post:
+ *     tags: [Authentication]
  *     summary: Reset password
+ *     description: Reset user password using the code received in email
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - email
+ *               - resetCode
+ *               - newPassword
  *             properties:
  *               email:
  *                 type: string
+ *                 format: email
+ *                 description: User's email address
  *               resetCode:
  *                 type: string
+ *                 description: Reset code received in email
  *               newPassword:
  *                 type: string
+ *                 format: password
+ *                 minLength: 6
+ *                 description: New password (minimum 6 characters)
  *     responses:
  *       200:
  *         description: Password reset successful
  *       400:
- *         description: Validation error
+ *         description: Invalid or expired reset code
  */
-
-// Reset password
 router.post('/reset-password', authController.resetPassword);
 
 module.exports = router;

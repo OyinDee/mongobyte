@@ -7,14 +7,23 @@ const Notification = require('../models/Notifications');
 const generateVerificationCode = () => Math.floor(100000 + Math.random() * 900000).toString();
 
 exports.register = async (request, response) => {
-    const { username, email, password, phoneNumber } = request.body;
+    const { username, email, password, phoneNumber, university, address } = request.body;
     try {
+        // Validate required fields
+        if (!username || !email || !password || !phoneNumber || !university || !address) {
+            return response.status(400).json({ 
+                message: 'All fields are required: username, email, password, phoneNumber, university, and address' 
+            });
+        }
+
         const verificationCode = generateVerificationCode();
         const newUser = new User({
             username,
             email,
             password,
             phoneNumber,
+            university,
+            address,
             verificationCode
         });
 
@@ -337,6 +346,67 @@ exports.loginRestaurant = async (request, response) => {
     } catch (error) {
         console.error(error);
         return response.status(500).json({ message: 'Server error. Please try again later.' });
+    }
+};
+
+exports.resendVerification = async (request, response) => {
+    const { email } = request.body;
+
+    try {
+        const user = await User.findOne({ email });
+        
+        if (!user) {
+            return response.status(404).json({ message: 'User not found' });
+        }
+
+        if (user.isVerified) {
+            return response.status(400).json({ message: 'Email is already verified' });
+        }
+
+        // Generate new verification code
+        const newVerificationCode = generateVerificationCode();
+        user.verificationCode = newVerificationCode;
+        await user.save();
+
+        const emailHtml = `
+        <html>
+        <head>
+          <style>
+            body { font-family: Arial, sans-serif; color: #000000; }
+            .container { width: 90%; max-width: 600px; margin: 20px auto; padding: 20px; border: 1px solid #dddddd; border-radius: 8px; background-color: #ffffff; }
+            .header { text-align: center; border-bottom: 1px solid #dddddd; padding-bottom: 10px; margin-bottom: 20px; }
+            .content { font-size: 16px; line-height: 1.5; }
+            .code { font-size: 24px; text-align: center; padding: 20px; background-color: #f8f9fa; border-radius: 4px; margin: 20px 0; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header"><h1>Email Verification</h1></div>
+            <div class="content">
+              <p>You requested a new verification code. Please use the following code to verify your email address:</p>
+              <div class="code"><strong>${newVerificationCode}</strong></div>
+              <p>This code will expire in 24 hours.</p>
+              <p>If you didn't request this code, please ignore this email.</p>
+            </div>
+          </div>
+        </body>
+        </html>
+        `;
+
+        await sendEmail(
+            email,
+            'New Verification Code - Byte',
+            'Please verify your email with the new verification code.',
+            emailHtml
+        );
+
+        response.status(200).json({
+            message: 'New verification code sent successfully. Please check your email.'
+        });
+
+    } catch (error) {
+        console.error('Resend verification error:', error);
+        response.status(500).json({ message: 'Error sending verification code. Please try again later.' });
     }
 };
 

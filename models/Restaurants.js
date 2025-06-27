@@ -14,6 +14,10 @@ const restaurantSchema = new mongoose.Schema({
         required: true,
         unique: true,
     },
+    university: {
+        type: String,
+        required: true,
+    },
     bankName: {
         type: String,
     },
