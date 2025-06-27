@@ -291,4 +291,7 @@ router.delete('/:id', authenticate, (req, res, next) => {
 
 router.patch('/:id/toggle-active', authenticate, restaurantController.toggleRestaurantActiveStatus);
 
+// Test route to check restaurant lookup
+router.get('/test/:id', restaurantController.testRestaurantLookup);
+
 module.exports = router;

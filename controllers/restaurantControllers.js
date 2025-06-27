@@ -3,7 +3,8 @@ const crypto = require('crypto')
 const sendEmail = require('../configs/nodemailer');
 const Meal = require('../models/Meals')
 const Withdrawal = require('../models/Withdrawals');
-const Notification = require('../models/Notifications')
+const Notification = require('../models/Notifications');
+const Order = require('../models/Orders');
 
 function generatePassword() {
     return crypto.randomBytes(5).toString('hex');
@@ -502,5 +503,43 @@ exports.findRestaurantById = async (id) => {
     } catch (error) {
         console.error('Error in findRestaurantById helper:', error);
         return null;
+    }
+};
+
+// Test endpoint to check restaurant lookup by ID
+exports.testRestaurantLookup = async (request, response) => {
+    const { id } = request.params;
+    
+    try {
+        console.log('Testing restaurant lookup for ID:', id);
+        
+        const restaurant = await exports.findRestaurantById(id);
+        
+        if (!restaurant) {
+            return response.status(404).json({ 
+                message: 'Restaurant not found',
+                searchedId: id,
+                idType: id.match(/^[0-9a-fA-F]{24}$/) ? 'MongoDB ObjectId' : 'Custom ID'
+            });
+        }
+        
+        response.json({
+            message: 'Restaurant found successfully',
+            restaurant: {
+                _id: restaurant._id,
+                customId: restaurant.customId,
+                name: restaurant.name,
+                email: restaurant.email,
+                isActive: restaurant.isActive
+            },
+            searchedWith: id,
+            foundBy: id === restaurant.customId ? 'Custom ID' : 'MongoDB ObjectId'
+        });
+    } catch (error) {
+        console.error('Error in testRestaurantLookup:', error);
+        response.status(500).json({ 
+            message: 'Internal server error',
+            error: error.message 
+        });
     }
 };
