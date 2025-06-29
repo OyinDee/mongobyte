@@ -23,7 +23,8 @@ const userSchema = new mongoose.Schema({
         unique: true,
     },
     university: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'University',
         required: true,
     },
     isVerified: {

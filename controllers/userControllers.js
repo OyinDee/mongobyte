@@ -2,8 +2,9 @@ const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const Order = require('../models/Orders');
 const Meal = require('../models/Meals');
-const Restaurant = require('../models/Restaurants')
+const Restaurant = require('../models/Restaurants');
 const Notification = require('../models/Notifications');
+const University = require('../models/University');
 
 exports.getProfile = async (request, response) => {
     const userId = request.user._id; 
@@ -333,6 +334,79 @@ exports.fetchNotifications = async (request, response) => {
   } catch (error) {
     console.error('Error fetching notifications:', error);
     response.status(500).json({ message: 'Error fetching notifications' });
+  }
+};
+
+exports.updateUniversity = async (req, res) => {
+  try {
+    const { universityId } = req.body;
+    const userId = req.user._id;
+
+    // Validate the university ID
+    if (!universityId) {
+      return res.status(400).json({ 
+        status: 'error',
+        message: 'University ID is required' 
+      });
+    }
+
+    // Check if university exists and is active
+    const university = await University.findById(universityId);
+    if (!university) {
+      return res.status(404).json({ 
+        status: 'error',
+        message: 'University not found' 
+      });
+    }
+
+    if (!university.isActive) {
+      return res.status(400).json({ 
+        status: 'error',
+        message: 'This university is not currently active on the platform' 
+      });
+    }
+
+    // Update the user's university
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { university: universityId },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ 
+        status: 'error',
+        message: 'User not found' 
+      });
+    }
+
+    // Create a notification for the user
+    const notification = new Notification({
+      userId: userId,
+      message: `You have successfully updated your university to ${university.name}.`
+    });
+    await notification.save();
+
+    // Generate a new JWT token with updated user info
+    const token = jwt.sign({ user: updatedUser }, process.env.JWT_SECRET);
+
+    return res.status(200).json({
+      status: 'success',
+      message: 'University updated successfully',
+      user: {
+        id: updatedUser._id,
+        username: updatedUser.username,
+        email: updatedUser.email,
+        university: updatedUser.university
+      },
+      token
+    });
+  } catch (error) {
+    console.error('Error updating university:', error);
+    return res.status(500).json({ 
+      status: 'error',
+      message: 'Internal server error' 
+    });
   }
 };
 

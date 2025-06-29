@@ -32,49 +32,102 @@ exports.createRestaurant = async (request, response) => {
         <head>
           <style>
             body {
-              font-family: Arial, sans-serif;
+              font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
               color: #000000;
+              margin: 0;
+              padding: 0;
+              background-color: #f8f9fa;
             }
             .container {
               width: 90%;
               max-width: 600px;
-              margin: 20px auto;
-              padding: 20px;
-              border: 1px solid #dddddd;
-              border-radius: 8px;
+              margin: 30px auto;
+              padding: 0;
+              border-radius: 12px;
               background-color: #ffffff;
+              box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+              overflow: hidden;
             }
             .header {
               text-align: center;
-              border-bottom: 1px solid #dddddd;
-              padding-bottom: 10px;
-              margin-bottom: 20px;
+              padding: 40px 20px 30px;
+              background: linear-gradient(135deg, #990000 0%, #cc0000 100%);
+              color: #ffffff;
+            }
+            .header h1 {
+              margin: 0;
+              font-size: 32px;
+              font-weight: 700;
+              text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            }
+            .brand-text {
+              color: #FFCC00;
+              font-weight: 800;
             }
             .content {
               font-size: 16px;
-              line-height: 1.5;
+              line-height: 1.6;
+              padding: 30px;
+              color: #333333;
             }
             .password {
-              font-weight: bold;
-              font-size: 20px;
-              color: #333;
-              margin-top: 20px;
+              background: linear-gradient(135deg, #FFCC00 0%, #ffdb4d 100%);
+              color: #000000;
+              font-size: 28px;
+              font-weight: 800;
               text-align: center;
+              padding: 25px;
+              margin: 25px 0;
+              border-radius: 8px;
+              letter-spacing: 2px;
+              box-shadow: 0 3px 10px rgba(255, 204, 0, 0.3);
+            }
+            .welcome-box {
+              background: linear-gradient(135deg, #fff3cd 0%, #fffaee 100%);
+              border-left: 4px solid #FFCC00;
+              padding: 20px;
+              margin: 20px 0;
+              border-radius: 8px;
+            }
+            .footer {
+              background-color: #000000;
+              color: #ffffff;
+              text-align: center;
+              padding: 20px;
+              font-size: 14px;
+            }
+            .footer .brand {
+              color: #FFCC00;
+              font-weight: bold;
             }
           </style>
         </head>
         <body>
           <div class="container">
             <div class="header">
-              <h1>Welcome to Byte!</h1>
+              <h1>🍽️ Welcome to <span class="brand-text">Byte!</span></h1>
             </div>
             <div class="content">
-              <p>Hello,</p>
-              <p>Thank you for joining Byte as a restaurant partner! Your account has been successfully created.</p>
-              <p>Your login password is:</p>
-              <p class="password">${password}</p>
-              <p>Please use this password to log in and start managing your restaurant.</p>
-              <p>If you did not request this account, please contact us immediately.</p>
+              <p>Hello and welcome! 🎉</p>
+              <div class="welcome-box">
+                <p><strong>🎊 Congratulations!</strong> Your restaurant has been successfully onboarded to the Byte platform!</p>
+                <p>You're now part of our amazing community of food partners serving delicious meals to hungry students.</p>
+              </div>
+              <p>Here's your secure login password:</p>
+              <div class="password">${password}</div>
+              <p><strong>What's next?</strong></p>
+              <ul>
+                <li>🔐 Use this password to log into your restaurant dashboard</li>
+                <li>📋 Start adding your delicious menu items</li>
+                <li>📱 Manage orders and connect with customers</li>
+                <li>💰 Track your earnings and grow your business</li>
+              </ul>
+              <p>If you have any questions or didn't expect this account, please contact our support team immediately.</p>
+              <p>Ready to start serving? Let's make some students happy! 🎯</p>
+            </div>
+            <div class="footer">
+              <p>© ${new Date().getFullYear()} <span class="brand">Byte</span> - Your Campus Food Partner</p>
+              <p>Let's cook up something amazing! 👨‍🍳</p>
             </div>
           </div>
         </body>
@@ -293,67 +346,112 @@ exports.createWithdrawal = async (req, res) => {
 <head>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background-color: #f5f5f5;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f8f9fa;
       color: #333333;
       margin: 0;
       padding: 0;
     }
     .email-container {
-      width: 95%;
+      width: 90%;
       max-width: 600px;
-      margin: 0 auto;
+      margin: 30px auto;
       background-color: #ffffff;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
       overflow: hidden;
-      padding: 20px;
-      box-sizing: border-box;
     }
-    h1 {
+    .header {
+      text-align: center;
+      padding: 40px 20px 30px;
+      background: linear-gradient(135deg, #990000 0%, #cc0000 100%);
+      color: #ffffff;
+    }
+    .header h1 {
+      margin: 0;
+      font-size: 28px;
+      font-weight: 700;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+    .brand-text {
+      color: #FFCC00;
+      font-weight: 800;
+    }
+    .content {
+      padding: 30px;
+    }
+    .content p {
       color: #333333;
-      font-size: 24px;
-      margin-bottom: 20px;
-    }
-    p {
-      color: #666666;
       font-size: 16px;
       line-height: 1.6;
       margin-bottom: 15px;
     }
-    .order-info {
-      background-color: #f8f8f8;
-      padding: 15px;
+    .withdrawal-info {
+      background: linear-gradient(135deg, #fff3cd 0%, #fffaee 100%);
+      border-left: 4px solid #FFCC00;
+      padding: 20px;
       border-radius: 8px;
-      margin-bottom: 20px;
+      margin: 20px 0;
     }
-    .order-info p {
-      color: #333333;
-      font-weight: bold;
+    .withdrawal-info p {
+      color: #000000;
+      font-weight: 600;
+      margin: 8px 0;
+    }
+    .amount {
+      background: linear-gradient(135deg, #FFCC00 0%, #ffdb4d 100%);
+      color: #000000;
+      font-size: 24px;
+      font-weight: 800;
+      text-align: center;
+      padding: 15px;
+      margin: 20px 0;
+      border-radius: 8px;
+      letter-spacing: 1px;
     }
     .footer {
+      background-color: #000000;
+      color: #ffffff;
       text-align: center;
-      font-size: 12px;
-      color: #999999;
-      margin-top: 20px;
+      padding: 20px;
+      font-size: 14px;
+    }
+    .footer .brand {
+      color: #FFCC00;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
   <div class="email-container">
-    <h1>Withdrawal Request Received</h1>
-    <p>Your withdrawal request has been successfully sent!</p>
-    
-    <div class="order-info">
-      <p>Restaurant Name: ${restaurantName}</p>
-      <p>Withdrawal Amount: ₦${amount.toFixed(2)}</p>
-      <p>Updated Wallet Balance: ₦${restaurant.walletBalance.toFixed(2)}</p>
+    <div class="header">
+      <h1>💰 <span class="brand-text">Byte</span> Withdrawal Request</h1>
     </div>
+    <div class="content">
+      <p>Great news! 🎉</p>
+      <p>Your withdrawal request has been successfully received and is now being processed by our team.</p>
+      
+      <div class="withdrawal-info">
+        <p>🏪 Restaurant: ${restaurantName}</p>
+        <p>📅 Request Date: ${new Date().toLocaleDateString()}</p>
+        <p>💳 Updated Balance: ₦${restaurant.walletBalance.toFixed(2)}</p>
+      </div>
 
-    <p>If you have any questions or concerns, please contact our support team.</p>
+      <p>Withdrawal Amount:</p>
+      <div class="amount">₦${amount.toFixed(2)}</div>
 
+      <p><strong>What happens next?</strong></p>
+      <ul>
+        <li>🔍 Our team will review your request</li>
+        <li>💸 Funds will be transferred to your registered account</li>
+        <li>📧 You'll receive a confirmation email once processed</li>
+      </ul>
+
+      <p>If you have any questions, our support team is here to help! 🤝</p>
+    </div>
     <div class="footer">
-      <p>&copy; ${new Date().getFullYear()} Byte. All rights reserved.</p>
+      <p>© ${new Date().getFullYear()} <span class="brand">Byte</span> - Your Campus Food Partner</p>
+      <p>Growing together, one bite at a time! 🚀</p>
     </div>
   </div>
 </body>
@@ -367,65 +465,126 @@ exports.createWithdrawal = async (req, res) => {
 <head>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background-color: #f5f5f5;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f8f9fa;
       color: #333333;
       margin: 0;
       padding: 0;
     }
     .email-container {
-      width: 95%;
+      width: 90%;
       max-width: 600px;
-      margin: 0 auto;
+      margin: 30px auto;
       background-color: #ffffff;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
       overflow: hidden;
-      padding: 20px;
-      box-sizing: border-box;
     }
-    h1 {
+    .header {
+      text-align: center;
+      padding: 40px 20px 30px;
+      background: linear-gradient(135deg, #990000 0%, #cc0000 100%);
+      color: #ffffff;
+    }
+    .header h1 {
+      margin: 0;
+      font-size: 28px;
+      font-weight: 700;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+    .brand-text {
+      color: #FFCC00;
+      font-weight: 800;
+    }
+    .content {
+      padding: 30px;
+    }
+    .content p {
       color: #333333;
-      font-size: 24px;
-      margin-bottom: 20px;
-    }
-    p {
-      color: #666666;
       font-size: 16px;
       line-height: 1.6;
       margin-bottom: 15px;
     }
     .withdrawal-info {
-      background-color: #f8f8f8;
-      padding: 15px;
+      background: linear-gradient(135deg, #fff3cd 0%, #fffaee 100%);
+      border-left: 4px solid #FFCC00;
+      padding: 20px;
       border-radius: 8px;
-      margin-bottom: 20px;
+      margin: 20px 0;
+    }
+    .withdrawal-info p {
+      color: #000000;
+      font-weight: 600;
+      margin: 8px 0;
+    }
+    .amount {
+      background: linear-gradient(135deg, #FFCC00 0%, #ffdb4d 100%);
+      color: #000000;
+      font-size: 28px;
+      font-weight: 800;
+      text-align: center;
+      padding: 20px;
+      margin: 20px 0;
+      border-radius: 8px;
+      letter-spacing: 1px;
+    }
+    .urgent-tag {
+      background-color: #dc3545;
+      color: #ffffff;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: bold;
+      display: inline-block;
+      margin-bottom: 15px;
     }
     .footer {
+      background-color: #000000;
+      color: #ffffff;
       text-align: center;
-      font-size: 12px;
-      color: #999999;
-      margin-top: 20px;
+      padding: 20px;
+      font-size: 14px;
+    }
+    .footer .brand {
+      color: #FFCC00;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
   <div class="email-container">
-    <h1>New Withdrawal Request</h1>
-    <p>A new withdrawal request has been created.</p>
-    
-    <div class="withdrawal-info">
-      <p>Restaurant Name: ${restaurantName}</p>
-      <p>Withdrawal Amount: ₦${amount.toFixed(2)}</p>
-      <p>Bank Name: ${restaurant.bankName}</p>
-      <p>Account Number: ${restaurant.accountNumber}</p>
-      <p>Holder's Name: ${restaurant.accountHolder}</p>
+    <div class="header">
+      <h1>🚨 <span class="brand-text">Byte</span> Admin Alert</h1>
     </div>
+    <div class="content">
+      <span class="urgent-tag">ACTION REQUIRED</span>
+      <p>A new withdrawal request requires your immediate attention! 📋</p>
+      
+      <div class="withdrawal-info">
+        <p>🏪 Restaurant: ${restaurantName}</p>
+        <p>📅 Request Date: ${new Date().toLocaleDateString()}</p>
+        <p>📧 Restaurant Email: ${restaurant.email}</p>
+        <p>🏦 Bank: ${restaurant.bankName}</p>
+        <p>💳 Account: ${restaurant.accountNumber}</p>
+        <p>👤 Account Holder: ${restaurant.accountHolder}</p>
+      </div>
 
-    <p>Please review the request.</p>
+      <p>Withdrawal Amount:</p>
+      <div class="amount">₦${amount.toFixed(2)}</div>
 
+      <p><strong>Next Steps:</strong></p>
+      <ul>
+        <li>🔍 Verify restaurant account details</li>
+        <li>💰 Process the withdrawal payment</li>
+        <li>✅ Update withdrawal status</li>
+        <li>📧 Send confirmation to restaurant</li>
+      </ul>
+
+      <p>Please review and process this request as soon as possible. 🚀</p>
+    </div>
     <div class="footer">
-      <p>&copy; ${new Date().getFullYear()} Byte. All rights reserved.</p>
+      <p>© ${new Date().getFullYear()} <span class="brand">Byte</span> - Admin Panel</p>
+      <p>Keeping the food flowing! 🍽️</p>
     </div>
   </div>
 </body>

@@ -242,6 +242,65 @@ router.get('/notifications', userControllers.fetchNotifications);
 
 /**
  * @swagger
+ * /users/updateUniversity:
+ *   put:
+ *     tags: [Users]
+ *     summary: Update user's university
+ *     description: Change the university associated with the user's account
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - universityId
+ *             properties:
+ *               universityId:
+ *                 type: string
+ *                 description: The ID of the university to change to
+ *     responses:
+ *       200:
+ *         description: University updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 message:
+ *                   type: string
+ *                   example: University updated successfully
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                     username:
+ *                       type: string
+ *                     email:
+ *                       type: string
+ *                     university:
+ *                       type: string
+ *                 token:
+ *                   type: string
+ *       400:
+ *         description: Invalid input or inactive university
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: University or user not found
+ *       500:
+ *         description: Server error
+ */
+router.put('/updateUniversity', authenticate, userControllers.updateUniversity);
+
+/**
+ * @swagger
  * /users/orders/{username}:
  *   get:
  *     tags: [Users]

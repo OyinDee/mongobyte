@@ -10,6 +10,7 @@ const mealRoutes = require('./routes/mealRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 const superAdminRoutes = require('./routes/superAdminRoutes');
 const orderRoutes = require('./routes/orderRoutes');
+const universityRoutes = require('./routes/universityRoutes');
 const cookieParser = require('cookie-parser');
 const axios = require('axios');
 const swaggerUi = require('swagger-ui-express');
@@ -78,6 +79,10 @@ const swaggerOptions = {
       {
         name: 'Admin',
         description: 'Super admin operations and management'
+      },
+      {
+        name: 'Universities',
+        description: 'University management and operations'
       }
     ],
     components: {
@@ -111,6 +116,7 @@ app.use('/api/v1/meals', mealRoutes);
 app.use('/api/v1/pay', paymentRoutes);
 app.use('/api/v1/orders', orderRoutes);
 app.use('/api/v1/superadmin', superAdminRoutes);
+app.use('/api/v1/universities', universityRoutes);
 
 const PORT = process.env.PORT || 8080;
 server.listen(PORT, () => {

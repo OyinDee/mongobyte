@@ -141,63 +141,109 @@ sendSMS(formattedNumber, smsMessage);
         <head>
           <style>
             body {
-              font-family: Arial, sans-serif;
-              background-color: #ffffff;
+              font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+              background-color: #f8f9fa;
               color: #000000;
               margin: 0;
               padding: 0;
             }
             .container {
-              width: 85%;
+              width: 90%;
               max-width: 600px;
-              margin: 20px auto;
-              padding: 20px;
-              border: 1px solid #dddddd;
-              border-radius: 8px;
+              margin: 30px auto;
+              padding: 0;
+              border-radius: 12px;
               background-color: #ffffff;
+              box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+              overflow: hidden;
             }
             .header {
               text-align: center;
-              border-bottom: 1px solid #dddddd;
-              padding-bottom: 10px;
-              margin-bottom: 20px;
+              padding: 40px 20px 30px;
+              background: linear-gradient(135deg, #990000 0%, #cc0000 100%);
+              color: #ffffff;
             }
             .header h1 {
               margin: 0;
-              font-size: 24px;
-              color: #000000;
+              font-size: 28px;
+              font-weight: 700;
+              text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            }
+            .brand-text {
+              color: #FFCC00;
+              font-weight: 800;
             }
             .content {
               font-size: 16px;
-              line-height: 1.5;
+              line-height: 1.6;
+              padding: 30px;
+              color: #333333;
             }
             .content p {
-              margin: 10px 0;
+              margin: 15px 0;
+            }
+            .order-details {
+              background: linear-gradient(135deg, #fff3cd 0%, #fffaee 100%);
+              border-left: 4px solid #FFCC00;
+              padding: 20px;
+              border-radius: 8px;
+              margin: 20px 0;
+            }
+            .order-details p {
+              color: #000000;
+              font-weight: 600;
+              margin: 8px 0;
+            }
+            .alert-box {
+              background-color: #d1ecf1;
+              border-left: 4px solid #17a2b8;
+              padding: 15px;
+              margin: 20px 0;
+              border-radius: 4px;
             }
             .footer {
+              background-color: #000000;
+              color: #ffffff;
               text-align: center;
-              margin-top: 20px;
+              padding: 20px;
               font-size: 14px;
-              color: #666666;
+            }
+            .footer .brand {
+              color: #FFCC00;
+              font-weight: bold;
             }
           </style>
         </head>
         <body>
           <div class="container">
             <div class="header">
-              <h1>New Order Received</h1>
+              <h1>🍽️ New <span class="brand-text">Byte</span> Order!</h1>
             </div>
             <div class="content">
-              <p>You have received a new order.</p>
-              <p><strong>Order Details:</strong></p>
-              <p>Location: ${location}, around ${nearestLandmark || '...'}</p>
-              <p>Phone: ${phoneNumber}</p>
-              <p>Please check the dashboard for meal details.</p>
-              <p><strong>Note:</strong> ${note || 'No special notes'}</p>
+              <p>Exciting news! 🎉 You have received a new order from a hungry customer!</p>
+              
+              <div class="order-details">
+                <p>📍 <strong>Delivery Location:</strong> ${location}</p>
+                <p>🏘️ <strong>Nearest Landmark:</strong> ${nearestLandmark || 'Not specified'}</p>
+                <p>📱 <strong>Customer Phone:</strong> ${phoneNumber}</p>
+                <p>📝 <strong>Special Instructions:</strong> ${note || 'No special notes'}</p>
+              </div>
+
+              <div class="alert-box">
+                <p><strong>📋 Next Steps:</strong></p>
+                <ul>
+                  <li>Check your restaurant dashboard for full meal details</li>
+                  <li>Prepare the order with care</li>
+                  <li>Contact the customer if needed</li>
+                  <li>Update order status as you progress</li>
+                </ul>
+              </div>
+
+              <p>Let's make this customer's day delicious! 🚀</p>
             </div>
             <div class="footer">
-              <p>Thank you for your attention.</p>
-              <p>&copy; ${new Date().getFullYear()} Byte</p>
+              <p>© ${new Date().getFullYear()} <span class="brand">Byte</span> - Your Campus Food Partner</p>
+              <p>Cooking up happiness, one order at a time! 👨‍🍳</p>
             </div>
           </div>
         </body>
@@ -302,70 +348,117 @@ exports.orderConfirmation = async (request, response) => {
           <head>
             <style>
               body {
-                font-family: Arial, sans-serif;
-                background-color: #f5f5f5;
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                background-color: #f8f9fa;
                 color: #333333;
                 margin: 0;
                 padding: 0;
               }
               .email-container {
-                width: 95%;
+                width: 90%;
                 max-width: 600px;
-                margin: 0 auto;
+                margin: 30px auto;
                 background-color: #ffffff;
-                border-radius: 8px;
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                border-radius: 12px;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
                 overflow: hidden;
-                padding: 20px;
-                box-sizing: border-box;
               }
-              h1 {
+              .header {
+                text-align: center;
+                padding: 40px 20px 30px;
+                background: linear-gradient(135deg, #990000 0%, #cc0000 100%);
+                color: #ffffff;
+              }
+              .header h1 {
+                margin: 0;
+                font-size: 28px;
+                font-weight: 700;
+                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+              }
+              .brand-text {
+                color: #FFCC00;
+                font-weight: 800;
+              }
+              .content {
+                padding: 30px;
+              }
+              .content p {
                 color: #333333;
-                font-size: 24px;
-                margin-bottom: 20px;
-              }
-              p {
-                color: #666666;
                 font-size: 16px;
                 line-height: 1.6;
                 margin-bottom: 15px;
               }
               .fee-info {
-                background-color: #f8f8f8;
-                padding: 15px;
+                background: linear-gradient(135deg, #fff3cd 0%, #fffaee 100%);
+                border-left: 4px solid #FFCC00;
+                padding: 20px;
                 border-radius: 8px;
-                margin-bottom: 20px;
+                margin: 20px 0;
               }
               .fee-info p {
-                color: #333333;
-                font-weight: bold;
-              }
-              .footer {
-                text-align: center;
-                font-size: 12px;
-                color: #999999;
-                margin-top: 20px;
+                color: #000000;
+                font-weight: 600;
+                margin: 8px 0;
               }
               .highlight {
-                color: #d9534f;
+                background: linear-gradient(135deg, #FFCC00 0%, #ffdb4d 100%);
+                color: #000000;
+                font-weight: 800;
+                padding: 4px 8px;
+                border-radius: 4px;
+              }
+              .alert-box {
+                background-color: #f8d7da;
+                border-left: 4px solid #dc3545;
+                padding: 15px;
+                margin: 20px 0;
+                border-radius: 4px;
+              }
+              .footer {
+                background-color: #000000;
+                color: #ffffff;
+                text-align: center;
+                padding: 20px;
+                font-size: 14px;
+              }
+              .footer .brand {
+                color: #FFCC00;
+                font-weight: bold;
               }
             </style>
           </head>
           <body>
             <div class="email-container">
-              <h1>Order Fee Request</h1>
-              <p>Your order with ID <strong>${order.customId}</strong> has a fee request that exceeds the permitted limit.</p>
-            
-              <div class="fee-info">
-                <p>Additional Fee Requested: <span class="highlight">₦${parsedFee}</span></p>
-                <p>Permitted Fee: ₦${order.fee}</p>
-                <p>Note: ${requestDescription || "No attatched description"}</p>
+              <div class="header">
+                <h1>⚠️ <span class="brand-text">Byte</span> Order Alert</h1>
               </div>
+              <div class="content">
+                <p>Hi there! 👋</p>
+                <p>We need your attention for order <strong>#${order.customId}</strong>. The restaurant has requested an additional fee that exceeds the standard limit.</p>
+              
+                <div class="fee-info">
+                  <p>💰 <strong>Additional Fee Requested:</strong> <span class="highlight">₦${parsedFee}</span></p>
+                  <p>📊 <strong>Standard Permitted Fee:</strong> ₦${order.fee}</p>
+                  <p>📝 <strong>Restaurant Note:</strong> ${requestDescription || "No description provided"}</p>
+                </div>
 
-              <p>Please log in and check your order history to approve or cancel this order or contact support if you have any questions.</p>
+                <div class="alert-box">
+                  <p><strong>🚨 Action Required:</strong></p>
+                  <p>Please log into your Byte account and check your order history to either approve or cancel this order.</p>
+                </div>
 
+                <p><strong>What you can do:</strong></p>
+                <ul>
+                  <li>✅ Approve the additional fee if you're okay with it</li>
+                  <li>❌ Cancel the order if the fee seems unreasonable</li>
+                  <li>📞 Contact our support team if you have questions</li>
+                </ul>
+
+                <p>We're here to help if you need assistance! 🤝</p>
+              </div>
               <div class="footer">
-                <p>&copy; ${new Date().getFullYear()} Byte. All rights reserved.</p>
+                <p>© ${new Date().getFullYear()} <span class="brand">Byte</span> - Your Campus Food Companion</p>
+                <p>Keeping your orders transparent! 🔍</p>
               </div>
             </div>
           </body>

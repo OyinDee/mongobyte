@@ -32,18 +32,86 @@ exports.register = async (request, response) => {
         <html>
         <head>
           <style>
-            body { font-family: Arial, sans-serif; color: #000000; }
-            .container { width: 90%; max-width: 600px; margin: 20px auto; padding: 20px; border: 1px solid #dddddd; border-radius: 8px; background-color: #ffffff; }
-            .header { text-align: center; border-bottom: 1px solid #dddddd; padding-bottom: 10px; margin-bottom: 20px; }
-            .content { font-size: 16px; line-height: 1.5; }
+            body { 
+              font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+              color: #000000; 
+              margin: 0;
+              padding: 0;
+              background-color: #f8f9fa;
+            }
+            .container { 
+              width: 90%; 
+              max-width: 600px; 
+              margin: 30px auto; 
+              padding: 0; 
+              border-radius: 12px; 
+              background-color: #ffffff; 
+              box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+              overflow: hidden;
+            }
+            .header { 
+              text-align: center; 
+              padding: 40px 20px 30px; 
+              background: linear-gradient(135deg, #990000 0%, #cc0000 100%);
+              color: #ffffff;
+            }
+            .header h1 {
+              margin: 0;
+              font-size: 32px;
+              font-weight: 700;
+              text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            }
+            .brand-text {
+              color: #FFCC00;
+              font-weight: 800;
+              font-size: 36px;
+            }
+            .content { 
+              font-size: 16px; 
+              line-height: 1.6; 
+              padding: 30px;
+              color: #333333;
+            }
+            .verification-code {
+              background: linear-gradient(135deg, #FFCC00 0%, #ffdb4d 100%);
+              color: #000000;
+              font-size: 28px;
+              font-weight: 800;
+              text-align: center;
+              padding: 20px;
+              margin: 25px 0;
+              border-radius: 8px;
+              letter-spacing: 3px;
+              box-shadow: 0 3px 10px rgba(255, 204, 0, 0.3);
+            }
+            .footer {
+              background-color: #000000;
+              color: #ffffff;
+              text-align: center;
+              padding: 20px;
+              font-size: 14px;
+            }
+            .footer .brand {
+              color: #FFCC00;
+              font-weight: bold;
+            }
           </style>
         </head>
         <body>
           <div class="container">
-            <div class="header"><h1>Welcome!</h1></div>
+            <div class="header">
+              <h1>Welcome to <span class="brand-text">Byte!</span></h1>
+            </div>
             <div class="content">
-              <p>Thank you for joining us. Please verify your email using the following code:</p>
-              <p><strong>${verificationCode}</strong></p>
+              <p>🎉 <strong>Congratulations!</strong> You've successfully joined the Byte community!</p>
+              <p>We're excited to have you on board. To complete your registration and start enjoying delicious meals, please verify your email using the code below:</p>
+              <div class="verification-code">${verificationCode}</div>
+              <p>Simply enter this code in the app to activate your account and start your food journey with us!</p>
+              <p>Can't wait to serve you! 🍽️</p>
+            </div>
+            <div class="footer">
+              <p>© ${new Date().getFullYear()} <span class="brand">Byte</span> - Your Campus Food Companion</p>
+              <p>Ready to take a bite? 😋</p>
             </div>
           </div>
         </body>
@@ -93,21 +161,85 @@ exports.login = async (request, response) => {
             <html>
             <head>
               <style>
-                body { font-family: Arial, sans-serif; color: #000000; }
-                .container { width: 90%; max-width: 600px; margin: 20px auto; padding: 20px; border: 1px solid #dddddd; border-radius: 8px; background-color: #ffffff; }
-                .header { text-align: center; border-bottom: 1px solid #dddddd; padding-bottom: 10px; margin-bottom: 20px; }
-                .content { font-size: 16px; line-height: 1.5; }
-                .code { font-weight: bold; font-size: 24px; margin-top: 20px; text-align: center; color: #333; }
+                body { 
+                  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+                  color: #000000; 
+                  margin: 0;
+                  padding: 0;
+                  background-color: #f8f9fa;
+                }
+                .container { 
+                  width: 90%; 
+                  max-width: 600px; 
+                  margin: 30px auto; 
+                  padding: 0; 
+                  border-radius: 12px; 
+                  background-color: #ffffff; 
+                  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+                  overflow: hidden;
+                }
+                .header { 
+                  text-align: center; 
+                  padding: 40px 20px 30px; 
+                  background: linear-gradient(135deg, #990000 0%, #cc0000 100%);
+                  color: #ffffff;
+                }
+                .header h1 {
+                  margin: 0;
+                  font-size: 28px;
+                  font-weight: 700;
+                  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+                }
+                .brand-text {
+                  color: #FFCC00;
+                  font-weight: 800;
+                }
+                .content { 
+                  font-size: 16px; 
+                  line-height: 1.6; 
+                  padding: 30px;
+                  color: #333333;
+                }
+                .code { 
+                  background: linear-gradient(135deg, #FFCC00 0%, #ffdb4d 100%);
+                  color: #000000;
+                  font-size: 32px;
+                  font-weight: 800;
+                  text-align: center;
+                  padding: 25px;
+                  margin: 25px 0;
+                  border-radius: 8px;
+                  letter-spacing: 4px;
+                  box-shadow: 0 3px 10px rgba(255, 204, 0, 0.3);
+                }
+                .footer {
+                  background-color: #000000;
+                  color: #ffffff;
+                  text-align: center;
+                  padding: 20px;
+                  font-size: 14px;
+                }
+                .footer .brand {
+                  color: #FFCC00;
+                  font-weight: bold;
+                }
               </style>
             </head>
             <body>
               <div class="container">
-                <div class="header"><h1>Verify Your Email</h1></div>
+                <div class="header">
+                  <h1>🔐 Verify Your <span class="brand-text">Byte</span> Account</h1>
+                </div>
                 <div class="content">
-                  <p>Hello,</p>
-                  <p>Please use the following code to verify your email address:</p>
-                  <p class="code">${newVerificationCode}</p>
-                  <p>If you did not request this, please ignore this message.</p>
+                  <p>Hello there! 👋</p>
+                  <p>We noticed you tried to log in, but your email isn't verified yet. No worries! We've sent you a fresh verification code:</p>
+                  <div class="code">${newVerificationCode}</div>
+                  <p>Enter this code in the app to unlock your account and start exploring amazing food options!</p>
+                  <p>If you didn't request this, you can safely ignore this message. 🛡️</p>
+                </div>
+                <div class="footer">
+                  <p>© ${new Date().getFullYear()} <span class="brand">Byte</span> - Your Campus Food Companion</p>
+                  <p>Almost ready to bite! 🍕</p>
                 </div>
               </div>
             </body>
@@ -230,22 +362,95 @@ exports.forgotPassword = async (request, response) => {
         <html>
         <head>
           <style>
-            body { font-family: Arial, sans-serif; color: #000000; }
-            .container { width: 85%; max-width: 600px; margin: 20px auto; padding: 20px; border: 1px solid #dddddd; border-radius: 8px; background-color: #ffffff; }
-            .header { text-align: center; border-bottom: 1px solid #dddddd; padding-bottom: 10px; margin-bottom: 20px; }
-            .content { font-size: 16px; line-height: 1.5; }
-            .reset-code { font-weight: bold; font-size: 24px; color: #333; margin-top: 20px; text-align: center; }
+            body { 
+              font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+              color: #000000; 
+              margin: 0;
+              padding: 0;
+              background-color: #f8f9fa;
+            }
+            .container { 
+              width: 90%; 
+              max-width: 600px; 
+              margin: 30px auto; 
+              padding: 0; 
+              border-radius: 12px; 
+              background-color: #ffffff; 
+              box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+              overflow: hidden;
+            }
+            .header { 
+              text-align: center; 
+              padding: 40px 20px 30px; 
+              background: linear-gradient(135deg, #990000 0%, #cc0000 100%);
+              color: #ffffff;
+            }
+            .header h1 {
+              margin: 0;
+              font-size: 28px;
+              font-weight: 700;
+              text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            }
+            .brand-text {
+              color: #FFCC00;
+              font-weight: 800;
+            }
+            .content { 
+              font-size: 16px; 
+              line-height: 1.6; 
+              padding: 30px;
+              color: #333333;
+            }
+            .reset-code { 
+              background: linear-gradient(135deg, #FFCC00 0%, #ffdb4d 100%);
+              color: #000000;
+              font-size: 32px;
+              font-weight: 800;
+              text-align: center;
+              padding: 25px;
+              margin: 25px 0;
+              border-radius: 8px;
+              letter-spacing: 4px;
+              box-shadow: 0 3px 10px rgba(255, 204, 0, 0.3);
+            }
+            .security-note {
+              background-color: #fff3cd;
+              border-left: 4px solid #FFCC00;
+              padding: 15px;
+              margin: 20px 0;
+              border-radius: 4px;
+            }
+            .footer {
+              background-color: #000000;
+              color: #ffffff;
+              text-align: center;
+              padding: 20px;
+              font-size: 14px;
+            }
+            .footer .brand {
+              color: #FFCC00;
+              font-weight: bold;
+            }
           </style>
         </head>
         <body>
           <div class="container">
-            <div class="header"><h1>Password Reset Request</h1></div>
+            <div class="header">
+              <h1>🔒 <span class="brand-text">Byte</span> Password Reset</h1>
+            </div>
             <div class="content">
-              <p>Hello,</p>
-              <p>We received a request to reset your password. Use the code below to proceed with resetting your password:</p>
-              <p class="reset-code">${resetCode}</p>
-              <p>If you did not request a password reset, please ignore this email or contact support immediately.</p>
-              <p>Thank you!</p>
+              <p>Hello! 👋</p>
+              <p>We received a request to reset your password. Use the secure code below to create a new password:</p>
+              <div class="reset-code">${resetCode}</div>
+              <div class="security-note">
+                <p><strong>🛡️ Security Notice:</strong></p>
+                <p>This code will expire in 1 hour for your security. If you didn't request this reset, please contact our support team immediately.</p>
+              </div>
+              <p>Ready to get back to enjoying great food? Let's get you back on track! 🍽️</p>
+            </div>
+            <div class="footer">
+              <p>© ${new Date().getFullYear()} <span class="brand">Byte</span> - Your Campus Food Companion</p>
+              <p>Securing your food journey! 🔐</p>
             </div>
           </div>
         </body>
@@ -426,21 +631,96 @@ exports.resendVerification = async (request, response) => {
         <html>
         <head>
           <style>
-            body { font-family: Arial, sans-serif; color: #000000; }
-            .container { width: 90%; max-width: 600px; margin: 20px auto; padding: 20px; border: 1px solid #dddddd; border-radius: 8px; background-color: #ffffff; }
-            .header { text-align: center; border-bottom: 1px solid #dddddd; padding-bottom: 10px; margin-bottom: 20px; }
-            .content { font-size: 16px; line-height: 1.5; }
-            .code { font-size: 24px; text-align: center; padding: 20px; background-color: #f8f9fa; border-radius: 4px; margin: 20px 0; }
+            body { 
+              font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+              color: #000000; 
+              margin: 0;
+              padding: 0;
+              background-color: #f8f9fa;
+            }
+            .container { 
+              width: 90%; 
+              max-width: 600px; 
+              margin: 30px auto; 
+              padding: 0; 
+              border-radius: 12px; 
+              background-color: #ffffff; 
+              box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+              overflow: hidden;
+            }
+            .header { 
+              text-align: center; 
+              padding: 40px 20px 30px; 
+              background: linear-gradient(135deg, #990000 0%, #cc0000 100%);
+              color: #ffffff;
+            }
+            .header h1 {
+              margin: 0;
+              font-size: 28px;
+              font-weight: 700;
+              text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            }
+            .brand-text {
+              color: #FFCC00;
+              font-weight: 800;
+            }
+            .content { 
+              font-size: 16px; 
+              line-height: 1.6; 
+              padding: 30px;
+              color: #333333;
+            }
+            .code { 
+              background: linear-gradient(135deg, #FFCC00 0%, #ffdb4d 100%);
+              color: #000000;
+              font-size: 32px;
+              font-weight: 800;
+              text-align: center;
+              padding: 25px;
+              margin: 25px 0;
+              border-radius: 8px;
+              letter-spacing: 4px;
+              box-shadow: 0 3px 10px rgba(255, 204, 0, 0.3);
+            }
+            .expiry-note {
+              background-color: #e7f3ff;
+              border-left: 4px solid #0066cc;
+              padding: 15px;
+              margin: 20px 0;
+              border-radius: 4px;
+              font-size: 14px;
+            }
+            .footer {
+              background-color: #000000;
+              color: #ffffff;
+              text-align: center;
+              padding: 20px;
+              font-size: 14px;
+            }
+            .footer .brand {
+              color: #FFCC00;
+              font-weight: bold;
+            }
           </style>
         </head>
         <body>
           <div class="container">
-            <div class="header"><h1>Email Verification</h1></div>
+            <div class="header">
+              <h1>📧 <span class="brand-text">Byte</span> Verification</h1>
+            </div>
             <div class="content">
-              <p>You requested a new verification code. Please use the following code to verify your email address:</p>
-              <div class="code"><strong>${newVerificationCode}</strong></div>
-              <p>This code will expire in 24 hours.</p>
-              <p>If you didn't request this code, please ignore this email.</p>
+              <p>Hey there! 🎉</p>
+              <p>Thanks for requesting a new verification code. We've got you covered! Here's your fresh verification code:</p>
+              <div class="code">${newVerificationCode}</div>
+              <div class="expiry-note">
+                <p><strong>⏰ Quick reminder:</strong> This code will expire in 24 hours for security reasons.</p>
+              </div>
+              <p>If you didn't request this code, no worries – just ignore this email and your account stays secure! 🛡️</p>
+              <p>Ready to start your food adventure? Let's go! 🚀</p>
+            </div>
+            <div class="footer">
+              <p>© ${new Date().getFullYear()} <span class="brand">Byte</span> - Your Campus Food Companion</p>
+              <p>One step closer to deliciousness! 😋</p>
             </div>
           </div>
         </body>
