@@ -504,69 +504,122 @@ exports.orderConfirmation = async (request, response) => {
 <head>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background-color: #f5f5f5;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f8f9fa;
       color: #333333;
       margin: 0;
       padding: 0;
     }
     .email-container {
-      width: 95%;
+      width: 90%;
       max-width: 600px;
-      margin: 0 auto;
+      margin: 30px auto;
       background-color: #ffffff;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
       overflow: hidden;
-      padding: 20px;
-      box-sizing: border-box;
     }
-    h1 {
+    .header {
+      text-align: center;
+      padding: 40px 20px 30px;
+      background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+      color: #ffffff;
+    }
+    .header h1 {
+      margin: 0;
+      font-size: 28px;
+      font-weight: 700;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+    .brand-text {
+      color: #FFCC00;
+      font-weight: 800;
+    }
+    .content {
+      padding: 30px;
+    }
+    .content p {
       color: #333333;
-      font-size: 24px;
-      margin-bottom: 20px;
-    }
-    p {
-      color: #666666;
       font-size: 16px;
       line-height: 1.6;
       margin-bottom: 15px;
     }
     .order-info {
-      background-color: #f8f8f8;
-      padding: 15px;
+      background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+      border-left: 4px solid #dc3545;
+      padding: 20px;
       border-radius: 8px;
-      margin-bottom: 20px;
+      margin: 20px 0;
     }
     .order-info p {
-      color: #333333;
+      color: #000000;
+      font-weight: 600;
+      margin: 8px 0;
+    }
+    .balance-warning {
+      background-color: #fff3cd;
+      border-left: 4px solid #FFCC00;
+      padding: 15px;
+      margin: 20px 0;
+      border-radius: 4px;
+    }
+    .action-button {
+      background: linear-gradient(135deg, #FFCC00 0%, #ffdb4d 100%);
+      color: #000000;
+      text-decoration: none;
+      padding: 12px 24px;
+      border-radius: 8px;
       font-weight: bold;
+      display: inline-block;
+      margin: 15px 0;
+      text-align: center;
     }
     .footer {
+      background-color: #000000;
+      color: #ffffff;
       text-align: center;
-      font-size: 12px;
-      color: #999999;
-      margin-top: 20px;
+      padding: 20px;
+      font-size: 14px;
+    }
+    .footer .brand {
+      color: #FFCC00;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
   <div class="email-container">
-    <h1>Order Cancelled</h1>
-    <p>Your order has been cancelled due to insufficient balance.</p>
-    
-    <div class="order-info">
-      <p>Order ID: ${order.customId}</p>
-      <p>Status: ${order.status}</p>
-      <p>Total Price: ₦${(order.totalPrice).toFixed(2)} (including any additional fees)</p>
-                <p>Note: ${requestDescription || "No attatched description"}</p>
-
+    <div class="header">
+      <h1>😔 <span class="brand-text">Byte</span> Order Update</h1>
     </div>
+    <div class="content">
+      <p>Hi there! 👋</p>
+      <p>We're sorry to inform you that your order has been cancelled due to insufficient balance in your Byte wallet.</p>
+      
+      <div class="order-info">
+        <p>📦 <strong>Order ID:</strong> #${order.customId}</p>
+        <p>📊 <strong>Status:</strong> ${order.status}</p>
+        <p>💰 <strong>Total Amount:</strong> ₦${(order.totalPrice).toFixed(2)}</p>
+        <p>📝 <strong>Note:</strong> ${requestDescription || "No description provided"}</p>
+      </div>
 
-    <p>Please top up your balance and place the order again if you wish.</p>
+      <div class="balance-warning">
+        <p><strong>💳 What happened?</strong></p>
+        <p>Your Byte balance wasn't sufficient to cover the total order amount including any additional fees.</p>
+      </div>
 
+      <p><strong>🚀 What's next?</strong></p>
+      <ul>
+        <li>💰 Top up your Byte balance</li>
+        <li>🛒 Place your order again</li>
+        <li>🍽️ Enjoy your delicious meal!</li>
+      </ul>
+
+      <p>Don't let hunger wait - top up now and get back to enjoying great food! 😋</p>
+    </div>
     <div class="footer">
-      <p>&copy; ${new Date().getFullYear()} Byte. All rights reserved.</p>
+      <p>© ${new Date().getFullYear()} <span class="brand">Byte</span> - Your Campus Food Companion</p>
+      <p>We'll be here when you're ready to bite again! 🍕</p>
     </div>
   </div>
 </body>
@@ -604,69 +657,127 @@ exports.orderConfirmation = async (request, response) => {
 <head>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background-color: #f5f5f5;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f8f9fa;
       color: #333333;
       margin: 0;
       padding: 0;
     }
     .email-container {
-      width: 95%;
+      width: 90%;
       max-width: 600px;
-      margin: 0 auto;
+      margin: 30px auto;
       background-color: #ffffff;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
       overflow: hidden;
-      padding: 20px;
-      box-sizing: border-box;
     }
-    h1 {
+    .header {
+      text-align: center;
+      padding: 40px 20px 30px;
+      background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+      color: #ffffff;
+    }
+    .header h1 {
+      margin: 0;
+      font-size: 28px;
+      font-weight: 700;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+    .brand-text {
+      color: #FFCC00;
+      font-weight: 800;
+    }
+    .content {
+      padding: 30px;
+    }
+    .content p {
       color: #333333;
-      font-size: 24px;
-      margin-bottom: 20px;
-    }
-    p {
-      color: #666666;
       font-size: 16px;
       line-height: 1.6;
       margin-bottom: 15px;
     }
     .order-info {
-      background-color: #f8f8f8;
-      padding: 15px;
+      background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+      border-left: 4px solid #28a745;
+      padding: 20px;
       border-radius: 8px;
-      margin-bottom: 20px;
+      margin: 20px 0;
     }
     .order-info p {
-      color: #333333;
+      color: #000000;
+      font-weight: 600;
+      margin: 8px 0;
+    }
+    .success-box {
+      background: linear-gradient(135deg, #FFCC00 0%, #ffdb4d 100%);
+      color: #000000;
+      text-align: center;
+      padding: 20px;
+      margin: 20px 0;
+      border-radius: 8px;
       font-weight: bold;
+      font-size: 18px;
+    }
+    .timeline {
+      background-color: #f8f9fa;
+      padding: 20px;
+      border-radius: 8px;
+      margin: 20px 0;
+    }
+    .timeline h3 {
+      color: #990000;
+      margin-top: 0;
     }
     .footer {
+      background-color: #000000;
+      color: #ffffff;
       text-align: center;
-      font-size: 12px;
-      color: #999999;
-      margin-top: 20px;
+      padding: 20px;
+      font-size: 14px;
+    }
+    .footer .brand {
+      color: #FFCC00;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
   <div class="email-container">
-    <h1>Order Update</h1>
-    <p>Your order has been successfully confirmed and should reach you soon!</p>
-    
-    <div class="order-info">
-      <p>Order ID: ${order.customId}</p>
-      <p>Status: ${order.status}</p>
-      <p>Total Price: ₦${(order.totalPrice).toFixed(2)} (including any additional fees)</p>
-                <p>Note: ${requestDescription || "No attatched description"}</p>
-
+    <div class="header">
+      <h1>🎉 <span class="brand-text">Byte</span> Order Confirmed!</h1>
     </div>
+    <div class="content">
+      <p>Great news! 🎊</p>
+      <p>Your order has been successfully confirmed and your delicious meal is on its way!</p>
+      
+      <div class="success-box">
+        ✨ Order Confirmed & Payment Processed ✨
+      </div>
 
-    <p>Thank you for your order. If you have any questions or concerns, feel free to reach out to our support team.</p>
+      <div class="order-info">
+        <p>📦 <strong>Order ID:</strong> #${order.customId}</p>
+        <p>📊 <strong>Status:</strong> ${order.status}</p>
+        <p>💰 <strong>Total Paid:</strong> ₦${(order.totalPrice).toFixed(2)}</p>
+        <p>📝 <strong>Special Note:</strong> ${requestDescription || "No special instructions"}</p>
+      </div>
 
+      <div class="timeline">
+        <h3>🚀 What happens next?</h3>
+        <ul>
+          <li>👨‍🍳 Restaurant is preparing your order</li>
+          <li>📦 Order will be packaged with care</li>
+          <li>🛵 Delivery will begin shortly</li>
+          <li>🍽️ Enjoy your delicious meal!</li>
+        </ul>
+      </div>
+
+      <p>If you have any questions or concerns, our support team is always ready to help! 🤝</p>
+      <p>Thank you for choosing Byte - we hope you enjoy every bite! 😋</p>
+    </div>
     <div class="footer">
-      <p>&copy; ${new Date().getFullYear()} Byte. All rights reserved.</p>
+      <p>© ${new Date().getFullYear()} <span class="brand">Byte</span> - Your Campus Food Companion</p>
+      <p>Making campus dining delightful! 🍕</p>
     </div>
   </div>
 </body>
