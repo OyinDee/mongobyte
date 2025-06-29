@@ -7,12 +7,12 @@ const Notification = require('../models/Notifications');
 const generateVerificationCode = () => Math.floor(100000 + Math.random() * 900000).toString();
 
 exports.register = async (request, response) => {
-    const { username, email, password, phoneNumber, university, address } = request.body;
+    const { username, email, password, phoneNumber, university} = request.body;
     try {
         // Validate required fields
-        if (!username || !email || !password || !phoneNumber || !university || !address) {
+        if (!username || !email || !password || !phoneNumber || !university) {
             return response.status(400).json({ 
-                message: 'All fields are required: username, email, password, phoneNumber, university, and address' 
+                message: 'All fields are required: username, email, password, phoneNumber, university' 
             });
         }
 
@@ -23,7 +23,6 @@ exports.register = async (request, response) => {
             password,
             phoneNumber,
             university,
-            address,
             verificationCode
         });
 
