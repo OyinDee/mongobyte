@@ -1,7 +1,7 @@
 const University = require('../models/University');
 
 // Add a new university
-exports.addUniversity = async (req, res) => {
+const addUniversity = async (req, res) => {
     try {
         const { name, state } = req.body;
 
@@ -20,11 +20,7 @@ exports.addUniversity = async (req, res) => {
             });
         }
 
-        const university = new University({
-            name,
-            state
-        });
-
+        const university = new University({ name, state });
         await university.save();
 
         res.status(201).json({
@@ -41,7 +37,7 @@ exports.addUniversity = async (req, res) => {
 };
 
 // Get all universities
-exports.getAllUniversities = async (req, res) => {
+const getAllUniversities = async (req, res) => {
     try {
         const universities = await University.find().sort({ name: 1 });
         res.status(200).json({
@@ -57,7 +53,7 @@ exports.getAllUniversities = async (req, res) => {
 };
 
 // Update university status
-exports.updateUniversityStatus = async (req, res) => {
+const updateUniversityStatus = async (req, res) => {
     try {
         const { id } = req.params;
         const { isActive } = req.body;
@@ -96,7 +92,7 @@ exports.updateUniversityStatus = async (req, res) => {
 };
 
 // Get single university
-exports.getUniversity = async (req, res) => {
+const getUniversity = async (req, res) => {
     try {
         const { id } = req.params;
         const university = await University.findById(id);
@@ -118,4 +114,11 @@ exports.getUniversity = async (req, res) => {
             message: error.message
         });
     }
+};
+
+module.exports = {
+    addUniversity,
+    getAllUniversities,
+    updateUniversityStatus,
+    getUniversity
 };

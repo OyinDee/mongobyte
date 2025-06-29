@@ -1,12 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const { authenticate } = require('../middlewares/authenticate');
 const {
     addUniversity,
     getAllUniversities,
     updateUniversityStatus,
     getUniversity
 } = require('../controllers/universityControllers');
+// const { authenticate } = require('../middlewares/authenticate');
+const authenticate = require('../middlewares/authenticate');
 
 /**
  * @swagger
@@ -44,26 +45,6 @@ router.get('/', getAllUniversities);
 
 /**
  * @swagger
- * /universities/{id}:
- *   get:
- *     tags: [Universities]
- *     summary: Get university by ID
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: University details retrieved successfully
- *       404:
- *         description: University not found
- */
-router.get('/:id', getUniversity);
-
-/**
- * @swagger
  * /universities/add:
  *   post:
  *     tags: [Universities]
@@ -93,6 +74,26 @@ router.get('/:id', getUniversity);
  *         description: Not authorized
  */
 router.post('/add', authenticate, addUniversity);
+
+/**
+ * @swagger
+ * /universities/{id}:
+ *   get:
+ *     tags: [Universities]
+ *     summary: Get university by ID
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: University details retrieved successfully
+ *       404:
+ *         description: University not found
+ */
+router.get('/:id', getUniversity);
 
 /**
  * @swagger
@@ -126,9 +127,5 @@ router.post('/add', authenticate, addUniversity);
  *         description: University not found
  */
 router.put('/:id/status', authenticate, updateUniversityStatus);
-
-// These routes can be accessed by anyone
-router.get('/', getAllUniversities);
-router.get('/:id', getUniversity);
 
 module.exports = router;
