@@ -237,7 +237,7 @@ router.get('/:id', restaurantController.getRestaurantById);
  */
 
 router.put('/:id', authenticate, (req, res, next) => {
-    if (req.userType !== 'restaurant') {
+    if (req.userType !== 'restaurant' && req.userType !== 'superadmin') {
         return res.status(403).json({ message: 'Access denied' });
     }
     next();
@@ -265,8 +265,8 @@ router.put('/:id', authenticate, (req, res, next) => {
  */
 
 router.delete('/:id', authenticate, (req, res, next) => {
-    if (req.userType !== 'restaurant') {
-        return res.status(403).json({ message: 'Access denied' });
+    if (req.userType !== 'superadmin') {
+        return res.status(403).json({ message: 'Only superadmin can delete restaurants' });
     }
     next();
 }, restaurantController.deleteRestaurant);

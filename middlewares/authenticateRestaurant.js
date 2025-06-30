@@ -14,20 +14,21 @@ const authenticate = async (req, res, next) => {
 
         if (decoded.user) {
             const user = await User.findById(decoded.user._id);
-            req.user = user; 
-            req.userType = 'user'; 
-            return res.status(403).json({ message: 'Access denied for users' });
+            req.user = user;
+            if (user && user.superAdmin) {
+                req.userType = 'superadmin';
+                return next();
+            } else {
+                req.userType = 'user';
+                return res.status(403).json({ message: 'Access denied for users' });
+            }
         }
-        
+
         if (decoded.restaurant) {
             const restaurant = await Restaurant.findById(decoded.restaurant._id);
             req.restaurant = restaurant;
-            req.userType = 'restaurant'; 
+            req.userType = 'restaurant';
             return next();
-        }
-
-        if(!user || !restaurant){
-            return res.status(404).json({ message: 'User or restaurant not found' });
         }
     } catch (error) {
         console.error(error);
