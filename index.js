@@ -20,6 +20,7 @@ const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
 const path = require('path');
 const { initializeScheduler } = require('./utils/scheduler');
+const withdrawalRoutes = require('./routes/withdrawalRoutes');
 
 const app = express();
 const server = http.createServer(app);
@@ -148,6 +149,7 @@ app.use('/api/v1/universities', universityRoutes);
 app.use('/api/v1/testimonials', testimonialRoutes);
 app.use('/api/v1/ratings', ratingRoutes);
 app.use('/api/v1/advanced-orders', advancedOrderRoutes);
+app.use('/api/v1/withdrawals', withdrawalRoutes);
 
 const PORT = process.env.PORT || 8080;
 server.listen(PORT, () => {
