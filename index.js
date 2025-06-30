@@ -13,11 +13,13 @@ const orderRoutes = require('./routes/orderRoutes');
 const universityRoutes = require('./routes/universityRoutes');
 const testimonialRoutes = require('./routes/testimonialRoutes');
 const ratingRoutes = require('./routes/ratingRoutes');
+const advancedOrderRoutes = require('./routes/advancedOrderRoutes');
 const cookieParser = require('cookie-parser');
 const axios = require('axios');
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
 const path = require('path');
+const { initializeScheduler } = require('./utils/scheduler');
 
 const app = express();
 const server = http.createServer(app);
@@ -27,7 +29,7 @@ app.use(cookieParser());
 app.use(cors({
     origin: ['https://www.yumbyte.ng',  'https://yumbyte.ng', 'yumbyte.ng', 'http://localhost:3000'],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'x-request-hash', 'X-Requested-With', 'Accept'],
     credentials: true
 }));
 
@@ -93,6 +95,22 @@ const swaggerOptions = {
       {
         name: 'Ratings',
         description: 'Restaurant rating and review system'
+      },
+      {
+        name: 'Scheduled Orders',
+        description: 'Pre-order for specific times and recurring orders'
+      },
+      {
+        name: 'Group Orders',
+        description: 'Collaborative ordering and bill splitting'
+      },
+      {
+        name: 'Referral System',
+        description: 'Friend referral and incentive system'
+      },
+      {
+        name: 'Quick Reorder',
+        description: 'One-click reorder of previous meals'
       }
     ],
     components: {
@@ -129,6 +147,7 @@ app.use('/api/v1/superadmin', superAdminRoutes);
 app.use('/api/v1/universities', universityRoutes);
 app.use('/api/v1/testimonials', testimonialRoutes);
 app.use('/api/v1/ratings', ratingRoutes);
+app.use('/api/v1/advanced-orders', advancedOrderRoutes);
 
 const PORT = process.env.PORT || 8080;
 server.listen(PORT, () => {
@@ -136,5 +155,9 @@ server.listen(PORT, () => {
 });
 
 mongoose.connect(`${process.env.MONGODB_URI}`, {})
-    .then(() => console.log('MongoDB connected'))
+    .then(() => {
+        console.log('MongoDB connected');
+        // Initialize scheduler after database connection
+        initializeScheduler();
+    })
     .catch(err => console.error('MongoDB connection error:', err));

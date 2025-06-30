@@ -71,6 +71,25 @@ const orderSchema = new mongoose.Schema({
         ref: 'Restaurant',
         required: true,
     },
+    groupOrderId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'GroupOrder',
+        required: false,
+    },
+    recipient: {
+        name: {
+            type: String,
+            required: false,
+        },
+        phone: {
+            type: String,
+            required: false,
+        },
+        instructions: {
+            type: String,
+            required: false,
+        }
+    },
 }, {
     timestamps: true,
 });
