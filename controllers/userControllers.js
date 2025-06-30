@@ -44,7 +44,8 @@ exports.getProfile = async (request, response) => {
                 location: user.location || '',
                 nearestLandmark: user.nearestLandmark || '',
                 isVerified: user.isVerified,
-                superAdmin: user.superAdmin
+                superAdmin: user.superAdmin,
+                orderItems: user.orderHistory ? user.orderHistory.length : 0
             },
             token: jwt.sign({ user }, process.env.JWT_SECRET)
         });
@@ -260,7 +261,8 @@ exports.updateUserProfile = async (req, res) => {
           location: updatedUser.location || '',
           nearestLandmark: updatedUser.nearestLandmark || '',
           isVerified: updatedUser.isVerified,
-          superAdmin: updatedUser.superAdmin
+          superAdmin: updatedUser.superAdmin,
+          orderItems: updatedUser.orderHistory ? updatedUser.orderHistory.length : 0
         }, 
         token: token 
       });
