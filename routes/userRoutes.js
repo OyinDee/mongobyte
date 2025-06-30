@@ -318,4 +318,82 @@ router.put('/updateUniversity', authenticateUser, userControllers.updateUniversi
  */
 router.get('/orders/:username', userControllers.getUserOrderHistory);
 
+/**
+ * @swagger
+ * /users/my-orders:
+ *   get:
+ *     tags: [Users]
+ *     summary: Get current user's order history
+ *     description: Get the order history for the currently authenticated user
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Page number
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *         description: Number of orders per page
+ *     responses:
+ *       200:
+ *         description: Order history retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 orders:
+ *                   type: array
+ *                 pagination:
+ *                   type: object
+ *                   properties:
+ *                     currentPage:
+ *                       type: integer
+ *                     totalPages:
+ *                       type: integer
+ *                     totalItems:
+ *                       type: integer
+ */
+router.get('/my-orders', authenticateUser, userControllers.getMyOrders);
+
+/**
+ * @swagger
+ * /users/my-notifications:
+ *   get:
+ *     tags: [Users]
+ *     summary: Get current user's notifications
+ *     description: Get notifications for the currently authenticated user
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Page number
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 20
+ *         description: Number of notifications per page
+ *       - in: query
+ *         name: unreadOnly
+ *         schema:
+ *           type: boolean
+ *           default: false
+ *         description: Only return unread notifications
+ *     responses:
+ *       200:
+ *         description: Notifications retrieved successfully
+ */
+router.get('/my-notifications', authenticateUser, userControllers.getMyNotifications);
+
 module.exports = router;

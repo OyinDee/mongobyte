@@ -284,9 +284,10 @@ exports.login = async (request, response) => {
                 byteBalance: user.byteBalance,
                 bio: user.bio,
                 imageUrl: user.imageUrl,
-                orderHistory: user.orderHistory,
                 location: user.location || '',
-                nearestLandmark: user.nearestLandmark || ''
+                nearestLandmark: user.nearestLandmark || '',
+                isVerified: user.isVerified,
+                superAdmin: user.superAdmin
             },
             token,
         });

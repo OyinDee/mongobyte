@@ -24,9 +24,10 @@ exports.getProfile = async (request, response) => {
                 byteBalance: user.byteBalance,
                 bio: user.bio,
                 imageUrl: user.imageUrl,
-                orderHistory: user.orderHistory,
                 location: user.location || '',
-                nearestLandmark: user.nearestLandmark || ''
+                nearestLandmark: user.nearestLandmark || '',
+                isVerified: user.isVerified,
+                superAdmin: user.superAdmin
             },
             token: jwt.sign({ user }, process.env.JWT_SECRET)
         });
@@ -86,7 +87,7 @@ exports.updateUserProfile = async (req, res) => {
         userId,
         { $set: updateFields },
         { new: true } 
-      );
+      ).populate('university', 'name _id');
   
       if (!updatedUser) {
         return res.status(404).json({ message: 'User not found' });
@@ -103,9 +104,10 @@ exports.updateUserProfile = async (req, res) => {
           byteBalance: updatedUser.byteBalance,
           bio: updatedUser.bio,
           imageUrl: updatedUser.imageUrl,
-          orderHistory: updatedUser.orderHistory,
           location: updatedUser.location || '',
-          nearestLandmark: updatedUser.nearestLandmark || ''
+          nearestLandmark: updatedUser.nearestLandmark || '',
+          isVerified: updatedUser.isVerified,
+          superAdmin: updatedUser.superAdmin
         }, 
         token: token 
       });
@@ -423,6 +425,107 @@ exports.updateUniversity = async (req, res) => {
     return res.status(500).json({ 
       status: 'error',
       message: 'Internal server error' 
+    });
+  }
+};
+
+exports.getMyOrders = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const { page = 1, limit = 10 } = req.query;
+    const skip = (page - 1) * limit;
+
+    const user = await User.findById(userId)
+      .populate({
+        path: 'orderHistory',
+        populate: [
+          {
+            path: 'meals.meal',
+            model: 'Meal',
+            select: 'name price imageUrl'
+          },
+          {
+            path: 'restaurant',
+            model: 'Restaurant',
+            select: 'name location imageUrl'
+          }
+        ],
+        options: {
+          sort: { createdAt: -1 },
+          skip: skip,
+          limit: parseInt(limit)
+        }
+      });
+
+    if (!user) {
+      return res.status(404).json({ 
+        success: false,
+        message: 'User not found' 
+      });
+    }
+
+    const totalOrders = user.orderHistory.length;
+    const totalPages = Math.ceil(totalOrders / limit);
+
+    res.status(200).json({
+      success: true,
+      data: {
+        orders: user.orderHistory,
+        pagination: {
+          currentPage: parseInt(page),
+          totalPages,
+          totalItems: totalOrders,
+          itemsPerPage: parseInt(limit)
+        }
+      }
+    });
+  } catch (error) {
+    console.error('Get my orders error:', error);
+    res.status(500).json({ 
+      success: false,
+      message: 'Error fetching orders',
+      error: error.message 
+    });
+  }
+};
+
+exports.getMyNotifications = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const { page = 1, limit = 20, unreadOnly = false } = req.query;
+    const skip = (page - 1) * limit;
+
+    let filter = { userId: userId };
+    if (unreadOnly === 'true') {
+      filter.isRead = false;
+    }
+
+    const notifications = await Notification.find(filter)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(parseInt(limit));
+
+    const total = await Notification.countDocuments(filter);
+    const totalPages = Math.ceil(total / limit);
+
+    res.status(200).json({
+      success: true,
+      data: {
+        notifications,
+        pagination: {
+          currentPage: parseInt(page),
+          totalPages,
+          totalItems: total,
+          itemsPerPage: parseInt(limit)
+        }
+      }
+    });
+  } catch (error) {
+    console.error('Get my notifications error:', error);
+    res.status(500).json({ 
+      success: false,
+      message: 'Error fetching notifications',
+      error: error.message 
     });
   }
 };
