@@ -14,13 +14,29 @@ exports.getProfile = async (request, response) => {
         if (!user) {
             return response.status(404).json({ message: 'User not found' });
         }
+
+        // Handle case where university might still be null/undefined
+        let universityInfo = user.university;
+        if (!universityInfo) {
+            // Find default university for users migrated from old schema
+            const defaultUniversity = await University.findOne({ name: 'Default University' });
+            if (defaultUniversity) {
+                // Update user with default university
+                await User.findByIdAndUpdate(userId, { university: defaultUniversity._id });
+                universityInfo = {
+                    _id: defaultUniversity._id,
+                    name: defaultUniversity.name
+                };
+            }
+        }
+
         response.status(200).json({
             user: {
                 id: user._id,
                 username: user.username,
                 email: user.email,
                 phoneNumber: user.phoneNumber,
-                university: user.university,
+                university: universityInfo,
                 byteBalance: user.byteBalance,
                 bio: user.bio,
                 imageUrl: user.imageUrl,
@@ -32,7 +48,7 @@ exports.getProfile = async (request, response) => {
             token: jwt.sign({ user }, process.env.JWT_SECRET)
         });
     } catch (error) {
-        console.error(error);
+        console.error('Get profile error:', error);
         response.status(500).json({ message: 'Internal server error' });
     }
 };
@@ -427,6 +443,58 @@ exports.updateUniversity = async (req, res) => {
       message: 'Internal server error' 
     });
   }
+};
+
+// Update user university
+exports.updateUserUniversity = async (req, res) => {
+    try {
+        const { university } = req.body;
+        const userId = req.user._id;
+
+        if (!university) {
+            return res.status(400).json({ message: 'University ID is required' });
+        }
+
+        // Verify university exists
+        const universityExists = await University.findById(university);
+        if (!universityExists) {
+            return res.status(404).json({ message: 'University not found' });
+        }
+
+        const updatedUser = await User.findByIdAndUpdate(
+            userId,
+            { $set: { university: university } },
+            { new: true }
+        ).populate('university', 'name _id');
+
+        if (!updatedUser) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        const token = jwt.sign({ user: updatedUser }, process.env.JWT_SECRET);
+
+        res.status(200).json({
+            message: 'University updated successfully',
+            user: {
+                id: updatedUser._id,
+                username: updatedUser.username,
+                email: updatedUser.email,
+                phoneNumber: updatedUser.phoneNumber,
+                university: updatedUser.university,
+                byteBalance: updatedUser.byteBalance,
+                bio: updatedUser.bio,
+                imageUrl: updatedUser.imageUrl,
+                location: updatedUser.location || '',
+                nearestLandmark: updatedUser.nearestLandmark || '',
+                isVerified: updatedUser.isVerified,
+                superAdmin: updatedUser.superAdmin
+            },
+            token: token
+        });
+    } catch (error) {
+        console.error('Error updating user university:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
 };
 
 exports.getMyOrders = async (req, res) => {
