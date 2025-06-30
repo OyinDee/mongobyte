@@ -11,6 +11,8 @@ const paymentRoutes = require('./routes/paymentRoutes');
 const superAdminRoutes = require('./routes/superAdminRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const universityRoutes = require('./routes/universityRoutes');
+const testimonialRoutes = require('./routes/testimonialRoutes');
+const ratingRoutes = require('./routes/ratingRoutes');
 const cookieParser = require('cookie-parser');
 const axios = require('axios');
 const swaggerUi = require('swagger-ui-express');
@@ -83,6 +85,14 @@ const swaggerOptions = {
       {
         name: 'Universities',
         description: 'University management and operations'
+      },
+      {
+        name: 'Testimonials',
+        description: 'User testimonials and reviews management'
+      },
+      {
+        name: 'Ratings',
+        description: 'Restaurant rating and review system'
       }
     ],
     components: {
@@ -117,6 +127,8 @@ app.use('/api/v1/pay', paymentRoutes);
 app.use('/api/v1/orders', orderRoutes);
 app.use('/api/v1/superadmin', superAdminRoutes);
 app.use('/api/v1/universities', universityRoutes);
+app.use('/api/v1/testimonials', testimonialRoutes);
+app.use('/api/v1/ratings', ratingRoutes);
 
 const PORT = process.env.PORT || 8080;
 server.listen(PORT, () => {

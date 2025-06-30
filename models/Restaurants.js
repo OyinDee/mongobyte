@@ -78,6 +78,28 @@ const restaurantSchema = new mongoose.Schema({
         type: Boolean,
         default: true,
     },
+    // Rating System Fields
+    averageRating: {
+        type: Number,
+        default: 0,
+        min: 0,
+        max: 5
+    },
+    totalRatings: {
+        type: Number,
+        default: 0
+    },
+    ratingsBreakdown: {
+        fiveStars: { type: Number, default: 0 },
+        fourStars: { type: Number, default: 0 },
+        threeStars: { type: Number, default: 0 },
+        twoStars: { type: Number, default: 0 },
+        oneStar: { type: Number, default: 0 }
+    },
+    lastRatingUpdate: {
+        type: Date,
+        default: Date.now
+    }
 }, {
     timestamps: true,
 });
