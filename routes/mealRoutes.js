@@ -51,11 +51,33 @@ const authenticate = require('../middlewares/authenticateRestaurant');
 
 /**
  * @swagger
+ * /meals/me:
+ *   get:
+ *     tags: [Meals]
+ *     summary: Get meals for the authenticated restaurant
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of meals for the authenticated restaurant
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Meal'
+ *       401:
+ *         description: Unauthorized - Not a restaurant account
+ */
+router.get('/me', authenticate, mealController.getRestaurantMeals);
+
+/**
+ * @swagger
  * /meals/{customId}/create:
  *   post:
  *     tags: [Meals]
- *     summary: Add a new meal to a restaurant
- *     description: Create a new meal for a specific restaurant (Restaurant auth required)
+ *     summary: Add a new meal to a restaurant (by customId or ObjectId)
+ *     description: Create a new meal for a specific restaurant using either customId or ObjectId (Restaurant auth required)
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -64,7 +86,7 @@ const authenticate = require('../middlewares/authenticateRestaurant');
  *         required: true
  *         schema:
  *           type: string
- *         description: Restaurant's custom ID
+ *         description: Restaurant's custom ID or ObjectId
  *     requestBody:
  *       required: true
  *       content:
@@ -114,13 +136,14 @@ router.get('/', mealController.getAllMeals);
  * /meals/{id}:
  *   get:
  *     tags: [Meals]
- *     summary: Get meal by ID
+ *     summary: Get meal by ID (customId or ObjectId)
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
  *         schema:
  *           type: string
+ *         description: Meal's custom ID or ObjectId
  *     responses:
  *       200:
  *         description: Meal details

@@ -66,7 +66,13 @@ exports.getAllMeals = async (request, response) => {
 exports.getMealById = async (request, response) => {
     const { id } = request.params;
     try {
-        const meal = await Meal.findOne({ customId: id }).populate('restaurant');
+        let meal = null;
+        // Try by customId first
+        meal = await Meal.findOne({ customId: id }).populate('restaurant');
+        // If not found and id looks like ObjectId, try by _id
+        if (!meal && id.match(/^[0-9a-fA-F]{24}$/)) {
+            meal = await Meal.findById(id).populate('restaurant');
+        }
         if (!meal) {
             return response.status(404).json({ message: 'Meal not found' });
         }
@@ -156,6 +162,21 @@ exports.addBatchMeals = async (req, res) => {
         }
         await restaurant.save();
         res.status(201).json({ message: 'Batch meals added successfully!', meals: createdMeals });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
+// Get meals for the authenticated restaurant
+exports.getRestaurantMeals = async (req, res) => {
+    try {
+        const restaurantId = req.restaurant?._id;
+        if (!restaurantId) {
+            return res.status(401).json({ message: 'Unauthorized: Not a restaurant account' });
+        }
+        const meals = await Meal.find({ restaurant: restaurantId });
+        res.status(200).json(meals);
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Internal server error' });
