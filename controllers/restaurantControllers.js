@@ -750,3 +750,19 @@ exports.testRestaurantLookup = async (request, response) => {
         });
     }
 };
+
+// Fetch notifications for the authenticated restaurant or by restaurant ID
+exports.getRestaurantNotifications = async (req, res) => {
+    try {
+        // Use authenticated restaurant if available, otherwise use :id param
+        const restaurantId = req.restaurant?._id || req.params.id;
+        if (!restaurantId) {
+            return res.status(400).json({ message: 'Restaurant ID required' });
+        }
+        const notifications = await Notification.find({ restaurantId }).sort({ createdAt: -1 });
+        res.status(200).json(notifications);
+    } catch (error) {
+        console.error('Error fetching restaurant notifications:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};

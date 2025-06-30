@@ -5,6 +5,7 @@ const authenticateAdmin = require('../middlewares/authenticate.js');
 const authenticate = require('../middlewares/authenticateRestaurant.js');
 const authController = require('../controllers/authControllers');
 const restaurantAdvancedOrdersController = require('../controllers/restaurantAdvancedOrdersController');
+const { getRestaurantNotifications } = require('../controllers/restaurantControllers');
 
 /**
  * @swagger
@@ -501,5 +502,8 @@ router.put('/advanced-orders/group/:orderId/status', authenticate, restaurantAdv
  *                           type: number
  */
 router.get('/advanced-orders/stats', authenticate, restaurantAdvancedOrdersController.getAdvancedOrdersStats);
+
+// Fetch notifications for the authenticated restaurant
+router.get('/notifications', authenticate, getRestaurantNotifications);
 
 module.exports = router;
