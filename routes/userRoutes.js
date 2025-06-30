@@ -3,7 +3,158 @@ const router = express.Router();
 const { authenticateUser } = require('../middlewares/authenticateUser');
 const userControllers = require('../controllers/userControllers');
 const restaurantControllers = require('../controllers/restaurantControllers')
+const superAdminController = require('../controllers/superAdminController')
+/**
+ * @swagger
+ * /users/revenue/restaurant/{id}:
+ *   get:
+ *     tags: [Users]
+ *     summary: Get total and breakdown revenue for a restaurant
+ *     description: Returns total revenue and breakdown (by day, month, year) for a specific restaurant
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Restaurant ID (customId or ObjectId)
+ *     responses:
+ *       200:
+ *         description: Revenue data
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 totalRevenue:
+ *                   type: number
+ *                 breakdown:
+ *                   type: object
+ *                   properties:
+ *                     byDay:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           date:
+ *                             type: string
+ *                           revenue:
+ *                             type: number
+ *                     byMonth:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           month:
+ *                             type: string
+ *                           revenue:
+ *                             type: number
+ *                     byYear:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           year:
+ *                             type: string
+ *                           revenue:
+ *                             type: number
+ *       404:
+ *         description: Restaurant not found
+ *       500:
+ *         description: Server error
+ */
+router.get('/revenue/restaurant/:id', restaurantControllers.getRestaurantRevenue);
+
+/**
+ * @swagger
+ * /users/revenue/global:
+ *   get:
+ *     tags: [Users]
+ *     summary: Get total and breakdown revenue for all restaurants (global)
+ *     description: Returns total revenue and breakdown (by day, month, year) for all orders
+ *     responses:
+ *       200:
+ *         description: Revenue data
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 totalRevenue:
+ *                   type: number
+ *                 breakdown:
+ *                   type: object
+ *                   properties:
+ *                     byDay:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           date:
+ *                             type: string
+ *                           revenue:
+ *                             type: number
+ *                     byMonth:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           month:
+ *                             type: string
+ *                           revenue:
+ *                             type: number
+ *                     byYear:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           year:
+ *                             type: string
+ *                           revenue:
+ *                             type: number
+ *       500:
+ *         description: Server error
+ */
+router.get('/revenue/global', superAdminController.getGlobalRevenue);
 const { uploadImage } = require('../controllers/image');
+/**
+ * @swagger
+ * /users/notifications/{username}:
+ *   get:
+ *     tags: [Users]
+ *     summary: Get notifications by username (public)
+ *     description: Fetch all notifications for a user by their username. Public endpoint, no authentication required.
+ *     parameters:
+ *       - in: path
+ *         name: username
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The username to fetch notifications for
+ *     responses:
+ *       200:
+ *         description: Notifications fetched successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 notifications:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *       400:
+ *         description: Username is required
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Error fetching notifications
+ */
+const authenticateSuperAdmin = require('../middlewares/authenticate');
+router.get('/notifications/:username', authenticateSuperAdmin, userControllers.getNotificationsByUsername);
+
 
 /**
  * @swagger

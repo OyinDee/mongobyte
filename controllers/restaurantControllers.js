@@ -1,3 +1,28 @@
+const { getBreakdown } = require('./restaurantRevenueHelpers');
+// Get total and breakdown revenue for a restaurant
+exports.getRestaurantRevenue = async (req, res) => {
+  const { id } = req.params;
+  try {
+    // Find restaurant by customId or ObjectId
+    let restaurant = null;
+    if (id.match(/^[0-9a-fA-F]{24}$/)) {
+      restaurant = await Restaurant.findById(id);
+    }
+    if (!restaurant) {
+      restaurant = await Restaurant.findOne({ customId: id });
+    }
+    if (!restaurant) {
+      return res.status(404).json({ message: 'Restaurant not found' });
+    }
+    const orders = await Order.find({ restaurant: restaurant._id }).populate('restaurant', 'name');
+    const totalRevenue = orders.reduce((sum, o) => sum + (o.totalPrice || 0), 0);
+    const breakdown = await getBreakdown(orders, true);
+    res.json({ totalRevenue, breakdown });
+  } catch (error) {
+    console.error('getRestaurantRevenue error:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
 const Restaurant = require('../models/Restaurants');
 const crypto = require('crypto')
 const sendEmail = require('../configs/nodemailer');

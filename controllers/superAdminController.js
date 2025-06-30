@@ -1,3 +1,16 @@
+const { getBreakdown } = require('./restaurantRevenueHelpers');
+// Get total and breakdown revenue for all orders (global)
+exports.getGlobalRevenue = async (req, res) => {
+  try {
+    const orders = await Order.find({}).populate('restaurant', 'name');
+    const totalRevenue = orders.reduce((sum, o) => sum + (o.totalPrice || 0), 0);
+    const breakdown = await getBreakdown(orders, true);
+    res.json({ totalRevenue, breakdown });
+  } catch (error) {
+    console.error('getGlobalRevenue error:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
 const Restaurant = require('../models/Restaurants')
 const Order = require('../models/Orders')
 
@@ -85,8 +98,14 @@ exports.updateOrderStatus = async (request, response) => {
 
 exports.getAllOrders = async (request, response) => {
     try {
-        const orders = await Order.find().populate('user', 'username email').populate('meals.meal');
-        response.json(orders);
+        const orders = await Order.find().populate('user', 'username email').populate('meals.meal').populate('restaurant', 'name');
+        // Add restaurantName to each order
+        const ordersWithRestaurantName = orders.map(order => {
+            const obj = order.toObject();
+            obj.restaurantName = order.restaurant && order.restaurant.name ? order.restaurant.name : undefined;
+            return obj;
+        });
+        response.json(ordersWithRestaurantName);
     } catch (error) {
         console.error(error);
         response.status(500).json({ message: 'Internal server error' });
@@ -97,11 +116,13 @@ exports.getOrderById = async (request, response) => {
     const { orderId } = request.params;
 
     try {
-        const order = await Order.findById(orderId).populate('user', 'username email').populate('meals.meal');
+        const order = await Order.findById(orderId).populate('user', 'username email').populate('meals.meal').populate('restaurant', 'name');
         if (!order) {
             return response.status(404).json({ message: 'Order not found' });
         }
-        response.json(order);
+        const obj = order.toObject();
+        obj.restaurantName = order.restaurant && order.restaurant.name ? order.restaurant.name : undefined;
+        response.json(obj);
     } catch (error) {
         console.error(error);
         response.status(500).json({ message: 'Internal server error' });
