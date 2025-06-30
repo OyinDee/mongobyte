@@ -104,22 +104,41 @@ exports.updateUserProfile = async (req, res) => {
       
       // Handle university update
       if (university !== undefined) {
-        if (typeof university === 'string') {
-          // If university is a string, find the university by name
-          const universityDoc = await University.findOne({ name: { $regex: new RegExp(`^${university}$`, 'i') } });
-          if (universityDoc) {
-            updateFields.university = universityDoc._id;
-          } else {
-            return res.status(404).json({ message: 'University not found' });
+        console.log('University update requested:', university, 'Type:', typeof university);
+        const mongoose = require('mongoose');
+        let universityDoc = null;
+        // If university is a string and a valid ObjectId, search by ID first
+        if (typeof university === 'string' && mongoose.Types.ObjectId.isValid(university)) {
+          try {
+            universityDoc = await University.findById(university);
+            console.log('Treated as ObjectId, University.findById result:', universityDoc);
+          } catch (err) {
+            console.error('Error during University.findById:', err);
+            return res.status(500).json({ message: 'Error searching for university', error: err.message });
           }
+        }
+        // If not found by ID, or not a valid ObjectId, try by name
+        if (!universityDoc) {
+          try {
+            universityDoc = await University.findOne({ name: { $regex: new RegExp(`^${university}$`, 'i') } });
+            console.log('Treated as name, University.findOne result:', universityDoc);
+          } catch (err) {
+            console.error('Error during University.findOne:', err);
+            return res.status(500).json({ message: 'Error searching for university by name', error: err.message });
+          }
+        }
+        if (universityDoc) {
+          updateFields.university = universityDoc._id;
+          console.log('University found, setting ID:', universityDoc._id);
         } else {
-          // If university is an ObjectId
-          const universityDoc = await University.findById(university);
-          if (universityDoc) {
-            updateFields.university = university;
-          } else {
-            return res.status(404).json({ message: 'University not found' });
-          }
+          console.log('University not found, searching all universities...');
+          const allUniversities = await University.find({}, 'name');
+          console.log('Available universities:', allUniversities);
+          return res.status(404).json({ 
+            message: 'University not found',
+            searchedFor: university,
+            availableUniversities: allUniversities.map(u => u.name)
+          });
         }
       }
       const updatedUser = await User.findByIdAndUpdate(
