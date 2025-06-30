@@ -1,3 +1,32 @@
+// Get top customers by total amount spent
+exports.getTopCustomers = async (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit, 10) || 10;
+    // Aggregate total spent per user
+    const top = await Order.aggregate([
+      { $group: { _id: "$user", totalSpent: { $sum: "$totalPrice" } } },
+      { $sort: { totalSpent: -1 } },
+      { $limit: limit },
+    ]);
+    // Get user details
+    const userIds = top.map(t => t._id);
+    const users = await User.find({ _id: { $in: userIds } }).select('_id username email');
+    // Merge user info with totalSpent
+    const customers = top.map(t => {
+      const user = users.find(u => u._id.equals(t._id));
+      return user ? {
+        userId: user._id,
+        username: user.username,
+        email: user.email,
+        totalSpent: t.totalSpent
+      } : null;
+    }).filter(Boolean);
+    res.json({ customers });
+  } catch (error) {
+    console.error('getTopCustomers error:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
 const User = require('../models/User');
 const Withdrawal = require('../models/Withdrawals');
 const mongoose = require('mongoose');

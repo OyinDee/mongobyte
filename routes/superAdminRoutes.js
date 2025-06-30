@@ -4,9 +4,49 @@ const superAdminController = require('../controllers/superAdminController');
 const authenticate = require('../middlewares/authenticate');
 /**
  * @swagger
+ * /api/v1/superadmin/top-customers:
+ *   get:
+ *     tags: [Admin]
+ *     summary: Get top customers
+ *     description: Returns a list of top customers by total amount spent
+ *     parameters:
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *         description: Number of top customers to return
+ *     responses:
+ *       200:
+ *         description: List of top customers
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 customers:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       userId:
+ *                         type: string
+ *                       username:
+ *                         type: string
+ *                       email:
+ *                         type: string
+ *                       totalSpent:
+ *                         type: number
+ *       500:
+ *         description: Server error
+ */
+router.get('/top-customers', superAdminController.getTopCustomers);
+
+/**
+ * @swagger
  * /api/v1/superadmin/dashboard:
  *   get:
- *     tags: [SuperAdmin]
+ *     tags: [Admin]
  *     summary: Get dashboard summary stats and recent activity
  *     description: Returns summary stats, recent orders, users, top restaurants, and pending withdrawals for the dashboard
  *     parameters:

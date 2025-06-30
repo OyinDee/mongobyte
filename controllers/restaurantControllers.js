@@ -190,7 +190,30 @@ exports.createRestaurant = async (request, response) => {
 exports.getAllRestaurants = async (request, response) => {
     try {
         const restaurants = await Restaurant.find().populate('meals');
-        response.json(restaurants);
+        // For each restaurant, get total orders and order details
+        const restaurantIds = restaurants.map(r => r._id);
+        // Get all orders for these restaurants
+        const orders = await Order.find({ restaurant: { $in: restaurantIds } })
+            .select('_id restaurant totalPrice status createdAt user')
+            .populate('user', 'username email');
+        // Group orders by restaurant
+        const ordersByRestaurant = {};
+        orders.forEach(order => {
+            const rid = order.restaurant.toString();
+            if (!ordersByRestaurant[rid]) ordersByRestaurant[rid] = [];
+            ordersByRestaurant[rid].push(order);
+        });
+        // Attach order info to each restaurant
+        const result = restaurants.map(r => {
+            const rid = r._id.toString();
+            const restOrders = ordersByRestaurant[rid] || [];
+            return {
+                ...r.toObject(),
+                totalOrders: restOrders.length,
+                orders: restOrders
+            };
+        });
+        response.json(result);
     } catch (error) {
         console.error(error);
         response.status(500).json({ message: 'Internal server error' });
