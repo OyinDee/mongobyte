@@ -5,6 +5,7 @@ const Restaurant = require('../models/Restaurants');
 const Meal = require('../models/Meals');
 const Notification = require('../models/Notifications');
 const generateId = require('../utils/generateID');
+const sendEmail = require('../configs/nodemailer');
 
 // ===== SCHEDULED ORDERS =====
 
@@ -637,6 +638,551 @@ const calculateNextExecution = (currentDate, repeatType, repeatDays = []) => {
     return nextDate;
 };
 
+// Process payment for group order participant
+const processGroupOrderPayment = async (req, res) => {
+    try {
+        const { orderId } = req.params;
+        const userId = req.user._id;
+
+        const groupOrder = await GroupOrder.findById(orderId)
+            .populate('participants.user', 'username byteBalance')
+            .populate('participants.meals.meal', 'name price')
+            .populate('restaurant', 'name');
+
+        if (!groupOrder) {
+            return res.status(404).json({
+                success: false,
+                message: 'Group order not found'
+            });
+        }
+
+        // Check if user is a participant
+        const participantIndex = groupOrder.participants.findIndex(
+            p => p.user._id.toString() === userId.toString()
+        );
+
+        if (participantIndex === -1) {
+            return res.status(403).json({
+                success: false,
+                message: 'You are not a participant in this group order'
+            });
+        }
+
+        const participant = groupOrder.participants[participantIndex];
+
+        // Check if already paid
+        if (participant.hasPaid) {
+            return res.status(400).json({
+                success: false,
+                message: 'You have already paid for this order'
+            });
+        }
+
+        // Check if order is still open
+        if (groupOrder.status !== 'open') {
+            return res.status(400).json({
+                success: false,
+                message: 'This group order is no longer accepting payments'
+            });
+        }
+
+        // Check if user has sufficient balance
+        const user = await User.findById(userId);
+        if (user.byteBalance < participant.subtotal) {
+            return res.status(400).json({
+                success: false,
+                message: `Insufficient balance. You need ${participant.subtotal} bytes but have ${user.byteBalance} bytes.`
+            });
+        }
+
+        // Deduct money from user
+        user.byteBalance -= participant.subtotal;
+        await user.save();
+
+        // Mark participant as paid
+        groupOrder.participants[participantIndex].hasPaid = true;
+        await groupOrder.save();
+
+        // Send payment confirmation email to user
+        if (user.email) {
+            const paymentEmailHtml = `
+<html>
+<head>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f8f9fa;
+      color: #333333;
+      margin: 0;
+      padding: 0;
+    }
+    .email-container {
+      width: 90%;
+      max-width: 600px;
+      margin: 30px auto;
+      background-color: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+    .header {
+      text-align: center;
+      padding: 40px 20px 30px;
+      background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+      color: #ffffff;
+    }
+    .header h1 {
+      margin: 0;
+      font-size: 28px;
+      font-weight: 600;
+    }
+    .content {
+      padding: 40px 30px;
+      line-height: 1.6;
+    }
+    .payment-info {
+      background-color: #f8f9fa;
+      border-left: 4px solid #28a745;
+      padding: 20px;
+      margin: 20px 0;
+      border-radius: 4px;
+    }
+    .footer {
+      text-align: center;
+      padding: 30px;
+      background-color: #f8f9fa;
+      color: #666666;
+      font-size: 14px;
+    }
+    .brand {
+      color: #28a745;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="email-container">
+    <div class="header">
+      <h1>Payment Confirmed! ✅</h1>
+    </div>
+    <div class="content">
+      <p>Hi ${user.username}! 👋</p>
+      <p>Great news! Your payment for the group order has been processed successfully.</p>
+      <div class="payment-info">
+        <p><strong>🍽️ Group Order:</strong> ${groupOrder.title}</p>
+        <p><strong>🏪 Restaurant:</strong> ${groupOrder.restaurant.name}</p>
+        <p><strong>💰 Amount Paid:</strong> ₦${participant.subtotal.toFixed(2)}</p>
+        <p><strong>💳 Your New Balance:</strong> ₦${user.byteBalance.toFixed(2)}</p>
+      </div>
+      <p>We're waiting for all participants to complete their payments before sending the order to the restaurant. You'll be notified once everyone has paid! 🎉</p>
+      <p>Thank you for choosing Byte for your group dining experience! 🍕</p>
+    </div>
+    <div class="footer">
+      <p>© ${new Date().getFullYear()} <span class="brand">Byte</span> - Your Campus Food Companion</p>
+      <p>Making group orders delicious! 😋</p>
+    </div>
+  </div>
+</body>
+</html>
+            `;
+            
+            setImmediate(async () => {
+                try {
+                    await sendEmail(user.email, 'Group Order Payment Confirmed', 'Your payment has been processed successfully.', paymentEmailHtml);
+                } catch (emailError) {
+                    console.error('Error sending payment confirmation email:', emailError);
+                }
+            });
+        }
+
+        // Check if all participants have paid
+        const allParticipantsPaid = groupOrder.participants.every(p => p.hasPaid);
+
+        if (allParticipantsPaid) {
+            // Update group order status to ready for restaurant review
+            groupOrder.status = 'ready';
+            await groupOrder.save();
+
+            // Notify restaurant about the completed group order
+            const restaurantNotification = new Notification({
+                restaurantId: groupOrder.restaurant._id,
+                message: `New group order "${groupOrder.title}" is ready for review. All participants have paid.`,
+                isRead: false,
+                type: 'group_order'
+            });
+            await restaurantNotification.save();
+
+            // Notify all participants that the order is complete
+            const participantNotifications = groupOrder.participants.map(p => new Notification({
+                userId: p.user._id,
+                message: `All participants have paid for "${groupOrder.title}". The order has been sent to the restaurant for preparation.`,
+                isRead: false,
+                type: 'group_order'
+            }));
+            await Notification.insertMany(participantNotifications);
+
+            // Send email notifications to all participants
+            setImmediate(async () => {
+                try {
+                    // Get all participant details for emails
+                    const participantUsers = await User.find({
+                        '_id': { $in: groupOrder.participants.map(p => p.user._id) }
+                    });
+
+                    for (const participantUser of participantUsers) {
+                        if (participantUser.email) {
+                            const allPaidEmailHtml = `
+<html>
+<head>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f8f9fa;
+      color: #333333;
+      margin: 0;
+      padding: 0;
+    }
+    .email-container {
+      width: 90%;
+      max-width: 600px;
+      margin: 30px auto;
+      background-color: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+    .header {
+      text-align: center;
+      padding: 40px 20px 30px;
+      background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+      color: #ffffff;
+    }
+    .header h1 {
+      margin: 0;
+      font-size: 28px;
+      font-weight: 600;
+    }
+    .content {
+      padding: 40px 30px;
+      line-height: 1.6;
+    }
+    .order-info {
+      background-color: #f8f9fa;
+      border-left: 4px solid #007bff;
+      padding: 20px;
+      margin: 20px 0;
+      border-radius: 4px;
+    }
+    .footer {
+      text-align: center;
+      padding: 30px;
+      background-color: #f8f9fa;
+      color: #666666;
+      font-size: 14px;
+    }
+    .brand {
+      color: #007bff;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="email-container">
+    <div class="header">
+      <h1>Order Sent to Restaurant! 🎉</h1>
+    </div>
+    <div class="content">
+      <p>Hi ${participantUser.username}! 👋</p>
+      <p>Fantastic news! All participants in your group order have completed their payments, and the order has been sent to the restaurant for preparation.</p>
+      <div class="order-info">
+        <p><strong>🍽️ Group Order:</strong> ${groupOrder.title}</p>
+        <p><strong>🏪 Restaurant:</strong> ${groupOrder.restaurant.name}</p>
+        <p><strong>👥 Total Participants:</strong> ${groupOrder.participants.length}</p>
+        <p><strong>📅 Delivery Time:</strong> ${new Date(groupOrder.deliveryTime).toLocaleString()}</p>
+      </div>
+      <p>The restaurant will now review and accept your order. You'll receive another notification once they confirm it! 🍕</p>
+      <p>Thank you for using Byte for your group dining experience! 😋</p>
+    </div>
+    <div class="footer">
+      <p>© ${new Date().getFullYear()} <span class="brand">Byte</span> - Your Campus Food Companion</p>
+      <p>Bringing groups together, one bite at a time! 🍽️</p>
+    </div>
+  </div>
+</body>
+</html>
+                            `;
+                            
+                            await sendEmail(
+                                participantUser.email, 
+                                'Group Order Sent to Restaurant!', 
+                                'All participants have paid - order sent to restaurant.', 
+                                allPaidEmailHtml
+                            );
+                        }
+                    }
+
+                    // Send email to restaurant
+                    const restaurant = await Restaurant.findById(groupOrder.restaurant._id);
+                    if (restaurant && restaurant.email) {
+                        const restaurantEmailHtml = `
+<html>
+<head>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f8f9fa;
+      color: #333333;
+      margin: 0;
+      padding: 0;
+    }
+    .email-container {
+      width: 90%;
+      max-width: 600px;
+      margin: 30px auto;
+      background-color: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+    .header {
+      text-align: center;
+      padding: 40px 20px 30px;
+      background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+      color: #ffffff;
+    }
+    .header h1 {
+      margin: 0;
+      font-size: 28px;
+      font-weight: 600;
+    }
+    .content {
+      padding: 40px 30px;
+      line-height: 1.6;
+    }
+    .order-info {
+      background-color: #f8f9fa;
+      border-left: 4px solid #28a745;
+      padding: 20px;
+      margin: 20px 0;
+      border-radius: 4px;
+    }
+    .footer {
+      text-align: center;
+      padding: 30px;
+      background-color: #f8f9fa;
+      color: #666666;
+      font-size: 14px;
+    }
+    .brand {
+      color: #28a745;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="email-container">
+    <div class="header">
+      <h1>New Group Order Ready! 🍽️</h1>
+    </div>
+    <div class="content">
+      <p>Hi ${restaurant.name}! 👋</p>
+      <p>You have received a new group order where all participants have completed their payments and the order is ready for your review.</p>
+      <div class="order-info">
+        <p><strong>🍽️ Group Order:</strong> ${groupOrder.title}</p>
+        <p><strong>👥 Total Participants:</strong> ${groupOrder.participants.length}</p>
+        <p><strong>📅 Requested Delivery Time:</strong> ${new Date(groupOrder.deliveryTime).toLocaleString()}</p>
+        <p><strong>💰 Total Order Value:</strong> ₦${groupOrder.participants.reduce((total, p) => total + p.subtotal, 0).toFixed(2)}</p>
+      </div>
+      <p>Please log into your dashboard to review the order details and accept or decline the order. All payments have been processed and are ready for transfer upon acceptance! 💰</p>
+      <p>Thank you for being part of the Byte platform! 🙏</p>
+    </div>
+    <div class="footer">
+      <p>© ${new Date().getFullYear()} <span class="brand">Byte</span> - Your Campus Food Partner</p>
+      <p>Growing your business, one order at a time! 📈</p>
+    </div>
+  </div>
+</body>
+</html>
+                        `;
+                        
+                        await sendEmail(
+                            restaurant.email, 
+                            'New Group Order - All Payments Complete', 
+                            'A new group order is ready for your review.', 
+                            restaurantEmailHtml
+                        );
+                    }
+                } catch (emailError) {
+                    console.error('Error sending group order completion emails:', emailError);
+                }
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: 'Payment processed successfully',
+            data: {
+                amountPaid: participant.subtotal,
+                newBalance: user.byteBalance,
+                allPaid: allParticipantsPaid,
+                orderStatus: groupOrder.status
+            }
+        });
+
+    } catch (error) {
+        console.error('Process group order payment error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error processing payment',
+            error: error.message
+        });
+    }
+};
+
+// Get group order payment status
+const getGroupOrderPaymentStatus = async (req, res) => {
+    try {
+        const { orderId } = req.params;
+        const userId = req.user._id;
+
+        const groupOrder = await GroupOrder.findById(orderId)
+            .populate('participants.user', 'username')
+            .select('participants status totalAmount deliveryFee');
+
+        if (!groupOrder) {
+            return res.status(404).json({
+                success: false,
+                message: 'Group order not found'
+            });
+        }
+
+        // Check if user is a participant
+        const participant = groupOrder.participants.find(
+            p => p.user._id.toString() === userId.toString()
+        );
+
+        if (!participant) {
+            return res.status(403).json({
+                success: false,
+                message: 'You are not a participant in this group order'
+            });
+        }
+
+        // Calculate payment summary
+        const totalParticipants = groupOrder.participants.length;
+        const paidParticipants = groupOrder.participants.filter(p => p.hasPaid).length;
+        const unpaidParticipants = groupOrder.participants.filter(p => !p.hasPaid);
+
+        res.status(200).json({
+            success: true,
+            data: {
+                yourPayment: {
+                    amount: participant.subtotal,
+                    hasPaid: participant.hasPaid
+                },
+                groupSummary: {
+                    totalParticipants,
+                    paidParticipants,
+                    unpaidParticipants: unpaidParticipants.map(p => ({
+                        username: p.user.username,
+                        amount: p.subtotal
+                    })),
+                    orderStatus: groupOrder.status,
+                    allPaid: paidParticipants === totalParticipants
+                }
+            }
+        });
+
+    } catch (error) {
+        console.error('Get group order payment status error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error fetching payment status',
+            error: error.message
+        });
+    }
+};
+
+// Refund group order (if order is cancelled before completion)
+const refundGroupOrder = async (req, res) => {
+    try {
+        const { orderId } = req.params;
+        const userId = req.user._id;
+
+        const groupOrder = await GroupOrder.findById(orderId)
+            .populate('participants.user', 'username byteBalance');
+
+        if (!groupOrder) {
+            return res.status(404).json({
+                success: false,
+                message: 'Group order not found'
+            });
+        }
+
+        // Only creator can trigger refunds or restaurant/admin
+        if (groupOrder.creator.toString() !== userId.toString()) {
+            return res.status(403).json({
+                success: false,
+                message: 'Only the group order creator can process refunds'
+            });
+        }
+
+        if (groupOrder.status !== 'cancelled') {
+            return res.status(400).json({
+                success: false,
+                message: 'Can only refund cancelled orders'
+            });
+        }
+
+        // Process refunds for all participants who paid
+        const refundPromises = groupOrder.participants
+            .filter(p => p.hasPaid)
+            .map(async (participant) => {
+                const user = await User.findById(participant.user._id);
+                user.byteBalance += participant.subtotal;
+                await user.save();
+
+                // Create refund notification
+                const notification = new Notification({
+                    userId: participant.user._id,
+                    message: `Refund processed: ${participant.subtotal} bytes returned for cancelled group order.`,
+                    isRead: false,
+                    type: 'refund'
+                });
+                await notification.save();
+
+                return {
+                    userId: participant.user._id,
+                    amount: participant.subtotal
+                };
+            });
+
+        const refunds = await Promise.all(refundPromises);
+
+        // Mark all participants as not paid
+        groupOrder.participants.forEach(p => p.hasPaid = false);
+        await groupOrder.save();
+
+        res.status(200).json({
+            success: true,
+            message: 'Refunds processed successfully',
+            data: {
+                refundsProcessed: refunds.length,
+                totalRefunded: refunds.reduce((sum, r) => sum + r.amount, 0),
+                refunds: refunds
+            }
+        });
+
+    } catch (error) {
+        console.error('Refund group order error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error processing refunds',
+            error: error.message
+        });
+    }
+};
+
 module.exports = {
     // Scheduled Orders
     createScheduledOrder,
@@ -652,5 +1198,10 @@ module.exports = {
     // Quick Reorder
     saveQuickReorder,
     getUserQuickReorders,
-    executeQuickReorder
+    executeQuickReorder,
+
+    // Payment Processing
+    processGroupOrderPayment,
+    getGroupOrderPaymentStatus,
+    refundGroupOrder
 };

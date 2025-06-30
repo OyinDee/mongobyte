@@ -193,7 +193,7 @@ Join an existing group order.
 ### Add Meals to Group Order
 **POST** `/group/{orderId}/meals`
 
-Add meals to your order within a group order.
+Add meals to your order within a group order. Subtotal is automatically calculated.
 
 **Request Body:**
 ```json
@@ -216,6 +216,75 @@ Add meals to your order within a group order.
     "subtotal": 25.50,
     "meals": [...],
     "groupTotal": 75.00
+  }
+}
+```
+
+### Process Group Order Payment
+**POST** `/group/{orderId}/pay`
+
+Pay for your portion of the group order. Money is deducted from your byte balance immediately.
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Payment processed successfully",
+  "data": {
+    "amountPaid": 25.50,
+    "newBalance": 74.50,
+    "allPaid": false,
+    "orderStatus": "open"
+  }
+}
+```
+
+**Note:** When all participants have paid, the order status automatically changes to "ready" and is sent to the restaurant for review.
+
+### Get Payment Status
+**GET** `/group/{orderId}/payment-status`
+
+Check who has paid and who hasn't in the group order.
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "yourPayment": {
+      "amount": 25.50,
+      "hasPaid": true
+    },
+    "groupSummary": {
+      "totalParticipants": 3,
+      "paidParticipants": 2,
+      "unpaidParticipants": [
+        {
+          "username": "pending_user",
+          "amount": 18.00
+        }
+      ],
+      "orderStatus": "open",
+      "allPaid": false
+    }
+  }
+}
+```
+
+### Process Refund
+**POST** `/group/{orderId}/refund`
+
+Process refunds for a cancelled group order (creator only).
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Refunds processed successfully",
+  "data": {
+    "refundsProcessed": 2,
+    "totalRefunded": 43.50,
+    "refunds": [...]
   }
 }
 ```

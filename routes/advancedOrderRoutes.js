@@ -13,6 +13,11 @@ const {
     addMealsToGroupOrder,
     getPublicGroupOrders,
     
+    // Payment Processing
+    processGroupOrderPayment,
+    getGroupOrderPaymentStatus,
+    refundGroupOrder,
+    
     // Quick Reorder
     saveQuickReorder,
     getUserQuickReorders,
@@ -467,6 +472,151 @@ router.post('/group/:orderId/leave', authenticateUser, leaveGroupOrder);
  *         description: Group order not found
  */
 router.put('/group/:orderId/cancel', authenticateUser, cancelGroupOrder);
+
+// ===== GROUP ORDER PAYMENT ROUTES =====
+
+/**
+ * @swagger
+ * /api/advanced-orders/group/{orderId}/pay:
+ *   post:
+ *     summary: Process payment for group order
+ *     tags: [Group Orders]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: orderId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Group order ID
+ *     responses:
+ *       200:
+ *         description: Payment processed successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     amountPaid:
+ *                       type: number
+ *                     newBalance:
+ *                       type: number
+ *                     allPaid:
+ *                       type: boolean
+ *                     orderStatus:
+ *                       type: string
+ *       400:
+ *         description: Payment error (insufficient balance, already paid, etc.)
+ *       404:
+ *         description: Group order not found
+ */
+router.post('/group/:orderId/pay', authenticateUser, processGroupOrderPayment);
+
+/**
+ * @swagger
+ * /api/advanced-orders/group/{orderId}/payment-status:
+ *   get:
+ *     summary: Get group order payment status
+ *     tags: [Group Orders]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: orderId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Group order ID
+ *     responses:
+ *       200:
+ *         description: Payment status retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     yourPayment:
+ *                       type: object
+ *                       properties:
+ *                         amount:
+ *                           type: number
+ *                         hasPaid:
+ *                           type: boolean
+ *                     groupSummary:
+ *                       type: object
+ *                       properties:
+ *                         totalParticipants:
+ *                           type: number
+ *                         paidParticipants:
+ *                           type: number
+ *                         unpaidParticipants:
+ *                           type: array
+ *                         allPaid:
+ *                           type: boolean
+ *       403:
+ *         description: Not a participant in this group order
+ *       404:
+ *         description: Group order not found
+ */
+router.get('/group/:orderId/payment-status', authenticateUser, getGroupOrderPaymentStatus);
+
+/**
+ * @swagger
+ * /api/advanced-orders/group/{orderId}/refund:
+ *   post:
+ *     summary: Process refund for cancelled group order
+ *     tags: [Group Orders]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: orderId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Group order ID
+ *     responses:
+ *       200:
+ *         description: Refunds processed successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     refundsProcessed:
+ *                       type: number
+ *                     totalRefunded:
+ *                       type: number
+ *                     refunds:
+ *                       type: array
+ *       400:
+ *         description: Can only refund cancelled orders
+ *       403:
+ *         description: Only creator can process refunds
+ *       404:
+ *         description: Group order not found
+ */
+router.post('/group/:orderId/refund', authenticateUser, refundGroupOrder);
 
 // ===== QUICK REORDER ROUTES =====
 
