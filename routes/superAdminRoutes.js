@@ -2,6 +2,28 @@ const express = require('express');
 const router = express.Router();
 const superAdminController = require('../controllers/superAdminController');
 const authenticate = require('../middlewares/authenticate');
+/**
+ * @swagger
+ * /api/v1/superadmin/dashboard:
+ *   get:
+ *     tags: [SuperAdmin]
+ *     summary: Get dashboard summary stats and recent activity
+ *     description: Returns summary stats, recent orders, users, top restaurants, and pending withdrawals for the dashboard
+ *     parameters:
+ *       - in: query
+ *         name: range
+ *         schema:
+ *           type: string
+ *           enum: [week, month, year]
+ *         description: Time range for growth stats
+ *     responses:
+ *       200:
+ *         description: Dashboard data
+ *       500:
+ *         description: Server error
+ */
+router.get('/dashboard', superAdminController.getDashboard);
+
 
 /**
  * @swagger
