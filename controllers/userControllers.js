@@ -105,135 +105,8 @@ exports.updateUserProfile = async (req, res) => {
       // Handle university update
       if (university !== undefined) {
         console.log('University update requested:', university, 'Type:', typeof university);
-        const mongoose = require('mongoose');
-        let universityDoc = null;
-        // If university is a string and a valid ObjectId, search by ID first
-        if (typeof university === 'string' && mongoose.Types.ObjectId.isValid(university)) {
-          try {
-            universityDoc = await University.findById(university);
-            console.log('Treated as ObjectId, University.findById result:', universityDoc);
-          } catch (err) {
-            console.error('Error during University.findById:', err);
-            return res.status(500).json({ message: 'Error searching for university', error: err.message });
-          }
-        }
-        // If not found by ID, or not a valid ObjectId, try by name
-        if (!universityDoc) {
-          try {
-            universityDoc = await University.findOne({ name: { $regex: new RegExp(`^${university}$`, 'i') } });
-            console.log('Treated as name, University.findOne result:', universityDoc);
-          } catch (err) {
-            console.error('Error during University.findOne:', err);
-            return res.status(500).json({ message: 'Error searching for university by name', error: err.message });
-          }
-        }
-        if (universityDoc) {
-          updateFields.university = universityDoc._id;
-          console.log('University found, setting ID:', universityDoc._id);
-        } else {
-          console.log('University not found, searching all universities...');
-          const allUniversities = await University.find({}, 'name');
-          console.log('Available universities:', allUniversities);
-          return res.status(404).json({ 
-            message: 'University not found',
-            searchedFor: university,
-            availableUniversities: allUniversities.map(u => u.name)
-          });
-        }
-      }
-      const updatedUser = await User.findByIdAndUpdate(
-        userId,
-        { $set: updateFields },
-        { new: true } 
-      ).populate('university', 'name _id');
-  
-      if (!updatedUser) {
-        return res.status(404).json({ message: 'User not found' });
-      }
-
-      // Send email notification for profile update
-      if (updatedUser.email) {
-        const emailHtml = `
-<html>
-<head>
-  <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f8f9fa;
-      color: #333333;
-      margin: 0;
-      padding: 0;
-    }
-    .email-container {
-      width: 90%;
-      max-width: 600px;
-      margin: 30px auto;
-      background-color: #ffffff;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-      overflow: hidden;
-    }
-    .header {
-      text-align: center;
-      padding: 40px 20px 30px;
-      background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
-      color: #ffffff;
-    }
-    .header h1 {
-      margin: 0;
-      font-size: 28px;
-      font-weight: 600;
-    }
-    .content {
-      padding: 40px 30px;
-      line-height: 1.6;
-    }
-    .update-info {
-      background-color: #f8f9fa;
-      border-left: 4px solid #007bff;
-      padding: 20px;
-      margin: 20px 0;
-      border-radius: 4px;
-    }
-    .footer {
-      text-align: center;
-      padding: 30px;
-      background-color: #f8f9fa;
-      color: #666666;
-      font-size: 14px;
-    }
-    .brand {
-      color: #007bff;
-      font-weight: 600;
-    }
-  </style>
-</head>
-<body>
-  <div class="email-container">
-    <div class="header">
-      <h1>Profile Updated! ✅</h1>
-    </div>
-    <div class="content">
-      <p>Hi ${updatedUser.username}! 👋</p>
-      <p>Great news! Your profile has been successfully updated. Here's what changed:</p>
-      <div class="update-info">
-        ${university ? `<p><strong>🏫 University:</strong> ${updatedUser.university?.name || 'Updated'}</p>` : ''}
-        ${bio !== undefined ? `<p><strong>📝 Bio:</strong> ${bio || 'Cleared'}</p>` : ''}
-        ${location !== undefined ? `<p><strong>📍 Location:</strong> ${location || 'Cleared'}</p>` : ''}
-        ${nearestLandmark !== undefined ? `<p><strong>🗺️ Nearest Landmark:</strong> ${nearestLandmark || 'Cleared'}</p>` : ''}
-        ${imageUrl !== undefined ? `<p><strong>📸 Profile Picture:</strong> Updated</p>` : ''}
-      </div>
-      <p>Your profile is now more complete and will help you get a better experience on our platform! 🎉</p>
-      <p>Ready to order some delicious food? Let's go! 🍕</p>
-    </div>
-    <div class="footer">
-      <p>© ${new Date().getFullYear()} <span class="brand">Byte</span> - Your Campus Food Companion</p>
-      <p>Keeping your profile fresh! 😋</p>
-    </div>
-  </div>
-</body>
-</html>
-        `;
+        const emailHtml = `<html><head><style>body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #FFFFFF; color: #000000; margin: 0; padding: 0; }.email-container { width: 90%; max-width: 600px; margin: 30px auto; background-color: #FFFFFF; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); overflow: hidden; }.header { text-align: center; padding: 40px 20px 30px; background: linear-gradient(135deg, #990000 0%, #FFCC00 100%); color: #FFFFFF; }.header h1 { margin: 0; font-size: 28px; font-weight: 600; }.content { padding: 40px 30px; line-height: 1.6; }.update-info { background-color: #FFCC00; border-left: 4px solid #990000; padding: 20px; margin: 20px 0; border-radius: 4px; color: #000000; }.footer { text-align: center; padding: 30px; background-color: #FFFFFF; color: #990000; font-size: 14px; }.brand { color: #990000; font-weight: 600; }</style></head><body><div class="email-container"><div class="header"><h1>Profile Updated! ✅</h1></div><div class="content"><p>Hi ${updatedUser.username}! 👋</p><p>Great news! Your profile has been successfully updated. Here's what changed:</p><div class="update-info">${university ? `<p><strong>🏫 University:</strong> ${updatedUser.university?.name || 'Updated'}</p>` : ''}${bio !== undefined ? `<p><strong>📝 Bio:</strong> ${bio || 'Cleared'}</p>` : ''}${location !== undefined ? `<p><strong>📍 Location:</strong> ${location || 'Cleared'}</p>` : ''}${nearestLandmark !== undefined ? `<p><strong>🗺️ Nearest Landmark:</strong> ${nearestLandmark || 'Cleared'}</p>` : ''}${imageUrl !== undefined ? `<p><strong>📸 Profile Picture:</strong> Updated</p>` : ''}</div><p>Your profile is now more complete and will help you get a better experience on our platform! 🎉</p><p>Ready to order some delicious food? Let's go! 🍕</p></div><div class="footer"><p>© ${new Date().getFullYear()} <span class="brand">Byte</span> - Your Campus Food Companion</p><p>Keeping your profile fresh! 😋</p></div></div></body></html>`;
+        // ...existing code continues...
         
         // Send email notification (non-blocking)
         setImmediate(async () => {
@@ -490,8 +363,8 @@ exports.transferBytes = async (request, response) => {
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f8f9fa;
-      color: #333333;
+      background-color: #FFFFFF;
+      color: #000000;
       margin: 0;
       padding: 0;
     }
@@ -499,7 +372,7 @@ exports.transferBytes = async (request, response) => {
       width: 90%;
       max-width: 600px;
       margin: 30px auto;
-      background-color: #ffffff;
+      background-color: #FFFFFF;
       border-radius: 12px;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
       overflow: hidden;
@@ -507,8 +380,8 @@ exports.transferBytes = async (request, response) => {
     .header {
       text-align: center;
       padding: 40px 20px 30px;
-      background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-      color: #ffffff;
+      background: linear-gradient(135deg, #990000 0%, #FFCC00 100%);
+      color: #FFFFFF;
     }
     .header h1 {
       margin: 0;
@@ -520,21 +393,22 @@ exports.transferBytes = async (request, response) => {
       line-height: 1.6;
     }
     .transfer-info {
-      background-color: #f8f9fa;
-      border-left: 4px solid #dc3545;
+      background-color: #FFCC00;
+      border-left: 4px solid #990000;
       padding: 20px;
       margin: 20px 0;
       border-radius: 4px;
+      color: #000000;
     }
     .footer {
       text-align: center;
       padding: 30px;
-      background-color: #f8f9fa;
-      color: #666666;
+      background-color: #FFFFFF;
+      color: #990000;
       font-size: 14px;
     }
     .brand {
-      color: #dc3545;
+      color: #990000;
       font-weight: 600;
     }
   </style>
@@ -573,8 +447,8 @@ exports.transferBytes = async (request, response) => {
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f8f9fa;
-      color: #333333;
+      background-color: #FFFFFF;
+      color: #000000;
       margin: 0;
       padding: 0;
     }
@@ -582,7 +456,7 @@ exports.transferBytes = async (request, response) => {
       width: 90%;
       max-width: 600px;
       margin: 30px auto;
-      background-color: #ffffff;
+      background-color: #FFFFFF;
       border-radius: 12px;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
       overflow: hidden;
@@ -590,8 +464,8 @@ exports.transferBytes = async (request, response) => {
     .header {
       text-align: center;
       padding: 40px 20px 30px;
-      background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-      color: #ffffff;
+      background: linear-gradient(135deg, #990000 0%, #FFCC00 100%);
+      color: #FFFFFF;
     }
     .header h1 {
       margin: 0;
@@ -603,21 +477,22 @@ exports.transferBytes = async (request, response) => {
       line-height: 1.6;
     }
     .transfer-info {
-      background-color: #f8f9fa;
-      border-left: 4px solid #28a745;
+      background-color: #FFCC00;
+      border-left: 4px solid #990000;
       padding: 20px;
       margin: 20px 0;
       border-radius: 4px;
+      color: #000000;
     }
     .footer {
       text-align: center;
       padding: 30px;
-      background-color: #f8f9fa;
-      color: #666666;
+      background-color: #FFFFFF;
+      color: #990000;
       font-size: 14px;
     }
     .brand {
-      color: #28a745;
+      color: #990000;
       font-weight: 600;
     }
   </style>
@@ -1080,8 +955,8 @@ exports.useReferralCode = async (req, res) => {
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f8f9fa;
-      color: #333333;
+      background-color: #FFFFFF;
+      color: #000000;
       margin: 0;
       padding: 0;
     }
@@ -1089,7 +964,7 @@ exports.useReferralCode = async (req, res) => {
       width: 90%;
       max-width: 600px;
       margin: 30px auto;
-      background-color: #ffffff;
+      background-color: #FFFFFF;
       border-radius: 12px;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
       overflow: hidden;
@@ -1097,8 +972,8 @@ exports.useReferralCode = async (req, res) => {
     .header {
       text-align: center;
       padding: 40px 20px 30px;
-      background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-      color: #ffffff;
+      background: linear-gradient(135deg, #990000 0%, #FFCC00 100%);
+      color: #FFFFFF;
     }
     .header h1 {
       margin: 0;
@@ -1110,21 +985,22 @@ exports.useReferralCode = async (req, res) => {
       line-height: 1.6;
     }
     .bonus-info {
-      background-color: #f8f9fa;
-      border-left: 4px solid #28a745;
+      background-color: #FFCC00;
+      border-left: 4px solid #990000;
       padding: 20px;
       margin: 20px 0;
       border-radius: 4px;
+      color: #000000;
     }
     .footer {
       text-align: center;
       padding: 30px;
-      background-color: #f8f9fa;
-      color: #666666;
+      background-color: #FFFFFF;
+      color: #990000;
       font-size: 14px;
     }
     .brand {
-      color: #28a745;
+      color: #990000;
       font-weight: 600;
     }
   </style>
@@ -1164,8 +1040,8 @@ exports.useReferralCode = async (req, res) => {
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f8f9fa;
-      color: #333333;
+      background-color: #FFFFFF;
+      color: #000000;
       margin: 0;
       padding: 0;
     }
@@ -1173,7 +1049,7 @@ exports.useReferralCode = async (req, res) => {
       width: 90%;
       max-width: 600px;
       margin: 30px auto;
-      background-color: #ffffff;
+      background-color: #FFFFFF;
       border-radius: 12px;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
       overflow: hidden;
@@ -1181,8 +1057,8 @@ exports.useReferralCode = async (req, res) => {
     .header {
       text-align: center;
       padding: 40px 20px 30px;
-      background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
-      color: #ffffff;
+      background: linear-gradient(135deg, #990000 0%, #FFCC00 100%);
+      color: #FFFFFF;
     }
     .header h1 {
       margin: 0;
@@ -1194,21 +1070,22 @@ exports.useReferralCode = async (req, res) => {
       line-height: 1.6;
     }
     .reward-info {
-      background-color: #f8f9fa;
-      border-left: 4px solid #007bff;
+      background-color: #FFCC00;
+      border-left: 4px solid #990000;
       padding: 20px;
       margin: 20px 0;
       border-radius: 4px;
+      color: #000000;
     }
     .footer {
       text-align: center;
       padding: 30px;
-      background-color: #f8f9fa;
-      color: #666666;
+      background-color: #FFFFFF;
+      color: #990000;
       font-size: 14px;
     }
     .brand {
-      color: #007bff;
+      color: #990000;
       font-weight: 600;
     }
   </style>
