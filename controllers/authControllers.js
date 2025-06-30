@@ -142,7 +142,7 @@ exports.register = async (request, response) => {
 exports.login = async (request, response) => {
     const { username, password } = request.body;
     try {
-        const user = await User.findOne({ username });
+        const user = await User.findOne({ username }).populate('university', 'name _id');
         if (!user) {
             return response.status(401).json({ message: 'Invalid username, you sure you won’t have to signup?' });
         }
@@ -280,10 +280,13 @@ exports.login = async (request, response) => {
                 username: user.username,
                 email: user.email,
                 phoneNumber: user.phoneNumber,
+                university: user.university,
                 byteBalance: user.byteBalance,
                 bio: user.bio,
                 imageUrl: user.imageUrl,
                 orderHistory: user.orderHistory,
+                location: user.location || '',
+                nearestLandmark: user.nearestLandmark || ''
             },
             token,
         });

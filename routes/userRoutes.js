@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const authenticate = require('../middlewares/authenticateUser');
+const { authenticateUser } = require('../middlewares/authenticateUser');
 const userControllers = require('../controllers/userControllers');
 const restaurantControllers = require('../controllers/restaurantControllers')
 const { uploadImage } = require('../controllers/image');
@@ -86,7 +86,7 @@ router.post('/upload', uploadImage);
  *       401:
  *         description: Unauthorized access
  */
-router.get('/getProfile', authenticate, userControllers.getProfile);
+router.get('/getProfile', authenticateUser, userControllers.getProfile);
 
 /**
  * @swagger
@@ -118,7 +118,7 @@ router.get('/getProfile', authenticate, userControllers.getProfile);
  *       400:
  *         description: Validation errors
  */
-router.put('/updateProfile', authenticate, userControllers.updateUserProfile);
+router.put('/updateProfile', authenticateUser, userControllers.updateUserProfile);
 
 /**
  * @swagger
@@ -146,7 +146,7 @@ router.put('/updateProfile', authenticate, userControllers.updateUserProfile);
  *       400:
  *         description: Validation errors
  */
-router.put('/updateByteBalance', authenticate, userControllers.updateByteBalance);
+router.put('/updateByteBalance', authenticateUser, userControllers.updateByteBalance);
 
 /**
  * @swagger
@@ -161,7 +161,7 @@ router.put('/updateByteBalance', authenticate, userControllers.updateByteBalance
  *       200:
  *         description: Returns a list of restaurants
  */
-router.get('/restaurants', authenticate, userControllers.getAllRestaurants);
+router.get('/restaurants', authenticateUser, userControllers.getAllRestaurants);
 
 /**
  * @swagger
@@ -202,7 +202,7 @@ router.get('/restaurants/public', userControllers.getAllRestaurantsPublic);
  *       400:
  *         description: Validation errors
  */
-router.post('/transfer', authenticate, userControllers.transferBytes)
+router.post('/transfer', authenticateUser, userControllers.transferBytes)
 
 /**
  * @swagger
@@ -297,7 +297,7 @@ router.get('/notifications', userControllers.fetchNotifications);
  *       500:
  *         description: Server error
  */
-router.put('/updateUniversity', authenticate, userControllers.updateUniversity);
+router.put('/updateUniversity', authenticateUser, userControllers.updateUniversity);
 
 /**
  * @swagger

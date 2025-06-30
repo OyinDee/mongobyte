@@ -10,7 +10,7 @@ exports.getProfile = async (request, response) => {
     const userId = request.user._id; 
 
     try {
-        const user = await User.findById(userId);
+        const user = await User.findById(userId).populate('university', 'name _id');
         if (!user) {
             return response.status(404).json({ message: 'User not found' });
         }
@@ -20,6 +20,7 @@ exports.getProfile = async (request, response) => {
                 username: user.username,
                 email: user.email,
                 phoneNumber: user.phoneNumber,
+                university: user.university,
                 byteBalance: user.byteBalance,
                 bio: user.bio,
                 imageUrl: user.imageUrl,
@@ -91,7 +92,23 @@ exports.updateUserProfile = async (req, res) => {
         return res.status(404).json({ message: 'User not found' });
       }
       const token = jwt.sign({ user: updatedUser }, process.env.JWT_SECRET)
-      res.status(200).json({ message: 'Profile updated successfully', user: updatedUser, token:token });
+      res.status(200).json({ 
+        message: 'Profile updated successfully', 
+        user: {
+          id: updatedUser._id,
+          username: updatedUser.username,
+          email: updatedUser.email,
+          phoneNumber: updatedUser.phoneNumber,
+          university: updatedUser.university,
+          byteBalance: updatedUser.byteBalance,
+          bio: updatedUser.bio,
+          imageUrl: updatedUser.imageUrl,
+          orderHistory: updatedUser.orderHistory,
+          location: updatedUser.location || '',
+          nearestLandmark: updatedUser.nearestLandmark || ''
+        }, 
+        token: token 
+      });
     } catch (error) {
       console.error('Error updating user profile:', error);
       res.status(500).json({ message: 'Server error' });
@@ -371,7 +388,7 @@ exports.updateUniversity = async (req, res) => {
       userId,
       { university: universityId },
       { new: true }
-    );
+    ).populate('university', 'name _id');
 
     if (!updatedUser) {
       return res.status(404).json({ 

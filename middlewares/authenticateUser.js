@@ -17,26 +17,29 @@ const authenticate = async (request, response, next) => {
         
         if (decoded.user) {
             const user = await User.findById(decoded.user._id);
+            if (!user) {
+                return response.status(404).json({ message: 'User not found' });
+            }
             request.user = user; 
             request.userType = 'user'; 
-            return next()
+            return next();
         }
         
         if (decoded.restaurant) {
             const restaurant = await Restaurant.findById(decoded.restaurant._id);
+            if (!restaurant) {
+                return response.status(404).json({ message: 'Restaurant not found' });
+            }
             request.restaurant = restaurant;
             request.userType = 'restaurant'; 
             return response.status(403).json({ message: 'Access denied for restaurants' });
         }
 
-
-        if(!user || !restaurant){
-            return response.status(404).json({ message: 'User or restaurant not found' });
-        }
+        return response.status(401).json({ message: 'Invalid token structure' });
     } catch (error) {
         console.error(error);
         response.status(401).json({ message: 'Invalid token' });
     }
 };
 
-module.exports = authenticate;
+module.exports = { authenticateUser: authenticate };

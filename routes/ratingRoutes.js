@@ -93,7 +93,7 @@ const {
     moderateRating
 } = require('../controllers/ratingControllers');
 
-const authenticateUser = require('../middlewares/authenticateUser');
+const { authenticateUser } = require('../middlewares/authenticateUser');
 const authenticateAdmin = require('../middlewares/authenticate');
 
 /**

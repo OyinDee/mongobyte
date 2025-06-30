@@ -1,7 +1,7 @@
 // routes/payment.routes.js
 const express = require('express');
 const { initiatePayment, verifyPayment } = require('../controllers/paymentControllers.js');
-const authenticate = require('../middlewares/authenticateUser.js')
+const { authenticateUser } = require('../middlewares/authenticateUser.js')
 const router = express.Router();
 
 /**
@@ -25,7 +25,7 @@ const router = express.Router();
  *         description: Validation error
  */
 
-router.post('/pay', authenticate, initiatePayment);
+router.post('/pay', authenticateUser, initiatePayment);
 
 /**
  * @swagger
