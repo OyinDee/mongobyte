@@ -13,10 +13,6 @@ const {
     addMealsToGroupOrder,
     getPublicGroupOrders,
     
-    // Referral System
-    generateReferralCode,
-    useReferralCode,
-    
     // Quick Reorder
     saveQuickReorder,
     getUserQuickReorders,
@@ -471,71 +467,6 @@ router.post('/group/:orderId/leave', authenticateUser, leaveGroupOrder);
  *         description: Group order not found
  */
 router.put('/group/:orderId/cancel', authenticateUser, cancelGroupOrder);
-
-// ===== REFERRAL SYSTEM ROUTES =====
-
-/**
- * @swagger
- * components:
- *   schemas:
- *     Referral:
- *       type: object
- *       properties:
- *         referralCode:
- *           type: string
- *         rewardAmount:
- *           type: number
- *         bonusAmount:
- *           type: number
- *         expiresAt:
- *           type: string
- *           format: date-time
- */
-
-/**
- * @swagger
- * /api/advanced-orders/referral/generate:
- *   post:
- *     summary: Generate a referral code
- *     tags: [Referral System]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       201:
- *         description: Referral code generated successfully
- *       200:
- *         description: Existing referral code returned
- */
-router.post('/referral/generate', authenticateUser, generateReferralCode);
-
-/**
- * @swagger
- * /api/advanced-orders/referral/use:
- *   post:
- *     summary: Use a referral code
- *     tags: [Referral System]
- *     security:
- *       - bearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - referralCode
- *             properties:
- *               referralCode:
- *                 type: string
- *     responses:
- *       200:
- *         description: Referral code applied successfully
- *       400:
- *         description: Invalid referral code or cannot use own code
- *       404:
- *         description: Referral code not found or expired
- */
-router.post('/referral/use', authenticateUser, useReferralCode);
 
 // ===== QUICK REORDER ROUTES =====
 

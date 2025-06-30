@@ -105,12 +105,12 @@ const swaggerOptions = {
         description: 'Collaborative ordering and bill splitting'
       },
       {
-        name: 'Referral System',
-        description: 'Friend referral and incentive system'
-      },
-      {
         name: 'Quick Reorder',
         description: 'One-click reorder of previous meals'
+      },
+      {
+        name: 'Restaurant Advanced Orders',
+        description: 'Restaurant management of scheduled and group orders'
       }
     ],
     components: {

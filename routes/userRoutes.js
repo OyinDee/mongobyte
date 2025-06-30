@@ -396,4 +396,99 @@ router.get('/my-orders', authenticateUser, userControllers.getMyOrders);
  */
 router.get('/my-notifications', authenticateUser, userControllers.getMyNotifications);
 
+/**
+ * @swagger
+ * /users/referral/generate:
+ *   post:
+ *     tags: [Users]
+ *     summary: Generate a referral code
+ *     description: Generate a personal referral code for inviting friends
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       201:
+ *         description: Referral code generated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     _id:
+ *                       type: string
+ *                     referralCode:
+ *                       type: string
+ *                     rewardAmount:
+ *                       type: number
+ *                     bonusAmount:
+ *                       type: number
+ *                     totalUses:
+ *                       type: number
+ *                     maxUses:
+ *                       type: number
+ *                     expiresAt:
+ *                       type: string
+ *                       format: date-time
+ *                     isActive:
+ *                       type: boolean
+ *       200:
+ *         description: Existing referral code returned
+ */
+router.post('/referral/generate', authenticateUser, userControllers.generateReferralCode);
+
+/**
+ * @swagger
+ * /users/referral/use:
+ *   post:
+ *     tags: [Users]
+ *     summary: Use a referral code
+ *     description: Apply a referral code to receive rewards
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - referralCode
+ *             properties:
+ *               referralCode:
+ *                 type: string
+ *                 description: The referral code to use
+ *     responses:
+ *       200:
+ *         description: Referral code applied successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     rewardEarned:
+ *                       type: number
+ *                     newBalance:
+ *                       type: number
+ *                     referrerBonus:
+ *                       type: number
+ *       400:
+ *         description: Invalid referral code or cannot use own code
+ *       404:
+ *         description: Referral code not found or expired
+ */
+router.post('/referral/use', authenticateUser, userControllers.useReferralCode);
+
 module.exports = router;

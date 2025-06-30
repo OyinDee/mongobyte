@@ -1,4 +1,4 @@
-const { ScheduledOrder, GroupOrder, Referral, QuickReorder } = require('../models/AdvancedOrders');
+const { ScheduledOrder, GroupOrder, QuickReorder } = require('../models/AdvancedOrders');
 const Order = require('../models/Orders');
 const User = require('../models/User');
 const Restaurant = require('../models/Restaurants');
@@ -71,6 +71,17 @@ const createScheduledOrder = async (req, res) => {
         });
 
         await scheduledOrder.save();
+
+        // Create notification for restaurant
+        const restaurantInfo = await Restaurant.findById(restaurant);
+        if (restaurantInfo) {
+            const restaurantNotification = new Notification({
+                restaurantId: restaurant,
+                message: `New scheduled order for ${new Date(scheduledFor).toLocaleDateString()}. Order value: ₦${totalPrice}`,
+                isRead: false
+            });
+            await restaurantNotification.save();
+        }
 
         const populatedOrder = await ScheduledOrder.findById(scheduledOrder._id)
             .populate('user', 'username email')
@@ -224,6 +235,17 @@ const createGroupOrder = async (req, res) => {
         });
 
         await groupOrder.save();
+
+        // Create notification for restaurant when group order is created
+        const restaurantInfo = await Restaurant.findById(restaurant);
+        if (restaurantInfo) {
+            const restaurantNotification = new Notification({
+                restaurantId: restaurant,
+                message: `New group order "${title}" created with deadline: ${new Date(orderDeadline).toLocaleDateString()}`,
+                isRead: false
+            });
+            await restaurantNotification.save();
+        }
 
         const populatedOrder = await GroupOrder.findById(groupOrder._id)
             .populate('creator', 'username')
@@ -443,130 +465,6 @@ const getPublicGroupOrders = async (req, res) => {
     }
 };
 
-// ===== REFERRAL SYSTEM =====
-
-// Generate referral code
-const generateReferralCode = async (req, res) => {
-    try {
-        const userId = req.user._id;
-        const user = await User.findById(userId);
-
-        // Check if user already has an active referral code
-        let existingReferral = await Referral.findOne({
-            referrer: userId,
-            status: 'pending',
-            expiresAt: { $gt: new Date() }
-        });
-
-        if (existingReferral) {
-            return res.status(200).json({
-                success: true,
-                data: {
-                    referralCode: existingReferral.referralCode,
-                    expiresAt: existingReferral.expiresAt,
-                    rewardAmount: existingReferral.rewardAmount
-                }
-            });
-        }
-
-        // Generate new referral code
-        const referralCode = `${user.username.toUpperCase()}-${generateId().substring(0, 6)}`;
-
-        const referral = new Referral({
-            referrer: userId,
-            referralCode,
-            status: 'pending'
-        });
-
-        // Create placeholder for referred user (will be updated when someone uses the code)
-        await referral.save();
-
-        res.status(201).json({
-            success: true,
-            message: 'Referral code generated successfully',
-            data: {
-                referralCode: referral.referralCode,
-                expiresAt: referral.expiresAt,
-                rewardAmount: referral.rewardAmount
-            }
-        });
-
-    } catch (error) {
-        console.error('Generate referral code error:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Error generating referral code',
-            error: error.message
-        });
-    }
-};
-
-// Use referral code during registration
-const useReferralCode = async (req, res) => {
-    try {
-        const { referralCode } = req.body;
-        const userId = req.user._id;
-
-        if (!referralCode) {
-            return res.status(400).json({
-                success: false,
-                message: 'Referral code is required'
-            });
-        }
-
-        const referral = await Referral.findOne({
-            referralCode,
-            status: 'pending',
-            expiresAt: { $gt: new Date() }
-        });
-
-        if (!referral) {
-            return res.status(404).json({
-                success: false,
-                message: 'Invalid or expired referral code'
-            });
-        }
-
-        // Check if user is trying to use their own referral code
-        if (referral.referrer.toString() === userId.toString()) {
-            return res.status(400).json({
-                success: false,
-                message: 'You cannot use your own referral code'
-            });
-        }
-
-        // Update referral with referred user
-        referral.referred = userId;
-        await referral.save();
-
-        // Give bonus to new user
-        const newUser = await User.findById(userId);
-        newUser.byteBalance += referral.bonusAmount;
-        await newUser.save();
-
-        // Create notifications
-        const newUserNotification = new Notification({
-            userId: userId,
-            message: `Welcome bonus: ${referral.bonusAmount} bytes added to your account!`
-        });
-        await newUserNotification.save();
-
-        res.status(200).json({
-            success: true,
-            message: `Referral code applied! You received ${referral.bonusAmount} bytes`,
-            bonusAmount: referral.bonusAmount
-        });
-
-    } catch (error) {
-        console.error('Use referral code error:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Error applying referral code',
-            error: error.message
-        });
-    }
-};
-
 // ===== QUICK REORDER =====
 
 // Save order as quick reorder
@@ -750,10 +648,6 @@ module.exports = {
     joinGroupOrder,
     addMealsToGroupOrder,
     getPublicGroupOrders,
-    
-    // Referral System
-    generateReferralCode,
-    useReferralCode,
     
     // Quick Reorder
     saveQuickReorder,

@@ -348,7 +348,7 @@ scheduledOrderSchema.index({ user: 1, scheduledFor: 1 });
 scheduledOrderSchema.index({ status: 1, nextExecution: 1 });
 groupOrderSchema.index({ creator: 1, status: 1 });
 groupOrderSchema.index({ restaurant: 1, status: 1, isPublic: 1 });
-referralSchema.index({ referralCode: 1 });
+// Note: referralCode already has unique: true which creates an index
 referralSchema.index({ referrer: 1, status: 1 });
 quickReorderSchema.index({ user: 1, timesOrdered: -1 });
 

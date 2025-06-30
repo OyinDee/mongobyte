@@ -4,6 +4,7 @@ const restaurantController = require('../controllers/restaurantControllers');
 const authenticateAdmin = require('../middlewares/authenticate.js');
 const authenticate = require('../middlewares/authenticateRestaurant.js');
 const authController = require('../controllers/authControllers');
+const restaurantAdvancedOrdersController = require('../controllers/restaurantAdvancedOrdersController');
 
 /**
  * @swagger
@@ -293,5 +294,212 @@ router.patch('/:id/toggle-active', authenticate, restaurantController.toggleRest
 
 // Test route to check restaurant lookup
 router.get('/test/:id', restaurantController.testRestaurantLookup);
+
+// ===== RESTAURANT ADVANCED ORDERS MANAGEMENT =====
+
+/**
+ * @swagger
+ * /restaurants/advanced-orders/scheduled:
+ *   get:
+ *     summary: Get restaurant's scheduled orders
+ *     tags: [Restaurants]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *         description: Page number
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *         description: Items per page
+ *       - in: query
+ *         name: status
+ *         schema:
+ *           type: string
+ *           enum: [scheduled, processing, completed, cancelled]
+ *         description: Filter by status
+ *       - in: query
+ *         name: startDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Filter orders from this date
+ *       - in: query
+ *         name: endDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Filter orders until this date
+ *     responses:
+ *       200:
+ *         description: Scheduled orders retrieved successfully
+ */
+router.get('/advanced-orders/scheduled', authenticate, restaurantAdvancedOrdersController.getRestaurantScheduledOrders);
+
+/**
+ * @swagger
+ * /restaurants/advanced-orders/scheduled/{orderId}/status:
+ *   put:
+ *     summary: Accept or decline a scheduled order
+ *     tags: [Restaurants]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: orderId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Scheduled order ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - status
+ *             properties:
+ *               status:
+ *                 type: string
+ *                 enum: [processing, cancelled]
+ *               reason:
+ *                 type: string
+ *                 description: Reason for cancellation (optional)
+ *     responses:
+ *       200:
+ *         description: Scheduled order status updated successfully
+ */
+router.put('/advanced-orders/scheduled/:orderId/status', authenticate, restaurantAdvancedOrdersController.updateScheduledOrderStatus);
+
+/**
+ * @swagger
+ * /restaurants/advanced-orders/scheduled/{orderId}/complete:
+ *   put:
+ *     summary: Mark scheduled order as completed
+ *     tags: [Restaurants]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: orderId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Scheduled order ID
+ *     responses:
+ *       200:
+ *         description: Scheduled order marked as completed
+ */
+router.put('/advanced-orders/scheduled/:orderId/complete', authenticate, restaurantAdvancedOrdersController.markScheduledOrderCompleted);
+
+/**
+ * @swagger
+ * /restaurants/advanced-orders/group:
+ *   get:
+ *     summary: Get restaurant's group orders
+ *     tags: [Restaurants]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *         description: Page number
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *         description: Items per page
+ *       - in: query
+ *         name: status
+ *         schema:
+ *           type: string
+ *           enum: [open, ready, confirmed, cancelled]
+ *         description: Filter by status
+ *     responses:
+ *       200:
+ *         description: Group orders retrieved successfully
+ */
+router.get('/advanced-orders/group', authenticate, restaurantAdvancedOrdersController.getRestaurantGroupOrders);
+
+/**
+ * @swagger
+ * /restaurants/advanced-orders/group/{orderId}/status:
+ *   put:
+ *     summary: Accept or decline a group order
+ *     tags: [Restaurants]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: orderId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Group order ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - status
+ *             properties:
+ *               status:
+ *                 type: string
+ *                 enum: [accepted, declined]
+ *               reason:
+ *                 type: string
+ *                 description: Reason for declining (optional)
+ *     responses:
+ *       200:
+ *         description: Group order status updated successfully
+ */
+router.put('/advanced-orders/group/:orderId/status', authenticate, restaurantAdvancedOrdersController.updateGroupOrderStatus);
+
+/**
+ * @swagger
+ * /restaurants/advanced-orders/stats:
+ *   get:
+ *     summary: Get advanced orders statistics for restaurant dashboard
+ *     tags: [Restaurants]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Advanced orders statistics retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     scheduledOrders:
+ *                       type: object
+ *                       properties:
+ *                         stats:
+ *                           type: array
+ *                         todaysOrders:
+ *                           type: number
+ *                     groupOrders:
+ *                       type: object
+ *                       properties:
+ *                         stats:
+ *                           type: array
+ *                         pendingOrders:
+ *                           type: number
+ */
+router.get('/advanced-orders/stats', authenticate, restaurantAdvancedOrdersController.getAdvancedOrdersStats);
 
 module.exports = router;

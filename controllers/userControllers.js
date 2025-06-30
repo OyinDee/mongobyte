@@ -598,4 +598,170 @@ exports.getMyNotifications = async (req, res) => {
   }
 };
 
+// Generate referral code
+exports.generateReferralCode = async (req, res) => {
+    try {
+        const userId = req.user._id;
+        const user = await User.findById(userId);
+
+        // Check if user already has an active referral code
+        const { Referral } = require('../models/AdvancedOrders');
+        const { generateId } = require('../utils/generateID');
+
+        let existingReferral = await Referral.findOne({
+            referrer: userId,
+            status: 'pending',
+            expiresAt: { $gt: new Date() }
+        });
+
+        if (existingReferral) {
+            return res.status(200).json({
+                success: true,
+                data: {
+                    referralCode: existingReferral.referralCode,
+                    expiresAt: existingReferral.expiresAt,
+                    rewardAmount: existingReferral.rewardAmount,
+                    bonusAmount: existingReferral.bonusAmount,
+                    totalUses: existingReferral.totalUses || 0,
+                    maxUses: existingReferral.maxUses,
+                    isActive: existingReferral.status === 'pending'
+                }
+            });
+        }
+
+        // Generate new referral code
+        const referralCode = `${user.username.toUpperCase()}-${generateId().substring(0, 6)}`;
+
+        const referral = new Referral({
+            referrer: userId,
+            referralCode,
+            status: 'pending'
+        });
+
+        await referral.save();
+
+        res.status(201).json({
+            success: true,
+            message: 'Referral code generated successfully',
+            data: {
+                _id: referral._id,
+                referralCode: referral.referralCode,
+                rewardAmount: referral.rewardAmount,
+                bonusAmount: referral.bonusAmount,
+                totalUses: 0,
+                maxUses: referral.maxUses,
+                expiresAt: referral.expiresAt,
+                isActive: true
+            }
+        });
+
+    } catch (error) {
+        console.error('Generate referral code error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error generating referral code',
+            error: error.message
+        });
+    }
+};
+
+// Use referral code
+exports.useReferralCode = async (req, res) => {
+    try {
+        const { referralCode } = req.body;
+        const userId = req.user._id;
+
+        if (!referralCode) {
+            return res.status(400).json({
+                success: false,
+                message: 'Referral code is required'
+            });
+        }
+
+        const { Referral } = require('../models/AdvancedOrders');
+
+        const referral = await Referral.findOne({
+            referralCode,
+            status: 'pending',
+            expiresAt: { $gt: new Date() }
+        });
+
+        if (!referral) {
+            return res.status(404).json({
+                success: false,
+                message: 'Invalid or expired referral code'
+            });
+        }
+
+        // Check if user is trying to use their own referral code
+        if (referral.referrer.toString() === userId.toString()) {
+            return res.status(400).json({
+                success: false,
+                message: 'You cannot use your own referral code'
+            });
+        }
+
+        // Check if user has already used a referral code
+        const existingUse = await Referral.findOne({
+            referred: userId,
+            status: 'completed'
+        });
+
+        if (existingUse) {
+            return res.status(400).json({
+                success: false,
+                message: 'You have already used a referral code'
+            });
+        }
+
+        // Update referral with referred user
+        referral.referred = userId;
+        referral.status = 'completed';
+        referral.usedAt = new Date();
+        await referral.save();
+
+        // Give bonus to new user
+        const newUser = await User.findById(userId);
+        const oldBalance = newUser.byteBalance;
+        newUser.byteBalance += referral.bonusAmount;
+        await newUser.save();
+
+        // Give reward to referrer
+        const referrer = await User.findById(referral.referrer);
+        referrer.byteBalance += referral.rewardAmount;
+        await referrer.save();
+
+        // Create notifications
+        const newUserNotification = new Notification({
+            userId: userId,
+            message: `Welcome bonus: ${referral.bonusAmount} bytes added to your account!`
+        });
+        await newUserNotification.save();
+
+        const referrerNotification = new Notification({
+            userId: referral.referrer,
+            message: `Your referral was successful! ${referral.rewardAmount} bytes added to your account.`
+        });
+        await referrerNotification.save();
+
+        res.status(200).json({
+            success: true,
+            message: `Referral code applied successfully! You earned ${referral.bonusAmount} bytes.`,
+            data: {
+                rewardEarned: referral.bonusAmount,
+                newBalance: newUser.byteBalance,
+                referrerBonus: referral.rewardAmount
+            }
+        });
+
+    } catch (error) {
+        console.error('Use referral code error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error using referral code',
+            error: error.message
+        });
+    }
+};
+
 
