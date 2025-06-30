@@ -3,6 +3,8 @@ const router = express.Router();
 const mealController = require('../controllers/mealControllers');
 const authenticate = require('../middlewares/authenticateRestaurant');
 
+console.log('mealControllers.js loaded');
+
 /**
  * @swagger
  * tags:

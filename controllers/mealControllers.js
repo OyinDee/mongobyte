@@ -31,22 +31,24 @@ exports.createMeal = async (request, response) => {
     const { customId } = request.params;
 
     try {
-        console.log('Creating meal for restaurant ID:', customId);
+        console.log(`[createMeal] Attempting to create meal for restaurant ID: ${customId}`);
         const restaurant = await findRestaurantByIdHelper(customId);
         if (!restaurant) {
-            console.log('Restaurant not found for meal creation:', customId);
+            console.log(`[createMeal] Restaurant not found for ID: ${customId}`);
             return response.status(404).json({ 
                 message: 'Restaurant not found',
                 restaurantId: customId 
             });
         }
+        console.log(`[createMeal] Restaurant found: ${restaurant.name} (${restaurant._id})`);
         const meal = new Meal({ ...request.body, restaurant: restaurant._id });
         restaurant.meals.push(meal._id);
         await restaurant.save();
         await meal.save();
+        console.log(`[createMeal] Meal created: ${meal.name} (ID: ${meal._id}) for restaurant: ${restaurant.name}`);
         response.status(201).json({ message: 'Meal created successfully!', meal });
     } catch (error) {
-        console.log(error);
+        console.error(`[createMeal] Error:`, error);
         response.status(500).json({ message: 'Internal server error' });
     }
 };
