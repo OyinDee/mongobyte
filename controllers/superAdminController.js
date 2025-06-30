@@ -1,3 +1,126 @@
+const User = require('../models/User');
+const Withdrawal = require('../models/Withdrawals');
+const mongoose = require('mongoose');
+// GET /api/superadmin/dashboard?range=week|month|year
+exports.getDashboard = async (req, res) => {
+  try {
+    const range = req.query.range || 'week';
+    const now = new Date();
+    let startDate;
+    if (range === 'month') {
+      startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+    } else if (range === 'year') {
+      startDate = new Date(now.getFullYear(), 0, 1);
+    } else { // week
+      const day = now.getDay();
+      startDate = new Date(now);
+      startDate.setDate(now.getDate() - day);
+      startDate.setHours(0,0,0,0);
+    }
+
+    // Stats
+    const [
+      totalUsers,
+      totalRestaurants,
+      totalOrders,
+      totalRevenue,
+      pendingOrders,
+      pendingWithdrawals,
+      activeRestaurants
+    ] = await Promise.all([
+      User.countDocuments(),
+      Restaurant.countDocuments(),
+      Order.countDocuments(),
+      Order.aggregate([{ $group: { _id: null, total: { $sum: "$totalPrice" } } }]).then(r => r[0]?.total || 0),
+      Order.countDocuments({ status: 'Pending' }),
+      Withdrawal.countDocuments({ status: 'pending' }),
+      Restaurant.countDocuments({ isActive: true })
+    ]);
+
+    // Growth (week/month/year)
+    const [
+      prevUsers,
+      prevOrders,
+      prevRevenue
+    ] = await Promise.all([
+      User.countDocuments({ createdAt: { $lt: startDate } }),
+      Order.countDocuments({ createdAt: { $lt: startDate } }),
+      Order.aggregate([
+        { $match: { createdAt: { $lt: startDate } } },
+        { $group: { _id: null, total: { $sum: "$totalPrice" } } }
+      ]).then(r => r[0]?.total || 0)
+    ]);
+    const userGrowth = totalUsers - prevUsers;
+    const orderGrowth = totalOrders - prevOrders;
+    const revenueGrowth = totalRevenue - prevRevenue;
+
+    // Recent orders (last 10)
+    const recentOrders = await Order.find({})
+      .sort({ createdAt: -1 })
+      .limit(10)
+      .populate('user', 'username email')
+      .populate('restaurant', 'name')
+      .select('_id user restaurant totalPrice status createdAt');
+
+    // Recent users (last 10)
+    const recentUsers = await User.find({})
+      .sort({ createdAt: -1 })
+      .limit(10)
+      .select('_id username email createdAt');
+
+    // Top restaurants (by order count and revenue)
+    const topRestaurantsAgg = await Order.aggregate([
+      { $group: {
+        _id: "$restaurant",
+        orderCount: { $sum: 1 },
+        revenue: { $sum: "$totalPrice" }
+      }},
+      { $sort: { revenue: -1 } },
+      { $limit: 10 }
+    ]);
+    const restaurantIds = topRestaurantsAgg.map(r => r._id);
+    const restaurants = await Restaurant.find({ _id: { $in: restaurantIds } })
+      .select('_id name imageUrl university');
+    const topRestaurants = topRestaurantsAgg.map(r => {
+      const rest = restaurants.find(rest => rest._id.equals(r._id));
+      return rest ? {
+        _id: rest._id,
+        name: rest.name,
+        imageUrl: rest.imageUrl,
+        university: rest.university,
+        orderCount: r.orderCount,
+        revenue: r.revenue
+      } : null;
+    }).filter(Boolean);
+
+    // Pending withdrawals (last 10)
+    const pendingWithdrawalsArr = await Withdrawal.find({ status: 'pending' })
+      .sort({ createdAt: -1 })
+      .limit(10);
+
+    res.json({
+      stats: {
+        totalUsers,
+        totalRestaurants,
+        totalOrders,
+        totalRevenue,
+        pendingOrders,
+        pendingWithdrawals,
+        activeRestaurants,
+        orderGrowth,
+        userGrowth,
+        revenueGrowth
+      },
+      recentOrders,
+      recentUsers,
+      topRestaurants,
+      pendingWithdrawals: pendingWithdrawalsArr
+    });
+  } catch (error) {
+    console.error('Dashboard error:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
 const { getBreakdown } = require('./restaurantRevenueHelpers');
 // Get total and breakdown revenue for all orders (global)
 exports.getGlobalRevenue = async (req, res) => {
