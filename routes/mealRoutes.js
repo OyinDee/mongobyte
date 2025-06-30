@@ -135,6 +135,22 @@ router.get('/', mealController.getAllMeals);
 
 /**
  * @swagger
+ * /meals/notifications:
+ *   get:
+ *     tags: [Meals]
+ *     summary: Get notifications for the authenticated restaurant
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of notifications for the authenticated restaurant
+ *       401:
+ *         description: Unauthorized - Not a restaurant account
+ */
+router.get('/notifications', authenticate, mealController.getRestaurantNotifications);
+
+/**
+ * @swagger
  * /meals/{id}:
  *   get:
  *     tags: [Meals]
