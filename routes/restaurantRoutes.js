@@ -13,7 +13,8 @@ const { getRestaurantNotifications } = require('../controllers/restaurantControl
  *   name: Restaurants
  *   description: Restaurant management and operations
  */
-
+// Fetch notifications for the authenticated restaurant
+router.get('/notifications', authenticate, getRestaurantNotifications);
 /**
  * @swagger
  * components:
@@ -503,7 +504,6 @@ router.put('/advanced-orders/group/:orderId/status', authenticate, restaurantAdv
  */
 router.get('/advanced-orders/stats', authenticate, restaurantAdvancedOrdersController.getAdvancedOrdersStats);
 
-// Fetch notifications for the authenticated restaurant
-router.get('/notifications', authenticate, getRestaurantNotifications);
+
 
 module.exports = router;
