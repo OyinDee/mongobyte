@@ -163,22 +163,60 @@ router.get('/:userId/order-history', userControllers.getUserOrderHistory);
 
 /**
  * @swagger
- * /orders/{orderId}:
- *   patch:
+ * /orders/{orderId}/confirm:
+ *   post:
  *     tags: [Orders]
- *     summary: Confirm order
+ *     summary: Restaurant confirm order with optional additional fee
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: orderId
  *         required: true
  *         schema:
  *           type: string
+ *         description: Order ID (customId)
+ *     requestBody:
+ *       required: false
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               additionalFee:
+ *                 type: number
+ *                 description: Optional additional fee amount
+ *                 example: 800
+ *               requestDescription:
+ *                 type: string
+ *                 description: Reason for additional fee
+ *                 example: "Extra distance delivery to off-campus location"
  *     responses:
  *       200:
- *         description: Order confirmed
+ *         description: Order confirmed successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 order:
+ *                   type: object
+ *       400:
+ *         description: Fee exceeds limit or insufficient balance
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       404:
+ *         description: Order not found
  */
 
-router.patch('/:orderId', orderController.orderConfirmation);
+router.post('/:orderId/confirm', authenticate, orderController.orderConfirmation);
 
 /**
  * @swagger
