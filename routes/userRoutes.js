@@ -25,7 +25,7 @@ const superAdminController = require('../controllers/superAdminController')
  *         content:
  *           application/json:
  *             schema:
- *               type: object
+ *
  *               properties:
  *                 totalRevenue:
  *                   type: number
@@ -642,5 +642,49 @@ router.post('/referral/generate', authenticateUser, userControllers.generateRefe
  *         description: Referral code not found or expired
  */
 router.post('/referral/use', authenticateUser, userControllers.useReferralCode);
+
+/**
+ * @swagger
+ * /users/delivery-info/{username}:
+ *   get:
+ *     tags: [Users]
+ *     summary: Get user delivery information by username
+ *     description: Retrieves delivery information (location, phone, etc.) for a user by their username. Used when ordering food for someone else.
+ *     parameters:
+ *       - in: path
+ *         name: username
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Username of the user to get delivery info for
+ *     responses:
+ *       200:
+ *         description: User delivery information retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     username:
+ *                       type: string
+ *                     phoneNumber:
+ *                       type: string
+ *                     location:
+ *                       type: string
+ *                     nearestLandmark:
+ *                       type: string
+ *                     hasDeliveryInfo:
+ *                       type: boolean
+ *       404:
+ *         description: User not found
+ *       400:
+ *         description: Username is required
+ */
+router.get('/delivery-info/:username', userControllers.getUserDeliveryInfo);
 
 module.exports = router;

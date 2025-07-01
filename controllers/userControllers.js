@@ -1176,4 +1176,35 @@ exports.useReferralCode = async (req, res) => {
     }
 };
 
+// Get user delivery information by username (for ordering for others)
+exports.getUserDeliveryInfo = async (req, res) => {
+  try {
+    const { username } = req.params;
+    
+    if (!username) {
+      return res.status(400).json({ message: 'Username is required' });
+    }
+
+    const user = await User.findOne({ username }).select('username phoneNumber location nearestLandmark email');
+    
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.status(200).json({
+      message: 'User delivery information retrieved successfully',
+      user: {
+        username: user.username,
+        phoneNumber: user.phoneNumber,
+        location: user.location,
+        nearestLandmark: user.nearestLandmark,
+        hasDeliveryInfo: !!(user.location && user.phoneNumber)
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching user delivery info:', error);
+    res.status(500).json({ message: 'Error fetching user information' });
+  }
+};
+
 

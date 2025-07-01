@@ -64,7 +64,7 @@ exports.createOrder = async (request, response) => {
 const TERMII_API_KEY = process.env.TERMII_API_KEY;
 const TERMII_SENDER_ID = process.env.TERMII_SENDER_ID;
 
-    const { user, meals, note, totalPrice, location, phoneNumber, restaurantCustomId, nearestLandmark, fee } = request.body;
+    const { user, meals, note, totalPrice, location, phoneNumber, restaurantCustomId, nearestLandmark, fee, orderForUsername } = request.body;
     try {
         const restaurant = await findRestaurantByIdHelper(restaurantCustomId);
         if (!restaurant) {
@@ -73,6 +73,38 @@ const TERMII_SENDER_ID = process.env.TERMII_SENDER_ID;
 
         if (!restaurant.isActive) {
             return response.status(403).json({ message: 'Restaurant is currently closed' });
+        }
+
+        // Handle ordering for another user
+        let orderingUser = await User.findById(user);
+        let recipientUser = null;
+        let finalLocation = location;
+        let finalPhoneNumber = phoneNumber;
+        let finalNearestLandmark = nearestLandmark;
+
+        if (orderForUsername) {
+            // Find the recipient user by username
+            recipientUser = await User.findOne({ username: orderForUsername });
+            if (!recipientUser) {
+                return response.status(404).json({ message: 'Recipient user not found' });
+            }
+
+            // Use recipient's saved location and phone if available, otherwise use provided values
+            finalLocation = recipientUser.location || location;
+            finalPhoneNumber = recipientUser.phoneNumber || phoneNumber;
+            finalNearestLandmark = recipientUser.nearestLandmark || nearestLandmark;
+
+            // Validate that we have the required delivery information
+            if (!finalLocation || !finalPhoneNumber) {
+                return response.status(400).json({ 
+                    message: 'Recipient user does not have saved location/phone. Please provide delivery details.',
+                    recipientInfo: {
+                        hasLocation: !!recipientUser.location,
+                        hasPhone: !!recipientUser.phoneNumber,
+                        hasLandmark: !!recipientUser.nearestLandmark
+                    }
+                });
+            }
         }
         const mealDetails = await Promise.all(
             meals.map(async ({ mealId, quantity }) => {
@@ -89,11 +121,19 @@ const TERMII_SENDER_ID = process.env.TERMII_SENDER_ID;
             meals: mealDetails, 
             note,
             totalPrice,
-            location,
-            nearestLandmark,
-            phoneNumber,
+            location: finalLocation,
+            nearestLandmark: finalNearestLandmark,
+            phoneNumber: finalPhoneNumber,
             restaurant: restaurant._id, 
-            fee
+            fee,
+            // Store recipient information if ordering for someone else
+            ...(orderForUsername && {
+                recipient: {
+                    name: recipientUser.username,
+                    phone: recipientUser.phoneNumber,
+                    instructions: `Order for ${recipientUser.username}`
+                }
+            })
         });
 
         await newOrder.save();
@@ -102,15 +142,142 @@ const TERMII_SENDER_ID = process.env.TERMII_SENDER_ID;
         if (!userDoc) {
             return response.status(404).json({ message: 'User not found' });
         }
+
+        // Create notification for the ordering user
+        const orderingUserMessage = orderForUsername 
+            ? `You placed an order for ${recipientUser.username}! Order ID: ${newOrder.customId}. They'll receive their delicious meal soon!`
+            : `You must be hungry, you placed a new order! It has an ID of ${newOrder.customId}. Watch out for it!`;
+
         const userNotification = new Notification({
           userId: userDoc._id,
-          message: `You must be hungry, you placed a new order! It has an ID of ${newOrder.customId}. Watch out for it!`,
+          message: orderingUserMessage,
         });
         await userNotification.save();
         
         userDoc.notifications.push(userNotification._id);
         userDoc.orderHistory.push(newOrder._id);
         await userDoc.save();
+
+        // If ordering for someone else, notify the recipient too
+        if (orderForUsername && recipientUser) {
+            const recipientNotification = new Notification({
+                userId: recipientUser._id,
+                message: `${userDoc.username} ordered food for you! Order ID: ${newOrder.customId}. Get ready for a delicious surprise!`,
+            });
+            await recipientNotification.save();
+            
+            recipientUser.notifications.push(recipientNotification._id);
+            await recipientUser.save();
+
+            // Send email to recipient if they have an email
+            if (recipientUser.email) {
+                const recipientEmailHtml = `
+                <html>
+                <head>
+                  <style>
+                    body {
+                      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                      background-color: #f8f9fa;
+                      color: #000000;
+                      margin: 0;
+                      padding: 0;
+                    }
+                    .container {
+                      width: 90%;
+                      max-width: 600px;
+                      margin: 30px auto;
+                      padding: 0;
+                      border-radius: 12px;
+                      background-color: #ffffff;
+                      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+                      overflow: hidden;
+                    }
+                    .header {
+                      text-align: center;
+                      padding: 40px 20px 30px;
+                      background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+                      color: #ffffff;
+                    }
+                    .header h1 {
+                      margin: 0;
+                      font-size: 28px;
+                      font-weight: 700;
+                      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+                    }
+                    .brand-text {
+                      color: #FFCC00;
+                      font-weight: 800;
+                    }
+                    .content {
+                      font-size: 16px;
+                      line-height: 1.6;
+                      padding: 30px;
+                      color: #333333;
+                    }
+                    .surprise-box {
+                      background: linear-gradient(135deg, #FFCC00 0%, #ffdb4d 100%);
+                      color: #000000;
+                      text-align: center;
+                      padding: 20px;
+                      margin: 20px 0;
+                      border-radius: 8px;
+                      font-weight: bold;
+                      font-size: 18px;
+                    }
+                    .order-details {
+                      background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+                      border-left: 4px solid #28a745;
+                      padding: 20px;
+                      border-radius: 8px;
+                      margin: 20px 0;
+                    }
+                    .footer {
+                      background-color: #000000;
+                      color: #ffffff;
+                      text-align: center;
+                      padding: 20px;
+                      font-size: 14px;
+                    }
+                  </style>
+                </head>
+                <body>
+                  <div class="container">
+                    <div class="header">
+                      <h1>🎁 Someone Ordered For You!</h1>
+                    </div>
+                    <div class="content">
+                      <div class="surprise-box">
+                        🎉 ${userDoc.username} just treated you to a meal! 🎉
+                      </div>
+                      <p>What a thoughtful friend! ${userDoc.username} has ordered delicious food for you through <span class="brand-text">Byte</span>!</p>
+                      
+                      <div class="order-details">
+                        <p><strong>📦 Order ID:</strong> ${newOrder.customId}</p>
+                        <p><strong>👤 Ordered by:</strong> ${userDoc.username}</p>
+                        <p><strong>📍 Delivery to:</strong> ${finalLocation}</p>
+                        <p><strong>📱 Contact:</strong> ${finalPhoneNumber}</p>
+                        <p><strong>🏘️ Landmark:</strong> ${finalNearestLandmark || 'Not specified'}</p>
+                      </div>
+
+                      <p>Your meal is being prepared and will be delivered to you soon. Make sure to be available at the delivery location!</p>
+                      <p>Don't forget to thank ${userDoc.username} for this awesome treat! 😊</p>
+                    </div>
+                    <div class="footer">
+                      <p>© ${new Date().getFullYear()} Byte - Bringing friends together through food! 🍕</p>
+                    </div>
+                  </div>
+                </body>
+                </html>
+                `;
+
+                await sendEmail(
+                    recipientUser.email,
+                    'Someone Ordered Food For You!',
+                    `${userDoc.username} has ordered food for you through Byte!`,
+                    recipientEmailHtml
+                );
+            }
+        }
         const restaurantNotification = new Notification({
           restaurantId: restaurant._id,
           message: `You have received a new order with ID: ${newOrder.customId}.`,
@@ -221,12 +388,15 @@ sendSMS(formattedNumber, smsMessage);
             </div>
             <div class="content">
               <p>Exciting news! 🎉 You have received a new order from a hungry customer!</p>
+              ${orderForUsername ? `<p><strong>🎁 Special Order:</strong> This order was placed by ${userDoc.username} for ${recipientUser.username}</p>` : ''}
               
               <div class="order-details">
-                <p>📍 <strong>Delivery Location:</strong> ${location}</p>
-                <p>🏘️ <strong>Nearest Landmark:</strong> ${nearestLandmark || 'Not specified'}</p>
-                <p>📱 <strong>Customer Phone:</strong> ${phoneNumber}</p>
+                <p>📍 <strong>Delivery Location:</strong> ${finalLocation}</p>
+                <p>🏘️ <strong>Nearest Landmark:</strong> ${finalNearestLandmark || 'Not specified'}</p>
+                <p>📱 <strong>Contact Phone:</strong> ${finalPhoneNumber}</p>
                 <p>📝 <strong>Special Instructions:</strong> ${note || 'No special notes'}</p>
+                ${orderForUsername ? `<p>👤 <strong>Recipient:</strong> ${recipientUser.username}</p>` : ''}
+                ${orderForUsername ? `<p>🛒 <strong>Ordered by:</strong> ${userDoc.username}</p>` : ''}
               </div>
 
               <div class="alert-box">
@@ -234,12 +404,12 @@ sendSMS(formattedNumber, smsMessage);
                 <ul>
                   <li>Check your restaurant dashboard for full meal details</li>
                   <li>Prepare the order with care</li>
-                  <li>Contact the customer if needed</li>
+                  <li>Contact the ${orderForUsername ? 'recipient' : 'customer'} if needed</li>
                   <li>Update order status as you progress</li>
                 </ul>
               </div>
 
-              <p>Let's make this customer's day delicious! 🚀</p>
+              <p>Let's make this ${orderForUsername ? 'surprise delivery' : 'customer\'s day'} delicious! 🚀</p>
             </div>
             <div class="footer">
               <p>© ${new Date().getFullYear()} <span class="brand">Byte</span> - Your Campus Food Partner</p>
@@ -257,9 +427,19 @@ sendSMS(formattedNumber, smsMessage);
             emailHtml
         );
 
+        const successMessage = orderForUsername 
+            ? `Order created successfully for ${recipientUser.username}! Both you and ${recipientUser.username} have been notified.`
+            : 'Order created successfully, and notification sent to the restaurant!';
+
         return response.status(201).json({
-            message: 'Order created successfully, and notification sent to the restaurant!',
+            message: successMessage,
             order: newOrder,
+            recipientInfo: orderForUsername ? {
+                username: recipientUser.username,
+                deliveryLocation: finalLocation,
+                deliveryPhone: finalPhoneNumber,
+                landmark: finalNearestLandmark
+            } : null
         });
     } catch (error) {
         console.error(error);
