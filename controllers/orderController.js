@@ -511,12 +511,26 @@ exports.orderConfirmation = async (request, response) => {
 
     if (additionalFee) {
       const parsedFee = parseFloat(additionalFee);
-      order.totalPrice = (order.totalPrice-order.fee)+(parsedFee);
-      order.fee = (parsedFee);
       
-      if ((parsedFee) > order.fee) {
+      // Ensure fee and totalPrice are numbers to avoid undefined calculations
+      const currentFee = order.fee || 600; // default fee
+      const currentTotalPrice = order.totalPrice || 0;
+      
+      // Store the food amount separately if not already set
+      if (!order.foodAmount) {
+        order.foodAmount = currentTotalPrice - currentFee;
+      }
+
+      // Calculate new total price by replacing the old fee with the new fee
+      order.totalPrice = order.foodAmount + parsedFee;
+      
+      if (parsedFee <= currentFee) {
+        order.status = 'Confirmed';
+        order.fee = parsedFee;
+      } else {
         // Fee exceeds permitted limit - require user approval
         order.status = 'Fee Requested';
+        order.fee = parsedFee;
 
         const user = await User.findById(order.user._id);
         if (user && user.email) {
@@ -642,7 +656,6 @@ exports.orderConfirmation = async (request, response) => {
           </html>
           `;
           await sendEmail(user.email, 'Order Additional Fee Request', 'Your order has a fee request that requires approval.', emailHtml); 
-           order.fee = (parsedFee);
         }
         await order.save();
         const userNotification = new Notification({
@@ -656,10 +669,28 @@ exports.orderConfirmation = async (request, response) => {
   
         return res.status(200).json({ 
           success: true,
-          message: 'Fee request sent to user for approval', 
-          order: order 
+          message: 'Fee request sent to user for approval',
+          order: order
         });
       }
+    } else {
+      // No additional fee or fee is within permitted limit
+      order.status = 'Confirmed';
+      
+      // Ensure fee is set to default if not already set
+      if (!order.fee) {
+        order.fee = 600; // default fee
+      }
+      
+      // Store the food amount separately if not already set
+      if (!order.foodAmount && order.totalPrice) {
+        order.foodAmount = order.totalPrice - order.fee;
+      }
+    }
+
+    // Only proceed with confirmation logic if status is 'Confirmed'
+    if (order.status !== 'Confirmed') {
+      return; // Early return if not confirmed (fee request sent)
     }
 
     const user = await User.findById(order.user._id);

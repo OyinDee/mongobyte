@@ -38,6 +38,10 @@ const orderSchema = new mongoose.Schema({
         type: Number,
         default: 600,
     },
+    foodAmount: {
+        type: Number,
+        required: false,
+    },
     requestedFee:{
         type: Number,
     },
