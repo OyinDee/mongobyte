@@ -511,14 +511,11 @@ exports.orderConfirmation = async (request, response) => {
 
     if (additionalFee) {
       const parsedFee = parseFloat(additionalFee);
-
       order.totalPrice = (order.totalPrice-order.fee)+(parsedFee);
+      order.fee = (parsedFee);
       
-      if ((parsedFee) <= order.fee) {
-        order.status = 'Confirmed';
-        order.fee = (parsedFee);
-      } else {
-       
+      if ((parsedFee) > order.fee) {
+        // Fee exceeds permitted limit - require user approval
         order.status = 'Fee Requested';
 
         const user = await User.findById(order.user._id);
@@ -657,7 +654,11 @@ exports.orderConfirmation = async (request, response) => {
         user.notifications.push(userNotification._id);
         await user.save();
   
-        return response.status(400).json({ message: 'Additional fee exceeds allowed limit. User notified to log in and approve.' });
+        return res.status(200).json({ 
+          success: true,
+          message: 'Fee request sent to user for approval', 
+          order: order 
+        });
       }
     }
 
