@@ -6,17 +6,7 @@ const Restaurant = require('../models/Restaurants');
 const Notification = require('../models/Notifications');
 const generateVerificationCode = () => Math.floor(100000 + Math.random() * 900000).toString();
 
-export            .header { 
-              text-align: center; 
-              padding: 40px 20px 30px; 
-              background-color: #990000; 
-              color: #ffffff; 
-            }
-            .header h1 { 
-              margin: 0; 
-              font-size: 28px; 
-              font-weight: 700; 
-            } async (request, response) => {
+exports.register = async (request, response) => {
     const { username, email, password, phoneNumber, university} = request.body;
     try {
         // Validate required fields
