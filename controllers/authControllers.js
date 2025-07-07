@@ -6,7 +6,17 @@ const Restaurant = require('../models/Restaurants');
 const Notification = require('../models/Notifications');
 const generateVerificationCode = () => Math.floor(100000 + Math.random() * 900000).toString();
 
-exports.register = async (request, response) => {
+export            .header { 
+              text-align: center; 
+              padding: 40px 20px 30px; 
+              background-color: #990000; 
+              color: #ffffff; 
+            }
+            .header h1 { 
+              margin: 0; 
+              font-size: 28px; 
+              font-weight: 700; 
+            } async (request, response) => {
     const { username, email, password, phoneNumber, university} = request.body;
     try {
         // Validate required fields
@@ -52,14 +62,13 @@ exports.register = async (request, response) => {
             .header { 
               text-align: center; 
               padding: 40px 20px 30px; 
-              background: linear-gradient(135deg, #990000 0%, #cc0000 100%);
+              background-color: #990000;
               color: #ffffff;
             }
             .header h1 {
               margin: 0;
               font-size: 32px;
               font-weight: 700;
-              text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
             }
             .brand-text {
               color: #FFCC00;
@@ -73,7 +82,7 @@ exports.register = async (request, response) => {
               color: #333333;
             }
             .verification-code {
-              background: linear-gradient(135deg, #FFCC00 0%, #ffdb4d 100%);
+              background-color: #FFCC00;
               color: #000000;
               font-size: 28px;
               font-weight: 800;
@@ -181,7 +190,7 @@ exports.login = async (request, response) => {
                 .header { 
                   text-align: center; 
                   padding: 40px 20px 30px; 
-                  background: linear-gradient(135deg, #990000 0%, #cc0000 100%);
+                  background: #cc0000;
                   color: #ffffff;
                 }
                 .header h1 {
@@ -406,7 +415,7 @@ exports.forgotPassword = async (request, response) => {
               color: #333333;
             }
             .reset-code { 
-              background: linear-gradient(135deg, #FFCC00 0%, #ffdb4d 100%);
+              background: #FFCC00;
               color: #000000;
               font-size: 32px;
               font-weight: 800;

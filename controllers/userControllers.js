@@ -142,7 +142,7 @@ exports.updateUserProfile = async (req, res) => {
 
       // Send email notification if university was updated
       if (university !== undefined) {
-        const emailHtml = `<html><head><style>body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #FFFFFF; color: #000000; margin: 0; padding: 0; }.email-container { width: 90%; max-width: 600px; margin: 30px auto; background-color: #FFFFFF; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); overflow: hidden; }.header { text-align: center; padding: 40px 20px 30px; background: linear-gradient(135deg, #990000 0%, #FFCC00 100%); color: #FFFFFF; }.header h1 { margin: 0; font-size: 28px; font-weight: 600; }.content { padding: 40px 30px; line-height: 1.6; }.update-info { background-color: #FFCC00; border-left: 4px solid #990000; padding: 20px; margin: 20px 0; border-radius: 4px; color: #000000; }.footer { text-align: center; padding: 30px; background-color: #FFFFFF; color: #990000; font-size: 14px; }.brand { color: #990000; font-weight: 600; }</style></head><body><div class="email-container"><div class="header"><h1>Profile Updated! ✅</h1></div><div class="content"><p>Hi ${updatedUser.username}! 👋</p><p>Great news! Your profile has been successfully updated. Here's what changed:</p><div class="update-info">${university ? `<p><strong>🏫 University:</strong> ${updatedUser.university?.name || 'Updated'}</p>` : ''}${bio !== undefined ? `<p><strong>📝 Bio:</strong> ${bio || 'Cleared'}</p>` : ''}${location !== undefined ? `<p><strong>📍 Location:</strong> ${location || 'Cleared'}</p>` : ''}${nearestLandmark !== undefined ? `<p><strong>🗺️ Nearest Landmark:</strong> ${nearestLandmark || 'Cleared'}</p>` : ''}${imageUrl !== undefined ? `<p><strong>📸 Profile Picture:</strong> Updated</p>` : ''}</div><p>Your profile is now more complete and will help you get a better experience on our platform! 🎉</p><p>Ready to order some delicious food? Let's go! 🍕</p></div><div class="footer"><p>© ${new Date().getFullYear()} <span class="brand">Byte</span> - Your Campus Food Companion</p><p>Keeping your profile fresh! 😋</p></div></div></body></html>`;
+        const emailHtml = `<html><head><style>body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #FFFFFF; color: #000000; margin: 0; padding: 0; }.email-container { width: 90%; max-width: 600px; margin: 30px auto; background-color: #FFFFFF; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); overflow: hidden; }.header { text-align: center; padding: 40px 20px 30px; background: #990000; color: #FFFFFF; }.header h1 { margin: 0; font-size: 28px; font-weight: 600; }.content { padding: 40px 30px; line-height: 1.6; }.update-info { background-color: #FFCC00; border-left: 4px solid #990000; padding: 20px; margin: 20px 0; border-radius: 4px; color: #000000; }.footer { text-align: center; padding: 30px; background-color: #FFFFFF; color: #990000; font-size: 14px; }.brand { color: #990000; font-weight: 600; }</style></head><body><div class="email-container"><div class="header"><h1>Profile Updated! ✅</h1></div><div class="content"><p>Hi ${updatedUser.username}! 👋</p><p>Great news! Your profile has been successfully updated. Here's what changed:</p><div class="update-info">${university ? `<p><strong>🏫 University:</strong> ${updatedUser.university?.name || 'Updated'}</p>` : ''}${bio !== undefined ? `<p><strong>📝 Bio:</strong> ${bio || 'Cleared'}</p>` : ''}${location !== undefined ? `<p><strong>📍 Location:</strong> ${location || 'Cleared'}</p>` : ''}${nearestLandmark !== undefined ? `<p><strong>🗺️ Nearest Landmark:</strong> ${nearestLandmark || 'Cleared'}</p>` : ''}${imageUrl !== undefined ? `<p><strong>📸 Profile Picture:</strong> Updated</p>` : ''}</div><p>Your profile is now more complete and will help you get a better experience on our platform! 🎉</p><p>Ready to order some delicious food? Let's go! 🍕</p></div><div class="footer"><p>© ${new Date().getFullYear()} <span class="brand">Byte</span> - Your Campus Food Companion</p><p>Keeping your profile fresh! 😋</p></div></div></body></html>`;
         // Send email notification (non-blocking)
         setImmediate(async () => {
           try {
@@ -414,7 +414,7 @@ exports.transferBytes = async (request, response) => {
     .header {
       text-align: center;
       padding: 40px 20px 30px;
-      background: linear-gradient(135deg, #990000 0%, #FFCC00 100%);
+      background: #990000;
       color: #FFFFFF;
     }
     .header h1 {
@@ -498,7 +498,7 @@ exports.transferBytes = async (request, response) => {
     .header {
       text-align: center;
       padding: 40px 20px 30px;
-      background: linear-gradient(135deg, #990000 0%, #FFCC00 100%);
+      background: #990000;
       color: #FFFFFF;
     }
     .header h1 {
@@ -1006,7 +1006,7 @@ exports.useReferralCode = async (req, res) => {
     .header {
       text-align: center;
       padding: 40px 20px 30px;
-      background: linear-gradient(135deg, #990000 0%, #FFCC00 100%);
+      background: #990000;
       color: #FFFFFF;
     }
     .header h1 {
@@ -1091,7 +1091,7 @@ exports.useReferralCode = async (req, res) => {
     .header {
       text-align: center;
       padding: 40px 20px 30px;
-      background: linear-gradient(135deg, #990000 0%, #FFCC00 100%);
+      background: #990000;
       color: #FFFFFF;
     }
     .header h1 {
@@ -1206,5 +1206,6 @@ exports.getUserDeliveryInfo = async (req, res) => {
     res.status(500).json({ message: 'Error fetching user information' });
   }
 };
+
 
 

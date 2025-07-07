@@ -728,7 +728,7 @@ const processGroupOrderPayment = async (req, res) => {
     .header {
       text-align: center;
       padding: 40px 20px 30px;
-      background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+      background: #28a745;
       color: #ffffff;
     }
     .header h1 {
@@ -947,7 +947,7 @@ const processGroupOrderPayment = async (req, res) => {
     .header {
       text-align: center;
       padding: 40px 20px 30px;
-      background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+      background: #28a745;
       color: #ffffff;
     }
     .header h1 {
@@ -1205,3 +1205,4 @@ module.exports = {
     getGroupOrderPaymentStatus,
     refundGroupOrder
 };
+
