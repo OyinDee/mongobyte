@@ -210,7 +210,7 @@ exports.login = async (request, response) => {
                   color: #333333;
                 }
                 .code { 
-                  background: linear-gradient(135deg, #FFCC00 0%, #ffdb4d 100%);
+                  background: #FFCC00;
                   color: #000000;
                   font-size: 32px;
                   font-weight: 800;
@@ -395,7 +395,7 @@ exports.forgotPassword = async (request, response) => {
             .header { 
               text-align: center; 
               padding: 40px 20px 30px; 
-              background: linear-gradient(135deg, #990000 0%, #cc0000 100%);
+              background: #cc0000;
               color: #ffffff;
             }
             .header h1 {
@@ -664,7 +664,7 @@ exports.resendVerification = async (request, response) => {
             .header { 
               text-align: center; 
               padding: 40px 20px 30px; 
-              background: linear-gradient(135deg, #990000 0%, #cc0000 100%);
+              background: #cc0000;
               color: #ffffff;
             }
             .header h1 {
@@ -684,7 +684,7 @@ exports.resendVerification = async (request, response) => {
               color: #333333;
             }
             .code { 
-              background: linear-gradient(135deg, #FFCC00 0%, #ffdb4d 100%);
+              background: #FFCC00;
               color: #000000;
               font-size: 32px;
               font-weight: 800;
@@ -756,5 +756,6 @@ exports.resendVerification = async (request, response) => {
         response.status(500).json({ message: 'Error sending verification code. Please try again later.' });
     }
 };
+
 
 

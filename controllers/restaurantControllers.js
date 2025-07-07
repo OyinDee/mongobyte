@@ -412,7 +412,7 @@ exports.createWithdrawal = async (req, res) => {
     .header {
       text-align: center;
       padding: 40px 20px 30px;
-      background: linear-gradient(135deg, #990000 0%, #cc0000 100%);
+      background: #cc0000;
       color: #ffffff;
     }
     .header h1 {
@@ -435,7 +435,7 @@ exports.createWithdrawal = async (req, res) => {
       margin-bottom: 15px;
     }
     .withdrawal-info {
-      background: linear-gradient(135deg, #fff3cd 0%, #fffaee 100%);
+      background: #fff3cd;
       border-left: 4px solid #FFCC00;
       padding: 20px;
       border-radius: 8px;
@@ -447,7 +447,7 @@ exports.createWithdrawal = async (req, res) => {
       margin: 8px 0;
     }
     .amount {
-      background: linear-gradient(135deg, #FFCC00 0%, #ffdb4d 100%);
+      background: #FFCC00;
       color: #000000;
       font-size: 24px;
       font-weight: 800;
@@ -531,7 +531,7 @@ exports.createWithdrawal = async (req, res) => {
     .header {
       text-align: center;
       padding: 40px 20px 30px;
-      background: linear-gradient(135deg, #990000 0%, #cc0000 100%);
+      background: #cc0000;
       color: #ffffff;
     }
     .header h1 {
@@ -554,7 +554,7 @@ exports.createWithdrawal = async (req, res) => {
       margin-bottom: 15px;
     }
     .withdrawal-info {
-      background: linear-gradient(135deg, #fff3cd 0%, #fffaee 100%);
+      background: #fff3cd;
       border-left: 4px solid #FFCC00;
       padding: 20px;
       border-radius: 8px;
@@ -566,7 +566,7 @@ exports.createWithdrawal = async (req, res) => {
       margin: 8px 0;
     }
     .amount {
-      background: linear-gradient(135deg, #FFCC00 0%, #ffdb4d 100%);
+      background: #FFCC00;
       color: #000000;
       font-size: 28px;
       font-weight: 800;
@@ -766,3 +766,4 @@ exports.getRestaurantNotifications = async (req, res) => {
         res.status(500).json({ message: 'Internal server error' });
     }
 };
+
