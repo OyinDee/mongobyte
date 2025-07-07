@@ -291,7 +291,7 @@ const TERMII_SENDER_ID = process.env.TERMII_SENDER_ID;
           message: `You have received a new order with ID: ${newOrder.customId}.`,
       });
 
-        const smsMessage = `You have received a new order with ID: ${newOrder.customId}. Please check your dashboard for details.`;
+        const smsMessage = `Byte: New order #${newOrder.customId}! Items: ${meals.length}, Total: ₦${totalPrice}. ${note ? 'Note: ' + note.substring(0, 30) + (note.length > 30 ? '...' : '') : ''} Delivery: ${finalLocation.substring(0, 20)}${finalLocation.length > 20 ? '...' : ''}. Check dashboard now.`;
         function formatPhoneNumber(number) {
     const strNumber = String(number);
     if (strNumber.startsWith("234")) {

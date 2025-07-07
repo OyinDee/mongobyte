@@ -120,6 +120,43 @@ router.get('/revenue/global', superAdminController.getGlobalRevenue);
 const { uploadImage } = require('../controllers/image');
 /**
  * @swagger
+ * /users/balance/username:
+ *   get:
+ *     tags: [Users]
+ *     summary: Get user balance by username
+ *     description: Get a user's byte balance by their username
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: username
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Username of the user to get balance for
+ *     responses:
+ *       200:
+ *         description: User balance retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 username:
+ *                   type: string
+ *                 balance:
+ *                   type: number
+ *       404:
+ *         description: User not found
+ *       400:
+ *         description: Username is required
+ *       500:
+ *         description: Server error
+ */
+router.get('/balance/:username', authenticateUser, userControllers.getUserBalanceByUsername);
+
+/**
+ * @swagger
  * /users/notifications/{username}:
  *   get:
  *     tags: [Users]
@@ -155,6 +192,7 @@ const { uploadImage } = require('../controllers/image');
  */
 const authenticateSuperAdmin = require('../middlewares/authenticate');
 router.get('/notifications/:username', authenticateSuperAdmin, userControllers.getNotificationsByUsername);
+router.get('/balance/:username', authenticateUser, userControllers.getUserBalanceByUsername);
 
 
 /**
