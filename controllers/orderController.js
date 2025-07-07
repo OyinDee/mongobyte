@@ -531,8 +531,23 @@ exports.orderConfirmation = async (request, response) => {
         // Fee exceeds permitted limit - require user approval
         order.status = 'Fee Requested';
         order.fee = parsedFee;
-
+        order.requestedFee = parsedFee; // Store the requested fee explicitly
+        
         const user = await User.findById(order.user._id);
+        if (!user) {
+          return response.status(404).json({ message: 'User not found' });
+        }
+        
+        // Create notification for user
+        const feeRequestNotification = new Notification({
+          userId: user._id,
+          message: `For order ${order.customId}, the restaurant has requested a delivery fee of ₦${parsedFee}. Please check your order history to approve or cancel.`,
+        });
+        await feeRequestNotification.save();
+        
+        user.notifications.push(feeRequestNotification._id);
+        await user.save();
+        
         if (user && user.email) {
           const emailHtml = `
           <html>
@@ -686,10 +701,26 @@ exports.orderConfirmation = async (request, response) => {
       if (!order.foodAmount && order.totalPrice) {
         order.foodAmount = order.totalPrice - order.fee;
       }
-    }
-
-    // Only proceed with confirmation logic if status is 'Confirmed'
+    }      // Only proceed with confirmation logic if status is 'Confirmed'
     if (order.status !== 'Confirmed') {
+      // If status is 'Fee Requested', return appropriate response
+      if (order.status === 'Fee Requested') {
+        // Notify restaurant about the fee request status
+        const restaurantFeeRequestNotification = new Notification({
+          restaurantId: restaurant._id,
+          message: `For order ${order.customId}, your additional fee request of ₦${order.fee} has been sent to the customer for approval.`,
+        });
+        await restaurantFeeRequestNotification.save();
+        restaurant.notifications.push(restaurantFeeRequestNotification._id);
+        await restaurant.save();
+        
+        await order.save();
+        
+        return response.status(200).json({ 
+          message: 'Fee request sent to user for approval',
+          order: order
+        });
+      }
       return; // Early return if not confirmed (fee request sent)
     }
 
@@ -1173,13 +1204,16 @@ exports.handleOrderStatus = async (request, response) => {
         message: `Your order ${order.customId} has been confirmed!`,
       });
       await userNotification.save();
-
+      user.notifications.push(userNotification._id);
+      await user.save();
 
       const restaurantNotification = new Notification({
         restaurantId: restaurant._id,
-        message: `Order ${order.customId} has been confirmed, , ₦${order.totalPrice} has been added to your wallet!`,
+        message: `Order ${order.customId} has been confirmed, ₦${order.totalPrice} has been added to your wallet!`,
       });
       await restaurantNotification.save();
+      restaurant.notifications.push(restaurantNotification._id);
+      await restaurant.save();
 
       if (user.email) {
         const emailHtml = `
@@ -1271,12 +1305,16 @@ exports.handleOrderStatus = async (request, response) => {
         message: `Your order ${order.customId} has been canceled.`,
       });
       await userNotification.save();
+      user.notifications.push(userNotification._id);
+      await user.save();
 
       const restaurantNotification = new Notification({
         restaurantId: restaurant._id,
-        message: `Order ${order.customId} has been canceled.`,
+        message: `Order ${order.customId} has been canceled by the customer due to the fee request.`,
       });
       await restaurantNotification.save();
+      restaurant.notifications.push(restaurantNotification._id);
+      await restaurant.save();
 
       if (user.email) {
         const emailHtml = `
