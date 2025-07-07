@@ -195,14 +195,13 @@ const TERMII_SENDER_ID = process.env.TERMII_SENDER_ID;
                     .header {
                       text-align: center;
                       padding: 40px 20px 30px;
-                      background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+                      background-color: #28a745;
                       color: #ffffff;
                     }
                     .header h1 {
                       margin: 0;
                       font-size: 28px;
                       font-weight: 700;
-                      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
                     }
                     .brand-text {
                       color: #FFCC00;
@@ -215,7 +214,7 @@ const TERMII_SENDER_ID = process.env.TERMII_SENDER_ID;
                       color: #333333;
                     }
                     .surprise-box {
-                      background: linear-gradient(135deg, #FFCC00 0%, #ffdb4d 100%);
+                      background-color: #FFCC00;
                       color: #000000;
                       text-align: center;
                       padding: 20px;
@@ -225,7 +224,7 @@ const TERMII_SENDER_ID = process.env.TERMII_SENDER_ID;
                       font-size: 18px;
                     }
                     .order-details {
-                      background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+                      background-color: #d4edda;
                       border-left: 4px solid #28a745;
                       padding: 20px;
                       border-radius: 8px;
@@ -327,14 +326,13 @@ sendSMS(formattedNumber, smsMessage);
             .header {
               text-align: center;
               padding: 40px 20px 30px;
-              background: linear-gradient(135deg, #990000 0%, #cc0000 100%);
+              background-color: #990000;
               color: #ffffff;
             }
             .header h1 {
               margin: 0;
               font-size: 28px;
               font-weight: 700;
-              text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
             }
             .brand-text {
               color: #FFCC00;
@@ -350,7 +348,7 @@ sendSMS(formattedNumber, smsMessage);
               margin: 15px 0;
             }
             .order-details {
-              background: linear-gradient(135deg, #fff3cd 0%, #fffaee 100%);
+              background-color: #fff3cd;
               border-left: 4px solid #FFCC00;
               padding: 20px;
               border-radius: 8px;
@@ -572,14 +570,13 @@ exports.orderConfirmation = async (request, response) => {
               .header {
                 text-align: center;
                 padding: 40px 20px 30px;
-                background: linear-gradient(135deg, #990000 0%, #cc0000 100%);
+                background-color: #990000;
                 color: #ffffff;
               }
               .header h1 {
                 margin: 0;
                 font-size: 28px;
                 font-weight: 700;
-                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
               }
               .brand-text {
                 color: #FFCC00;
@@ -595,7 +592,7 @@ exports.orderConfirmation = async (request, response) => {
                 margin-bottom: 15px;
               }
               .fee-info {
-                background: linear-gradient(135deg, #fff3cd 0%, #fffaee 100%);
+                background-color: #fff3cd;
                 border-left: 4px solid #FFCC00;
                 padding: 20px;
                 border-radius: 8px;
@@ -607,7 +604,7 @@ exports.orderConfirmation = async (request, response) => {
                 margin: 8px 0;
               }
               .highlight {
-                background: linear-gradient(135deg, #FFCC00 0%, #ffdb4d 100%);
+                background-color: #FFCC00;
                 color: #000000;
                 font-weight: 800;
                 padding: 4px 8px;
@@ -765,14 +762,13 @@ exports.orderConfirmation = async (request, response) => {
     .header {
       text-align: center;
       padding: 40px 20px 30px;
-      background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+      background-color: #dc3545;
       color: #ffffff;
     }
     .header h1 {
       margin: 0;
       font-size: 28px;
       font-weight: 700;
-      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
     }
     .brand-text {
       color: #FFCC00;
@@ -788,7 +784,7 @@ exports.orderConfirmation = async (request, response) => {
       margin-bottom: 15px;
     }
     .order-info {
-      background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+      background-color: #f8d7da;
       border-left: 4px solid #dc3545;
       padding: 20px;
       border-radius: 8px;
@@ -807,7 +803,7 @@ exports.orderConfirmation = async (request, response) => {
       border-radius: 4px;
     }
     .action-button {
-      background: linear-gradient(135deg, #FFCC00 0%, #ffdb4d 100%);
+      background-color: #FFCC00;
       color: #000000;
       text-decoration: none;
       padding: 12px 24px;
@@ -918,14 +914,13 @@ exports.orderConfirmation = async (request, response) => {
     .header {
       text-align: center;
       padding: 40px 20px 30px;
-      background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+      background-color: #28a745;
       color: #ffffff;
     }
     .header h1 {
       margin: 0;
       font-size: 28px;
       font-weight: 700;
-      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
     }
     .brand-text {
       color: #FFCC00;
@@ -941,7 +936,7 @@ exports.orderConfirmation = async (request, response) => {
       margin-bottom: 15px;
     }
     .order-info {
-      background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+      background-color: #d4edda;
       border-left: 4px solid #28a745;
       padding: 20px;
       border-radius: 8px;
@@ -953,7 +948,7 @@ exports.orderConfirmation = async (request, response) => {
       margin: 8px 0;
     }
     .success-box {
-      background: linear-gradient(135deg, #FFCC00 0%, #ffdb4d 100%);
+      background-color: #FFCC00;
       color: #000000;
       text-align: center;
       padding: 20px;
