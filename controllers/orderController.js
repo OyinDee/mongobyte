@@ -1219,6 +1219,21 @@ exports.handleOrderStatus = async (request, response) => {
 
     const user = await User.findById(order.user._id);
     const restaurant = await Restaurant.findById(order.restaurant._id);
+    
+    // Helper function to format phone number for SMS
+    function formatPhoneNumber(number) {
+      const strNumber = String(number);
+      if (strNumber.startsWith("234")) {
+          return strNumber;
+      }
+      if (strNumber.startsWith("0")) {
+          return "234" + strNumber.slice(1);
+      }
+      if (/^[789]/.test(strNumber)) {
+          return "234" + strNumber;
+      }
+      return strNumber;
+    }
 
     if (action === 'accept') {
       if (order.status !== 'Fee Requested') {
@@ -1268,81 +1283,290 @@ exports.handleOrderStatus = async (request, response) => {
       await restaurantNotification.save();
       restaurant.notifications.push(restaurantNotification._id);
       await restaurant.save();
+      
+      // Send SMS to restaurant about fee approval
+      const formattedNumber = formatPhoneNumber(restaurant.contactNumber);
+      const smsMessage = `Fee Approved! Order #${order.customId} fee of ₦${order.fee} was accepted by customer. Total: ₦${order.totalPrice}. Please prepare order now.`;
+      sendSMS(formattedNumber, smsMessage);
 
       if (user.email) {
-        const emailHtml = `
+        // Email to user about order acceptance
+        const userEmailHtml = `
 <html>
 <head>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background-color: #f5f5f5;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f8f9fa;
       color: #333333;
       margin: 0;
       padding: 0;
     }
     .email-container {
-      width: 95%;
+      width: 90%;
       max-width: 600px;
-      margin: 0 auto;
+      margin: 30px auto;
       background-color: #ffffff;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
       overflow: hidden;
-      padding: 20px;
-      box-sizing: border-box;
     }
-    h1 {
+    .header {
+      text-align: center;
+      padding: 40px 20px 30px;
+      background-color: #28a745;
+      color: #ffffff;
+    }
+    .header h1 {
+      margin: 0;
+      font-size: 28px;
+      font-weight: 700;
+    }
+    .brand-text {
+      color: #FFCC00;
+      font-weight: 800;
+    }
+    .content {
+      padding: 30px;
+    }
+    .content p {
       color: #333333;
-      font-size: 24px;
-      margin-bottom: 20px;
-    }
-    p {
-      color: #666666;
       font-size: 16px;
       line-height: 1.6;
       margin-bottom: 15px;
     }
     .order-info {
-      background-color: #f8f8f8;
-      padding: 15px;
+      background-color: #d4edda;
+      border-left: 4px solid #28a745;
+      padding: 20px;
       border-radius: 8px;
-      margin-bottom: 20px;
+      margin: 20px 0;
     }
     .order-info p {
-      color: #333333;
+      color: #000000;
+      font-weight: 600;
+      margin: 8px 0;
+    }
+    .fee-approval {
+      background-color: #FFCC00;
+      color: #000000;
+      text-align: center;
+      padding: 20px;
+      margin: 20px 0;
+      border-radius: 8px;
       font-weight: bold;
+      font-size: 18px;
+    }
+    .timeline {
+      background-color: #f8f9fa;
+      padding: 20px;
+      border-radius: 8px;
+      margin: 20px 0;
+    }
+    .timeline h3 {
+      color: #990000;
+      margin-top: 0;
     }
     .footer {
+      background-color: #000000;
+      color: #ffffff;
       text-align: center;
-      font-size: 12px;
-      color: #999999;
-      margin-top: 20px;
+      padding: 20px;
+      font-size: 14px;
+    }
+    .footer .brand {
+      color: #FFCC00;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
   <div class="email-container">
-    <h1>Order Confirmed!</h1>
-    <p>Order with ID <strong>${order.customId}</strong> has just  been confirmed!</p>
-    
-    <div class="order-info">
-      <p>Order ID: ${order.customId}</p>
-      <p>Status: Confirmed</p>
-      <p>Total Price: ₦${(order.totalPrice).toFixed(2)}</p>
+    <div class="header">
+      <h1>🎉 <span class="brand-text">Byte</span> Order Confirmed!</h1>
     </div>
+    <div class="content">
+      <p>Great news! 🎊</p>
+      <p>Your order has been confirmed with the requested delivery fee and is now being prepared!</p>
+      
+      <div class="fee-approval">
+        ✨ Fee Approved & Order Confirmed ✨
+      </div>
 
-    <p>Thank you for using our service. If you have any questions or need assistance, feel free to contact us.</p>
+      <div class="order-info">
+        <p>📦 <strong>Order ID:</strong> #${order.customId}</p>
+        <p>📊 <strong>Status:</strong> ${order.status}</p>
+        <p>💰 <strong>Total Paid:</strong> ₦${(order.totalPrice).toFixed(2)}</p>
+        <p>🚚 <strong>Delivery Fee:</strong> ₦${(order.fee).toFixed(2)}</p>
+        <p>📝 <strong>Restaurant Note:</strong> ${order.requestDescription || "No special instructions"}</p>
+      </div>
 
+      <div class="timeline">
+        <h3>🚀 What happens next?</h3>
+        <ul>
+          <li>👨‍🍳 Restaurant is preparing your order</li>
+          <li>📦 Order will be packaged with care</li>
+          <li>🛵 Delivery will begin shortly</li>
+          <li>🍽️ Enjoy your delicious meal!</li>
+        </ul>
+      </div>
+
+      <p>Thank you for accepting the delivery fee and confirming your order. Your food will be on its way soon!</p>
+      <p>If you have any questions or concerns, our support team is always ready to help! 🤝</p>
+    </div>
     <div class="footer">
-      <p>&copy; ${new Date().getFullYear()} Byte. All rights reserved.</p>
+      <p>© ${new Date().getFullYear()} <span class="brand">Byte</span> - Your Campus Food Companion</p>
+      <p>Making campus dining delightful! 🍕</p>
     </div>
   </div>
 </body>
 </html>
         `;
-        await sendEmail(user.email, 'Order Confirmation', 'Your order has been confirmed!', emailHtml);
-        await sendEmail(restaurant.email, 'Order Confirmation after fee review', 'Order has been confirmed, wallet has been credited! Check dashboard and deliver...', emailHtml);
+        
+        // Email to restaurant about order confirmation after fee review
+        const restaurantEmailHtml = `
+<html>
+<head>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f8f9fa;
+      color: #333333;
+      margin: 0;
+      padding: 0;
+    }
+    .email-container {
+      width: 90%;
+      max-width: 600px;
+      margin: 30px auto;
+      background-color: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+    .header {
+      text-align: center;
+      padding: 40px 20px 30px;
+      background-color: #990000;
+      color: #ffffff;
+    }
+    .header h1 {
+      margin: 0;
+      font-size: 28px;
+      font-weight: 700;
+    }
+    .brand-text {
+      color: #FFCC00;
+      font-weight: 800;
+    }
+    .content {
+      padding: 30px;
+    }
+    .content p {
+      color: #333333;
+      font-size: 16px;
+      line-height: 1.6;
+      margin-bottom: 15px;
+    }
+    .success-banner {
+      background-color: #FFCC00;
+      color: #000000;
+      text-align: center;
+      padding: 20px;
+      margin: 20px 0;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 18px;
+    }
+    .order-info {
+      background-color: #fff3cd;
+      border-left: 4px solid #FFCC00;
+      padding: 20px;
+      border-radius: 8px;
+      margin: 20px 0;
+    }
+    .order-info p {
+      color: #000000;
+      font-weight: 600;
+      margin: 8px 0;
+    }
+    .wallet-update {
+      background-color: #d4edda;
+      border-left: 4px solid #28a745;
+      padding: 20px;
+      border-radius: 8px;
+      margin: 20px 0;
+    }
+    .next-steps {
+      background-color: #d1ecf1;
+      border-left: 4px solid #17a2b8;
+      padding: 15px;
+      margin: 20px 0;
+      border-radius: 4px;
+    }
+    .footer {
+      background-color: #000000;
+      color: #ffffff;
+      text-align: center;
+      padding: 20px;
+      font-size: 14px;
+    }
+    .footer .brand {
+      color: #FFCC00;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="email-container">
+    <div class="header">
+      <h1>💰 <span class="brand-text">Byte</span> Fee Approved!</h1>
+    </div>
+    <div class="content">
+      <p>Great news! 🎊</p>
+      <p>The customer has approved your requested delivery fee for order #${order.customId}!</p>
+      
+      <div class="success-banner">
+        ✅ Fee Request Approved & Payment Received ✅
+      </div>
+
+      <div class="order-info">
+        <p>📦 <strong>Order ID:</strong> #${order.customId}</p>
+        <p>📊 <strong>Status:</strong> ${order.status}</p>
+        <p>💰 <strong>Total Order Value:</strong> ₦${(order.totalPrice).toFixed(2)}</p>
+        <p>🚚 <strong>Approved Fee:</strong> ₦${(order.fee).toFixed(2)}</p>
+        <p>📝 <strong>Your Note:</strong> ${order.requestDescription || "No description provided"}</p>
+      </div>
+      
+      <div class="wallet-update">
+        <p>💳 <strong>Wallet Update:</strong></p>
+        <p>₦${(order.totalPrice).toFixed(2)} has been added to your restaurant wallet!</p>
+        <p>New balance: ₦${(restaurant.walletBalance).toFixed(2)}</p>
+      </div>
+
+      <div class="next-steps">
+        <p><strong>📋 Next Steps:</strong></p>
+        <ul>
+          <li>Prepare the order immediately</li>
+          <li>Package it with care</li>
+          <li>Arrange for delivery</li>
+          <li>Update the order status as you progress</li>
+        </ul>
+      </div>
+
+      <p>The customer is now eagerly waiting for their meal. Let's provide an excellent delivery experience! 🚀</p>
+    </div>
+    <div class="footer">
+      <p>© ${new Date().getFullYear()} <span class="brand">Byte</span> - Your Campus Food Partner</p>
+      <p>Cooking up happiness, one order at a time! 👨‍🍳</p>
+    </div>
+  </div>
+</body>
+</html>
+        `;
+        
+        await sendEmail(user.email, 'Order Confirmed - Fee Approved', 'Your order with the requested fee has been confirmed!', userEmailHtml);
+        await sendEmail(restaurant.email, 'Fee Approved & Order Confirmed', 'Customer approved your fee request - order is now confirmed!', restaurantEmailHtml);
       }
 
     } else if (action === 'cancel') {
@@ -1369,6 +1593,11 @@ exports.handleOrderStatus = async (request, response) => {
       await restaurantNotification.save();
       restaurant.notifications.push(restaurantNotification._id);
       await restaurant.save();
+      
+      // Send SMS to restaurant about fee rejection/cancellation
+      const formattedNumber = formatPhoneNumber(restaurant.contactNumber);
+      const smsMessage = `Fee Rejected! Order #${order.customId} was canceled by customer due to the requested fee of ₦${order.fee}. No action needed.`;
+      sendSMS(formattedNumber, smsMessage);
 
       if (user.email) {
         const emailHtml = `
