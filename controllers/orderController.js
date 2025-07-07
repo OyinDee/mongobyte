@@ -291,7 +291,7 @@ const TERMII_SENDER_ID = process.env.TERMII_SENDER_ID;
           message: `You have received a new order with ID: ${newOrder.customId}.`,
       });
 
-        const smsMessage = `Byte: New order #${newOrder.customId}! Items: ${meals.length}, Total: ₦${totalPrice}. ${note ? 'Note: ' + note.substring(0, 30) + (note.length > 30 ? '...' : '') : ''} Delivery: ${finalLocation.substring(0, 20)}${finalLocation.length > 20 ? '...' : ''}. Check dashboard now.`;
+        const smsMessage = `New order #${newOrder.customId}! Items: ${meals.length}, Total: ₦${totalPrice}. ${note ? 'Note: ' + note.substring(0, 30) + (note.length > 30 ? '...' : '') : ''} Delivery: ${finalLocation.substring(0, 20)}${finalLocation.length > 20 ? '...' : ''}. Check dashboard now.`;
         function formatPhoneNumber(number) {
     const strNumber = String(number);
     if (strNumber.startsWith("234")) {
@@ -573,11 +573,7 @@ exports.orderConfirmation = async (request, response) => {
         order.fee = parsedFee;
         order.requestedFee = parsedFee; // Store the requested fee explicitly
         await order.save();
-        console.log(`[Fee Request] Order saved with Fee Requested status. Stopping further processing.`);
-        return response.status(200).json({
-          message: 'Fee request pending user approval',
-          order: order
-        });
+        console.log(`[Fee Request] Order saved with Fee Requested status.`);
         
         const user = await User.findById(order.user._id);
         if (!user) {
@@ -591,9 +587,9 @@ exports.orderConfirmation = async (request, response) => {
         });
         await feeRequestNotification.save();
         
-        user.notifications.push(feeRequestNotification._id);
         await user.save();
-        
+  
+        // Send email to user about fee request
         if (user && user.email) {
           const emailHtml = `
           <html>
@@ -689,7 +685,7 @@ exports.orderConfirmation = async (request, response) => {
               
                 <div class="fee-info">
                   <p>💰 <strong>Additional Fee Requested:</strong> <span class="highlight">₦${parsedFee}</span></p>
-                  <p>📊 <strong>Standard Permitted Fee:</strong> ₦${order.fee}</p>
+                  <p>📊 <strong>Standard Permitted Fee:</strong> ₦${currentFee}</p>
                   <p>📝 <strong>Restaurant Note:</strong> ${requestDescription || "No description provided"}</p>
                 </div>
 
@@ -716,8 +712,9 @@ exports.orderConfirmation = async (request, response) => {
           </html>
           `;
           await sendEmail(user.email, 'Order Additional Fee Request', 'Your order has a fee request that requires approval.', emailHtml); 
+          console.log(`[Fee Request] Email sent to user ${user.email} about fee request for order ${order.customId}`);
         }
-        await order.save();
+        
         const userNotification = new Notification({
           userId: user._id,
           message: `For order ${order.customId}, requested fee is higher than permitted fee, check your order history! .`,
