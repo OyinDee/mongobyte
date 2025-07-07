@@ -143,6 +143,15 @@ const TERMII_SENDER_ID = process.env.TERMII_SENDER_ID;
             return response.status(404).json({ message: 'User not found' });
         }
 
+        // Check if user has sufficient balance before creating the order
+        if (userDoc.byteBalance < totalPrice) {
+            return response.status(400).json({ 
+                message: 'Insufficient balance. Please top up your Byte wallet before placing an order.',
+                currentBalance: userDoc.byteBalance,
+                requiredAmount: totalPrice
+            });
+        }
+
         // Create notification for the ordering user
         const orderingUserMessage = orderForUsername 
             ? `You placed an order for ${recipientUser.username}! Order ID: ${newOrder.customId}. They'll receive their delicious meal soon!`
@@ -475,7 +484,14 @@ exports.getOrderById = async (request, response) => {
     const { orderId } = request.params;
 
     try {
-        const order = await Order.findById(orderId).populate('user meals.meal');
+        // Try to find order by customId first
+        let order = await Order.findOne({ customId: orderId }).populate('user meals.meal');
+        
+        // If not found and orderId is a valid MongoDB ObjectId, try finding by _id
+        if (!order && orderId.match(/^[0-9a-fA-F]{24}$/)) {
+            order = await Order.findById(orderId).populate('user meals.meal');
+        }
+
         if (!order) {
             return response.status(404).json({ message: 'Order not found' });
         }
@@ -489,7 +505,18 @@ exports.getOrderById = async (request, response) => {
 
 exports.orderConfirmation = async (request, response) => {
   const { orderId } = request.params;
-  const { additionalFee, requestDescription } = request.body;
+  
+  // Detailed logging of the incoming request
+  console.log('REQUEST BODY:', request.body);
+  console.log('REQUEST HEADERS:', request.headers);
+  console.log('REQUEST CONTENT-TYPE:', request.headers['content-type']);
+  
+  // Extract values from request body or default to null
+  const additionalFee = request.body?.additionalFee || null;
+  const requestDescription = request.body?.requestDescription || null;
+  
+  console.log(`Processing confirmation for order ${orderId}`);
+  console.log(`Additional Fee: ${additionalFee}, Description: ${requestDescription}`);
 
   try {
     const order = await Order.findOne({ customId: orderId }).populate('user meals.meal restaurant');
@@ -508,28 +535,49 @@ exports.orderConfirmation = async (request, response) => {
     }
 
     if (additionalFee) {
+      // Convert to number and ensure it's a valid value
       const parsedFee = parseFloat(additionalFee);
+      if (isNaN(parsedFee)) {
+        console.log(`[Fee Error] Invalid additional fee value: ${additionalFee}`);
+        return response.status(400).json({ message: 'Invalid additional fee value' });
+      }
+      
+      console.log(`[Fee Processing] Order ${order.customId}: Requested fee: ${parsedFee}, Original fee: ${order.fee || 0}`);
       
       // Ensure fee and totalPrice are numbers to avoid undefined calculations
-      const currentFee = order.fee || 600; // default fee
+      const currentFee = order.fee || 0; // use 0 as default fee
       const currentTotalPrice = order.totalPrice || 0;
+      console.log(`[Fee Processing] Current total price: ${currentTotalPrice}, Current fee: ${currentFee}`);
       
       // Store the food amount separately if not already set
       if (!order.foodAmount) {
         order.foodAmount = currentTotalPrice - currentFee;
+        console.log(`[Fee Processing] Calculated food amount: ${order.foodAmount}`);
       }
 
       // Calculate new total price by replacing the old fee with the new fee
       order.totalPrice = order.foodAmount + parsedFee;
+      console.log(`[Fee Processing] New total price with requested fee: ${order.totalPrice}`);
+      
+      console.log(`[Fee Comparison] Comparing fees - Requested: ${parsedFee}, Current: ${currentFee}`);
       
       if (parsedFee <= currentFee) {
+        console.log(`[Fee Approved] Fee ${parsedFee} is within limit of ${currentFee}`);
         order.status = 'Confirmed';
         order.fee = parsedFee;
       } else {
+        console.log(`[Fee Requires Approval] Fee ${parsedFee} exceeds limit of ${currentFee}`);
         // Fee exceeds permitted limit - require user approval
+        console.log(`[Fee Request] Setting order ${order.customId} status to Fee Requested`);
         order.status = 'Fee Requested';
         order.fee = parsedFee;
         order.requestedFee = parsedFee; // Store the requested fee explicitly
+        await order.save();
+        console.log(`[Fee Request] Order saved with Fee Requested status. Stopping further processing.`);
+        return response.status(200).json({
+          message: 'Fee request pending user approval',
+          order: order
+        });
         
         const user = await User.findById(order.user._id);
         if (!user) {
@@ -679,29 +727,38 @@ exports.orderConfirmation = async (request, response) => {
         user.notifications.push(userNotification._id);
         await user.save();
   
-        return res.status(200).json({ 
+        return response.status(200).json({ 
           success: true,
           message: 'Fee request sent to user for approval',
           order: order
         });
       }
     } else {
-      // No additional fee or fee is within permitted limit
-      order.status = 'Confirmed';
+      console.log(`[No Additional Fee] Processing order ${order.customId} with no additional fee`);
       
-      // Ensure fee is set to default if not already set
+      // Set fee to 0 if not already set
       if (!order.fee) {
-        order.fee = 600; // default fee
+        console.log(`[Fee Setting] Setting fee to 0 for order ${order.customId}`);
+        order.fee = 0;
       }
+      console.log(`[Fee Status] Final fee for order ${order.customId}: ${order.fee}`);
       
       // Store the food amount separately if not already set
       if (!order.foodAmount && order.totalPrice) {
         order.foodAmount = order.totalPrice - order.fee;
       }
+      
+      // Set status to Confirmed here since there's no fee change requiring approval
+      // We'll still check balance below in the common confirmation flow
+      order.status = 'Confirmed';
+      console.log(`[Status Update] Setting order ${order.customId} status to Confirmed`);
     }      // Only proceed with confirmation logic if status is 'Confirmed'
+    console.log(`[Status Check] Order ${order.customId} status: ${order.status}`);
     if (order.status !== 'Confirmed') {
+      console.log(`[Non-Confirmed Status] Order requires additional processing. Status: ${order.status}`);
       // If status is 'Fee Requested', return appropriate response
       if (order.status === 'Fee Requested') {
+        console.log(`[Fee Request Flow] Initiating fee request process for order ${order.customId}`);
         // Notify restaurant about the fee request status
         const restaurantFeeRequestNotification = new Notification({
           restaurantId: restaurant._id,
@@ -718,7 +775,12 @@ exports.orderConfirmation = async (request, response) => {
           order: order
         });
       }
-      return; // Early return if not confirmed (fee request sent)
+    }
+
+    // If we reach here, we should explicitly set the order to Confirmed if not already
+    // This covers the case with no additional fee
+    if (order.status !== 'Confirmed') {
+      order.status = 'Confirmed';
     }
 
     const user = await User.findById(order.user._id);

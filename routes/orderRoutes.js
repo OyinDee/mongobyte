@@ -3,6 +3,7 @@ const router = express.Router();
 const orderController = require('../controllers/orderController');
 const userControllers = require('../controllers/userControllers');
 const authenticate = require('../middlewares/authenticateRestaurant');
+const customBodyParser = require('../middlewares/bodyParser');
 
 /**
  * @swagger
@@ -216,7 +217,7 @@ router.get('/:userId/order-history', userControllers.getUserOrderHistory);
  *         description: Order not found
  */
 
-router.post('/:orderId/confirm', authenticate, orderController.orderConfirmation);
+router.post('/:orderId/confirm', authenticate, customBodyParser, orderController.orderConfirmation);
 
 /**
  * @swagger
