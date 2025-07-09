@@ -14,6 +14,7 @@ const universityRoutes = require('./routes/universityRoutes');
 const testimonialRoutes = require('./routes/testimonialRoutes');
 const ratingRoutes = require('./routes/ratingRoutes');
 const advancedOrderRoutes = require('./routes/advancedOrderRoutes');
+const notificationRoutes = require('./routes/notificationRoutes');
 const cookieParser = require('cookie-parser');
 const axios = require('axios');
 const swaggerUi = require('swagger-ui-express');
@@ -150,6 +151,7 @@ app.use('/api/v1/testimonials', testimonialRoutes);
 app.use('/api/v1/ratings', ratingRoutes);
 app.use('/api/v1/advanced-orders', advancedOrderRoutes);
 app.use('/api/v1/withdrawals', withdrawalRoutes);
+app.use('/api/v1/notifications', notificationRoutes);
 
 const PORT = process.env.PORT || 8080;
 server.listen(PORT, () => {

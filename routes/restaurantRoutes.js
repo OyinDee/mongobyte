@@ -297,6 +297,72 @@ router.patch('/:id/toggle-active', authenticate, restaurantController.toggleRest
 // Test route to check restaurant lookup
 router.get('/test/:id', restaurantController.testRestaurantLookup);
 
+/**
+ * @swagger
+ * /restaurants/{id}/revenue:
+ *   get:
+ *     tags: [Restaurants]
+ *     summary: Get restaurant revenue statistics
+ *     description: Retrieve revenue statistics including daily, weekly, and monthly breakdowns, and fee vs. food amount.
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Restaurant's custom ID or ObjectId
+ *     responses:
+ *       200:
+ *         description: Revenue statistics retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 totalRevenue:
+ *                   type: number
+ *                   description: Total revenue from all orders
+ *                 breakdown:
+ *                   type: object
+ *                   properties:
+ *                     daily:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           date:
+ *                             type: string
+ *                           amount:
+ *                             type: number
+ *                     weekly:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           week:
+ *                             type: string
+ *                           amount:
+ *                             type: number
+ *                     monthly:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           month:
+ *                             type: string
+ *                           amount:
+ *                             type: number
+ *                     fees:
+ *                       type: number
+ *                     foodAmount:
+ *                       type: number
+ *       404:
+ *         description: Restaurant not found
+ */
+router.get('/:id/revenue', authenticate, restaurantController.getRestaurantRevenue);
+
 // ===== RESTAURANT ADVANCED ORDERS MANAGEMENT =====
 
 /**
