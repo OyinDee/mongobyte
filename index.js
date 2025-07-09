@@ -155,7 +155,7 @@ app.use('/api/v1/notifications', notificationRoutes);
 
 const PORT = process.env.PORT || 8080;
 server.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+    // console.log(`Server running on port ${PORT}`);
 });
 
 mongoose.connect(`${process.env.MONGODB_URI}`, {})

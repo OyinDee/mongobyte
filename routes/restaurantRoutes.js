@@ -303,7 +303,7 @@ router.get('/test/:id', restaurantController.testRestaurantLookup);
  *   get:
  *     tags: [Restaurants]
  *     summary: Get restaurant revenue statistics
- *     description: Retrieve revenue statistics including daily, weekly, and monthly breakdowns, and fee vs. food amount.
+ *     description: Retrieve revenue statistics including daily, weekly, and monthly breakdowns with pagination and cursor-based pagination support.
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -313,6 +313,56 @@ router.get('/test/:id', restaurantController.testRestaurantLookup);
  *         schema:
  *           type: string
  *         description: Restaurant's custom ID or ObjectId
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Page number for pagination (ignored if cursor is provided)
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *         description: Number of items per page
+ *       - in: query
+ *         name: cursor
+ *         schema:
+ *           type: string
+ *         description: Cursor for pagination (overrides page parameter)
+ *       - in: query
+ *         name: sortBy
+ *         schema:
+ *           type: string
+ *           enum: [date, revenue]
+ *           default: date
+ *         description: Field to sort by
+ *       - in: query
+ *         name: sortOrder
+ *         schema:
+ *           type: string
+ *           enum: [asc, desc]
+ *           default: desc
+ *         description: Sort order (ascending or descending)
+ *       - in: query
+ *         name: startDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Filter revenue from this date (YYYY-MM-DD)
+ *       - in: query
+ *         name: endDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Filter revenue until this date (YYYY-MM-DD)
+ *       - in: query
+ *         name: type
+ *         schema:
+ *           type: string
+ *           enum: [day, month, year]
+ *           default: day
+ *         description: Type of breakdown to return (day, month, or year)
  *     responses:
  *       200:
  *         description: Revenue statistics retrieved successfully
@@ -324,40 +374,55 @@ router.get('/test/:id', restaurantController.testRestaurantLookup);
  *                 totalRevenue:
  *                   type: number
  *                   description: Total revenue from all orders
- *                 breakdown:
+ *                 totalCount:
+ *                   type: integer
+ *                   description: Total number of items in the dataset
+ *                 pagination:
  *                   type: object
  *                   properties:
- *                     daily:
+ *                     page:
+ *                       type: integer
+ *                       description: Current page number
+ *                     limit:
+ *                       type: integer
+ *                       description: Items per page
+ *                     totalPages:
+ *                       type: integer
+ *                       description: Total number of pages
+ *                     nextCursor:
+ *                       type: string
+ *                       description: Cursor for fetching the next page of results
+ *                 data:
+ *                   type: array
+ *                   description: Paginated revenue data
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       date:
+ *                         type: string
+ *                         description: Date in ISO format (YYYY-MM-DD)
+ *                       revenue:
+ *                         type: number
+ *                         description: Total revenue for this period
+ *                       orders:
+ *                         type: array
+ *                         description: Orders that contributed to the revenue
+ *                 breakdown:
+ *                   type: object
+ *                   description: Full breakdown (for backward compatibility)
+ *                   properties:
+ *                     byDay:
  *                       type: array
  *                       items:
  *                         type: object
- *                         properties:
- *                           date:
- *                             type: string
- *                           amount:
- *                             type: number
- *                     weekly:
+ *                     byMonth:
  *                       type: array
  *                       items:
  *                         type: object
- *                         properties:
- *                           week:
- *                             type: string
- *                           amount:
- *                             type: number
- *                     monthly:
+ *                     byYear:
  *                       type: array
  *                       items:
  *                         type: object
- *                         properties:
- *                           month:
- *                             type: string
- *                           amount:
- *                             type: number
- *                     fees:
- *                       type: number
- *                     foodAmount:
- *                       type: number
  *       404:
  *         description: Restaurant not found
  */

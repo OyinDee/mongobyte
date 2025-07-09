@@ -2,6 +2,17 @@ const { getBreakdown } = require('./restaurantRevenueHelpers');
 // Get total and breakdown revenue for a restaurant
 exports.getRestaurantRevenue = async (req, res) => {
   const { id } = req.params;
+  const { 
+    page = 1, 
+    limit = 10, 
+    cursor, 
+    sortBy = 'date', 
+    sortOrder = 'desc', 
+    startDate, 
+    endDate, 
+    type = 'day' // day, month, or year
+  } = req.query;
+  
   try {
     // Find restaurant by customId or ObjectId
     let restaurant = null;
@@ -14,10 +25,82 @@ exports.getRestaurantRevenue = async (req, res) => {
     if (!restaurant) {
       return res.status(404).json({ message: 'Restaurant not found' });
     }
-    const orders = await Order.find({ restaurant: restaurant._id }).populate('restaurant', 'name');
+
+    // Build date filter if provided
+    const dateFilter = { restaurant: restaurant._id };
+    if (startDate || endDate) {
+      dateFilter.orderDate = {};
+      if (startDate) dateFilter.orderDate.$gte = new Date(startDate);
+      if (endDate) dateFilter.orderDate.$lte = new Date(endDate);
+    }
+
+    // Get all orders for total count and revenue
+    const orders = await Order.find(dateFilter).populate('restaurant', 'name');
     const totalRevenue = orders.reduce((sum, o) => sum + (o.totalPrice || 0), 0);
+    
+    // Get the breakdown data
     const breakdown = await getBreakdown(orders, true);
-    res.json({ totalRevenue, breakdown });
+    
+    // Determine which breakdown to use based on type
+    let dataSet;
+    if (type === 'month') {
+      dataSet = breakdown.byMonth;
+    } else if (type === 'year') {
+      dataSet = breakdown.byYear;
+    } else {
+      dataSet = breakdown.byDay;
+    }
+    
+    // Sort the data
+    const sortField = type === 'day' ? 'date' : (type === 'month' ? 'month' : 'year');
+    dataSet.sort((a, b) => {
+      if (sortOrder === 'asc') {
+        return a[sortField] > b[sortField] ? 1 : -1;
+      } else {
+        return a[sortField] < b[sortField] ? 1 : -1;
+      }
+    });
+    
+    // Implement cursor-based pagination if cursor is provided
+    let paginatedData;
+    let nextCursor = null;
+    
+    if (cursor) {
+      // Find the index of the item that matches the cursor
+      const cursorIndex = dataSet.findIndex(item => {
+        return item[sortField] === cursor;
+      });
+      
+      if (cursorIndex !== -1) {
+        // Get items after the cursor
+        paginatedData = dataSet.slice(cursorIndex, cursorIndex + parseInt(limit));
+      } else {
+        paginatedData = [];
+      }
+    } else {
+      // Use traditional pagination if no cursor
+      const skip = (parseInt(page) - 1) * parseInt(limit);
+      paginatedData = dataSet.slice(skip, skip + parseInt(limit));
+    }
+    
+    // Set the next cursor if there are more items
+    if (paginatedData.length === parseInt(limit) && paginatedData.length < dataSet.length) {
+      nextCursor = paginatedData[paginatedData.length - 1][sortField];
+    }
+
+    res.json({
+      totalRevenue,
+      totalCount: dataSet.length,
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        totalPages: Math.ceil(dataSet.length / parseInt(limit)),
+        nextCursor
+      },
+      data: paginatedData,
+      // Include full breakdown for backward compatibility
+      breakdown
+    });
   } catch (error) {
     console.error('getRestaurantRevenue error:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
