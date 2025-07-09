@@ -1121,73 +1121,129 @@ exports.markOrderAsDelivered = async (request, response) => {
 <head>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background-color: #f5f5f5;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f8f9fa;
       color: #333333;
       margin: 0;
       padding: 0;
     }
     .email-container {
-      width: 95%;
+      width: 90%;
       max-width: 600px;
-      margin: 0 auto;
+      margin: 30px auto;
       background-color: #ffffff;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
       overflow: hidden;
-      padding: 20px;
-      box-sizing: border-box;
     }
-    h1 {
+    .header {
+      text-align: center;
+      padding: 40px 20px 30px;
+      background-color: #990000;
+      color: #ffffff;
+    }
+    .header h1 {
+      margin: 0;
+      font-size: 28px;
+      font-weight: 700;
+    }
+    .brand-text {
+      color: #FFCC00;
+      font-weight: 800;
+    }
+    .content {
+      padding: 30px;
+    }
+    .content p {
       color: #333333;
-      font-size: 24px;
-      margin-bottom: 20px;
-    }
-    p {
-      color: #666666;
       font-size: 16px;
       line-height: 1.6;
       margin-bottom: 15px;
     }
-    .order-info {
-      background-color: #f8f8f8;
-      padding: 15px;
+    .delivery-banner {
+      background-color: #FFCC00;
+      color: #000000;
+      text-align: center;
+      padding: 20px;
+      margin: 20px 0;
       border-radius: 8px;
-      margin-bottom: 20px;
+      font-weight: bold;
+      font-size: 18px;
+    }
+    .order-info {
+      background-color: #fff3cd;
+      border-left: 4px solid #FFCC00;
+      padding: 20px;
+      border-radius: 8px;
+      margin: 20px 0;
     }
     .order-info p {
-      color: #333333;
-      font-weight: bold;
+      color: #000000;
+      font-weight: 600;
+      margin: 8px 0;
+    }
+    .delivery-tips {
+      background-color: #d1ecf1;
+      border-left: 4px solid #17a2b8;
+      padding: 15px;
+      margin: 20px 0;
+      border-radius: 4px;
     }
     .footer {
+      background-color: #000000;
+      color: #ffffff;
       text-align: center;
-      font-size: 12px;
-      color: #999999;
-      margin-top: 20px;
+      padding: 20px;
+      font-size: 14px;
+    }
+    .footer .brand {
+      color: #FFCC00;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
   <div class="email-container">
-    <h1>Order Almost At Your Door!</h1>
-    <p>Your order with ID <strong>${order.customId}</strong> has been sent out for delivery!</p>
-    
-    <div class="order-info">
-      <p>Order ID: ${order.customId}</p>
-      <p>Status: Out for delivery! </p>
-      <p>Total Price: ₦${(order.totalPrice).toFixed(2)}</p>
+    <div class="header">
+      <h1>🛵 <span class="brand-text">Byte</span> Delivery Update</h1>
     </div>
+    <div class="content">
+      <p>Great news! 🎊</p>
+      <p>Your delicious meal is on its way to you right now!</p>
+      
+      <div class="delivery-banner">
+        🚚 Your Order Is Out For Delivery! 🚚
+      </div>
 
-    <p>Thank you for using our service. If you have any questions or need assistance, feel free to contact us.</p>
+      <div class="order-info">
+        <p>📦 <strong>Order ID:</strong> #${order.customId}</p>
+        <p>📊 <strong>Status:</strong> Out for delivery</p>
+        <p>💰 <strong>Total:</strong> ₦${(order.totalPrice).toFixed(2)}</p>
+        <p>📍 <strong>Delivery Location:</strong> ${order.location}</p>
+        <p>🏘️ <strong>Landmark:</strong> ${order.nearestLandmark || 'Not specified'}</p>
+      </div>
 
+      <div class="delivery-tips">
+        <p><strong>🚀 Delivery Tips:</strong></p>
+        <ul>
+          <li>Keep your phone nearby for delivery updates</li>
+          <li>Ensure your location is accessible</li>
+          <li>Have your order ID handy if needed</li>
+        </ul>
+      </div>
+
+      <p>Get ready to enjoy your meal! If you have any questions, our support team is always ready to help.</p>
+      <p>Thank you for choosing Byte - we hope you enjoy every bite! 😋</p>
+    </div>
     <div class="footer">
-      <p>&copy; ${new Date().getFullYear()} Byte. All rights reserved.</p>
+      <p>© ${new Date().getFullYear()} <span class="brand">Byte</span> - Your Campus Food Companion</p>
+      <p>Making campus dining delightful! 🍕</p>
     </div>
   </div>
 </body>
 </html>
       `;
-      await sendEmail(user.email, 'Knock, Knock!', 'Your order has been sent out for delivery!.', emailHtml);
+      await sendEmail(user.email, 'Knock, Knock!', 'Your order has been sent out for delivery!', emailHtml);
     }
 
     const restaurantNotification = new Notification({

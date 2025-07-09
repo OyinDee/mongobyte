@@ -29,6 +29,10 @@ const mealSchema = new mongoose.Schema({
         type: Boolean,
         default: true,
     },
+    required: {
+        type: Boolean,
+        default: false,
+    },
     imageUrl: {
         type: String,
     },
