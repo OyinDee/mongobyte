@@ -768,6 +768,8 @@ exports.getMyOrders = async (req, res) => {
     const user = await User.findById(userId)
       .populate({
         path: 'orderHistory',
+        // Explicitly select all Order fields to ensure nothing is missing
+        select: 'customId user meals note nearestLandmark fee foodAmount requestedFee requestDescription totalPrice status location phoneNumber orderDate restaurant groupOrderId recipient createdAt updatedAt',
         populate: [
           {
             path: 'meals.meal',
