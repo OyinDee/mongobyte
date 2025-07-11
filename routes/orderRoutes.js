@@ -3,6 +3,7 @@ const router = express.Router();
 const orderController = require('../controllers/orderController');
 const userControllers = require('../controllers/userControllers');
 const authenticate = require('../middlewares/authenticateRestaurant');
+const { authenticateUser } = require('../middlewares/authenticateUser');
 const customBodyParser = require('../middlewares/bodyParser');
 
 /**
@@ -90,7 +91,7 @@ const customBodyParser = require('../middlewares/bodyParser');
  *       400:
  *         description: Validation error
  */
-router.post('/create', orderController.createOrder);
+router.post('/create', authenticateUser, orderController.createOrder);
 
 /**
  * @swagger
@@ -160,7 +161,7 @@ router.get('/:orderId', orderController.getOrderById);
  *         description: List of orders
  */
 
-router.get('/:userId/order-history', userControllers.getUserOrderHistory);
+router.get('/order-history', authenticateUser, userControllers.getUserOrderHistory);
 
 /**
  * @swagger

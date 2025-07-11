@@ -64,7 +64,11 @@ exports.createOrder = async (request, response) => {
 const TERMII_API_KEY = process.env.TERMII_API_KEY;
 const TERMII_SENDER_ID = process.env.TERMII_SENDER_ID;
 
-    const { user, meals, note, totalPrice, location, phoneNumber, restaurantCustomId, nearestLandmark, fee, orderForUsername } = request.body;
+    const { meals, note, totalPrice, location, phoneNumber, restaurantCustomId, nearestLandmark, fee, orderForUsername } = request.body;
+    
+    // Get user from authentication middleware instead of request body
+    const userId = request.user._id;
+    
     try {
         const restaurant = await findRestaurantByIdHelper(restaurantCustomId);
         if (!restaurant) {
@@ -76,7 +80,7 @@ const TERMII_SENDER_ID = process.env.TERMII_SENDER_ID;
         }
 
         // Handle ordering for another user
-        let orderingUser = await User.findById(user);
+        let orderingUser = await User.findById(userId);
         let recipientUser = null;
         let finalLocation = location;
         let finalPhoneNumber = phoneNumber;
@@ -117,7 +121,7 @@ const TERMII_SENDER_ID = process.env.TERMII_SENDER_ID;
         );
 
         const newOrder = new Order({
-            user,
+            user: userId,
             meals: mealDetails, 
             note,
             totalPrice,
@@ -138,7 +142,7 @@ const TERMII_SENDER_ID = process.env.TERMII_SENDER_ID;
 
         await newOrder.save();
 
-        const userDoc = await User.findById(user);
+        const userDoc = await User.findById(userId);
         if (!userDoc) {
             return response.status(404).json({ message: 'User not found' });
         }

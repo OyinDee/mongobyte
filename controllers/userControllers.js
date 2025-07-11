@@ -343,17 +343,18 @@ exports.createOrder = async (request, response) => {
 };
 
 exports.getUserOrderHistory = async (request, response) => {
-    const { username } = request.params;
+    // Use authenticated user instead of username from params for security
+    const userId = request.user._id;
 
     try {
-const user = await User.findOne({ username })
-  .populate({
-    path: 'orderHistory',
-    populate: {
-      path: 'meals.meal',
-      model: 'Meal',
-    }
-  });
+        const user = await User.findById(userId)
+            .populate({
+                path: 'orderHistory',
+                populate: {
+                    path: 'meals.meal',
+                    model: 'Meal',
+                }
+            });
         if (!user) {
             return response.status(404).json({ message: 'User not found' });
         }

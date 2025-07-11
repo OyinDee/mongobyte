@@ -506,7 +506,7 @@ router.put('/updateUniversity', authenticateUser, userControllers.updateUniversi
  *       200:
  *         description: List of orders
  */
-router.get('/orders/:username', userControllers.getUserOrderHistory);
+router.get('/orders/:username', authenticateSuperAdmin, userControllers.getUserOrderHistory);
 
 /**
  * @swagger
