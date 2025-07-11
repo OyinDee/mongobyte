@@ -125,6 +125,7 @@ const TERMII_SENDER_ID = process.env.TERMII_SENDER_ID;
             meals: mealDetails, 
             note,
             totalPrice,
+            foodAmount: totalPrice - (fee || 0), // Store the food amount separately
             location: finalLocation,
             nearestLandmark: finalNearestLandmark,
             phoneNumber: finalPhoneNumber,
@@ -295,7 +296,9 @@ const TERMII_SENDER_ID = process.env.TERMII_SENDER_ID;
           message: `You have received a new order with ID: ${newOrder.customId}.`,
       });
 
-        const smsMessage = `New order #${newOrder.customId}! Items: ${meals.length}, Total: ₦${totalPrice}. ${note ? 'Note: ' + note.substring(0, 30) + (note.length > 30 ? '...' : '') : ''} Delivery: ${finalLocation.substring(0, 20)}${finalLocation.length > 20 ? '...' : ''}. Check dashboard now.`;
+        // Calculate food amount (total minus fee) for SMS display
+        const foodAmountForSMS = totalPrice - (fee || 0);
+        const smsMessage = `New order #${newOrder.customId}! Items: ${meals.length}, Meal cost: ₦${foodAmountForSMS}. ${note ? 'Note: ' + note.substring(0, 30) + (note.length > 30 ? '...' : '') : ''} Delivery: ${finalLocation.substring(0, 20)}${finalLocation.length > 20 ? '...' : ''}. Check dashboard now.`;
         function formatPhoneNumber(number) {
     const strNumber = String(number);
     if (strNumber.startsWith("234")) {
@@ -1346,7 +1349,8 @@ exports.handleOrderStatus = async (request, response) => {
       
       // Send SMS to restaurant about fee approval
       const formattedNumber = formatPhoneNumber(restaurant.contactNumber);
-      const smsMessage = `Fee Approved! Order #${order.customId} fee of ₦${order.fee} was accepted by customer. Total: ₦${order.totalPrice}. Please prepare order now.`;
+      const foodAmountOnly = order.foodAmount || (order.totalPrice - order.fee);
+      const smsMessage = `Fee Approved! Order #${order.customId} fee of ₦${order.fee} was accepted by customer. Meal cost: ₦${foodAmountOnly}. Please prepare order now.`;
       sendSMS(formattedNumber, smsMessage);
 
       if (user.email) {
@@ -1656,7 +1660,8 @@ exports.handleOrderStatus = async (request, response) => {
       
       // Send SMS to restaurant about fee rejection/cancellation
       const formattedNumber = formatPhoneNumber(restaurant.contactNumber);
-      const smsMessage = `Fee Rejected! Order #${order.customId} was canceled by customer due to the requested fee of ₦${order.fee}. No action needed.`;
+      const foodAmountOnly = order.foodAmount || (order.totalPrice - order.fee);
+      const smsMessage = `Fee Rejected! Order #${order.customId} was canceled by customer due to the requested fee of ₦${order.fee}. Meal cost was: ₦${foodAmountOnly}. No action needed.`;
       sendSMS(formattedNumber, smsMessage);
 
       if (user.email) {
