@@ -1,0 +1,492 @@
+# RESTAURANT ORDER SYSTEM - COMPLETE DOCUMENTATION
+
+## BASE URL
+https://mongobyte.vercel.app/api/v1
+
+## AUTHENTICATION
+All restaurant endpoints require authentication using JWT token in Authorization header:
+Authorization: Bearer <restaurant_jwt_token>
+
+## ORDER STATUSES
+- Pending: Initial order status when created by user
+- Confirmed: Order accepted by restaurant and payment processed
+- Fee Requested: Restaurant requests additional fee, waiting for user approval
+- Canceled: Order canceled (by user or due to insufficient balance)
+- Delivered: Order marked as delivered
+
+---
+
+## 1. GET RESTAURANT ORDERS
+**Endpoint:** GET /orders/restaurant/{restaurantCustomId}
+**Description:** Get all orders for a specific restaurant
+**Authentication:** Required (Restaurant)
+
+**URL Parameters:**
+- restaurantCustomId: Restaurant's custom ID or MongoDB ObjectId
+
+**Response Example:**
+```json
+[
+  {
+    "_id": "645f1a2b8c9d1234567890ab",
+    "customId": "ORD123456789",
+    "user": {
+      "_id": "645f1a2b8c9d1234567890cd",
+      "username": "john_doe",
+      "email": "john@example.com",
+      "phoneNumber": "+2348012345678"
+    },
+    "meals": [
+      {
+        "meal": {
+          "_id": "645f1a2b8c9d1234567890ef",
+          "name": "Jollof Rice",
+          "price": 2000,
+          "customId": "MEAL123"
+        },
+        "quantity": 2
+      }
+    ],
+    "totalPrice": 4600,
+    "foodAmount": 4000,
+    "fee": 600,
+    "requestedFee": null,
+    "requestDescription": null,
+    "status": "Pending",
+    "location": "Block A, Student Hostel",
+    "nearestLandmark": "Main Gate",
+    "phoneNumber": "+2348012345678",
+    "note": "Extra spicy please",
+    "orderDate": "2024-07-11T10:30:00.000Z",
+    "restaurant": "645f1a2b8c9d1234567890gh",
+    "recipient": null
+  }
+]
+```
+
+---
+
+## ORDER DATA STRUCTURE EXPLANATION
+
+**Key Fields in Order Object:**
+
+- **`fee`**: User's original delivery fee (or confirmed fee after approval)
+- **`requestedFee`**: Restaurant's requested additional fee (only set when exceeds user's fee)  
+- **`requestDescription`**: Restaurant's explanation for additional fee request
+- **`note`**: User's original order note/instructions (never overwritten)
+- **`foodAmount`**: Cost of meals only (calculated as totalPrice - fee)
+- **`totalPrice`**: Full amount including food + current applicable fee
+- **`status`**: Current order status (Pending, Confirmed, Fee Requested, etc.)
+
+**Fee Request Flow:**
+1. User creates order with `fee: 600` (user's preferred delivery fee)
+2. Restaurant requests `additionalFee: 800` with description
+3. If 800 > 600: 
+   - `fee` remains 600 (user's original)
+   - `requestedFee` becomes 800 (restaurant's request)
+   - `requestDescription` stores restaurant's reason
+   - `totalPrice` updated to show potential new total
+   - Status becomes "Fee Requested"
+4. If user accepts: `fee` gets updated to 800, `requestedFee` cleared
+5. If user rejects: Order canceled, original values preserved
+
+---
+
+## 2. GET SINGLE ORDER
+**Endpoint:** GET /orders/{orderId}
+**Description:** Get details of a specific order
+**Authentication:** Not required (but recommended for security)
+
+**URL Parameters:**
+- orderId: Order's customId or MongoDB ObjectId
+
+**Response Example:**
+```json
+{
+  "_id": "645f1a2b8c9d1234567890ab",
+  "customId": "ORD123456789",
+  "user": {
+    "_id": "645f1a2b8c9d1234567890cd",
+    "username": "john_doe",
+    "email": "john@example.com",
+    "phoneNumber": "+2348012345678"
+  },
+  "meals": [
+    {
+      "meal": {
+        "_id": "645f1a2b8c9d1234567890ef",
+        "name": "Jollof Rice",
+        "price": 2000,
+        "customId": "MEAL123",
+        "description": "Traditional Nigerian rice dish",
+        "imageUrl": "https://example.com/jollof.jpg"
+      },
+      "quantity": 2
+    }
+  ],
+  "totalPrice": 4600,
+  "foodAmount": 4000,
+  "fee": 600,
+  "requestedFee": null,
+  "requestDescription": null,
+  "status": "Pending",
+  "location": "Block A, Student Hostel",
+  "nearestLandmark": "Main Gate",
+  "phoneNumber": "+2348012345678",
+  "note": "Extra spicy please",
+  "orderDate": "2024-07-11T10:30:00.000Z",
+  "restaurant": "645f1a2b8c9d1234567890gh"
+}
+```
+
+---
+
+## 3. CONFIRM ORDER (With Optional Additional Fee)
+**Endpoint:** POST /orders/{orderId}/confirm
+**Description:** Restaurant confirms order, optionally requesting additional delivery fee
+**Authentication:** Required (Restaurant)
+
+**URL Parameters:**
+- orderId: Order's customId
+
+**Request Body (Optional):**
+```json
+{
+  "additionalFee": 800,
+  "requestDescription": "Extra distance delivery to off-campus location"
+}
+```
+
+**Request Body Fields:**
+- additionalFee (optional): Additional fee amount in Naira
+- requestDescription (optional): Reason for additional fee
+
+**Response Examples:**
+
+**Success - Order Confirmed Immediately (fee within limit):**
+```json
+{
+  "message": "Order updated successfully!",
+  "order": {
+    "customId": "ORD123456789",
+    "status": "Confirmed",
+    "totalPrice": 4600,
+    "fee": 600
+  }
+}
+```
+
+**Success - Fee Request Sent to User (fee exceeds limit):**
+```json
+{
+  "success": true,
+  "message": "Fee request sent to user for approval",
+  "order": {
+    "customId": "ORD123456789",
+    "status": "Fee Requested",
+    "totalPrice": 4800,
+    "fee": 800,
+    "requestedFee": 800,
+    "requestDescription": "Extra distance delivery to off-campus location"
+  }
+}
+```
+
+**Error - Insufficient Balance:**
+```json
+{
+  "message": "Insufficient balance. Order has been cancelled."
+}
+```
+
+**Error - Invalid Fee:**
+```json
+{
+  "message": "Invalid additional fee value"
+}
+```
+
+**Order Flow:**
+1. If no additionalFee provided → Order confirmed immediately
+2. If additionalFee ≤ current fee → Order confirmed immediately, fee updated to new amount
+3. If additionalFee > current fee → Status changes to "Fee Requested", user gets notification
+   - Original user fee remains in `fee` field
+   - Restaurant's requested fee stored in `requestedFee` field
+   - Total price updated to show what user would pay if they accept
+4. User must then approve/cancel the order via /orders/{orderId}/status endpoint
+   - If approved: `fee` gets updated to `requestedFee` value
+   - If canceled: Order status becomes "Canceled"
+
+**Important Fee Fields:**
+- `fee`: User's original fee (or confirmed fee after acceptance)
+- `requestedFee`: Restaurant's requested additional fee (when exceeds limit)
+- `requestDescription`: Restaurant's reason for requesting additional fee
+- `note`: User's original order note (separate from restaurant's fee description)
+
+---
+
+## 4. MARK ORDER AS DELIVERED
+**Endpoint:** PATCH /orders/deliver/{orderId}
+**Description:** Mark order as delivered (out for delivery)
+**Authentication:** Not required (but recommended)
+
+**URL Parameters:**
+- orderId: Order's customId
+
+**Response Example:**
+```json
+{
+  "message": "Order marked as delivered successfully!",
+  "order": {
+    "customId": "ORD123456789",
+    "status": "Delivered",
+    "totalPrice": 4600
+  }
+}
+```
+
+---
+
+## 5. USER ORDER STATUS HANDLING (Accept/Cancel Fee Request)
+**Endpoint:** POST /orders/{orderId}/status
+**Description:** User accepts or cancels order with requested additional fee
+**Authentication:** Not required (but user-specific logic applies)
+
+**URL Parameters:**
+- orderId: Order's customId
+
+**Request Body:**
+```json
+{
+  "action": "accept"
+}
+```
+OR
+```json
+{
+  "action": "cancel"
+}
+```
+
+**Response Examples:**
+
+**Fee Accepted:**
+```json
+{
+  "message": "Order accepted successfully",
+  "order": {
+    "customId": "ORD123456789",
+    "status": "Confirmed",
+    "totalPrice": 4800,
+    "fee": 800
+  }
+}
+```
+
+**Order Canceled:**
+```json
+{
+  "message": "Order canceled successfully",
+  "order": {
+    "customId": "ORD123456789",
+    "status": "Canceled"
+  }
+}
+```
+
+---
+
+## 6. GET RESTAURANT NOTIFICATIONS
+**Endpoint:** GET /restaurants/notifications
+**Description:** Get notifications for authenticated restaurant
+**Authentication:** Required (Restaurant)
+
+**Response Example:**
+```json
+[
+  {
+    "_id": "645f1a2b8c9d1234567890ij",
+    "restaurantId": "645f1a2b8c9d1234567890gh",
+    "message": "You have received a new order with ID: ORD123456789.",
+    "createdAt": "2024-07-11T10:30:00.000Z",
+    "read": false
+  },
+  {
+    "_id": "645f1a2b8c9d1234567890kl",
+    "restaurantId": "645f1a2b8c9d1234567890gh",
+    "message": "Order ORD123456789 has been confirmed, ₦4600 has been added to your wallet.",
+    "createdAt": "2024-07-11T10:35:00.000Z",
+    "read": false
+  }
+]
+```
+
+---
+
+## 7. GET RESTAURANT REVENUE
+**Endpoint:** GET /restaurants/{restaurantId}/revenue
+**Description:** Get restaurant revenue statistics with pagination
+**Authentication:** Required (Restaurant)
+
+**URL Parameters:**
+- restaurantId: Restaurant's custom ID or MongoDB ObjectId
+
+**Query Parameters:**
+- page (optional): Page number (default: 1)
+- limit (optional): Items per page (default: 10)
+- cursor (optional): Cursor for pagination (overrides page)
+- sortBy (optional): 'date' or 'revenue' (default: 'date')
+- sortOrder (optional): 'asc' or 'desc' (default: 'desc')
+- startDate (optional): Filter from date (YYYY-MM-DD)
+- endDate (optional): Filter to date (YYYY-MM-DD)
+- type (optional): 'day', 'month', or 'year' (default: 'day')
+
+**Response Example:**
+```json
+{
+  "totalRevenue": 45000,
+  "totalCount": 15,
+  "pagination": {
+    "page": 1,
+    "limit": 10,
+    "totalPages": 2,
+    "nextCursor": "2024-07-10"
+  },
+  "data": [
+    {
+      "date": "2024-07-11",
+      "revenue": 4600,
+      "orders": [
+        {
+          "_id": "645f1a2b8c9d1234567890ab",
+          "customId": "ORD123456789",
+          "totalPrice": 4600
+        }
+      ]
+    }
+  ],
+  "breakdown": {
+    "byDay": [...],
+    "byMonth": [...],
+    "byYear": [...]
+  }
+}
+```
+
+---
+
+## SMS NOTIFICATIONS TO RESTAURANTS
+
+When orders are created or updated, restaurants receive SMS notifications:
+
+**New Order SMS:**
+"New order #ORD123456789! Items: 2, Meal cost: ₦4000. Note: Extra spicy... Delivery: Block A, Student... Check dashboard now."
+
+**Fee Approved SMS:**
+"Fee Approved! Order #ORD123456789 fee of ₦800 was accepted by customer. Meal cost: ₦4000. Please prepare order now."
+
+**Fee Rejected SMS:**
+"Fee Rejected! Order #ORD123456789 was canceled by customer due to the requested fee of ₦800. Meal cost was: ₦4000. No action needed."
+
+Note: SMS shows only the meal cost (food amount), not the total price including delivery fees, as restaurants receive the full amount and pay delivery riders themselves.
+
+---
+
+## EMAIL NOTIFICATIONS
+
+Restaurants also receive detailed email notifications for:
+- New orders (with full order details)
+- Order confirmations
+- Fee request approvals/rejections
+
+---
+
+## WALLET SYSTEM
+
+**How Restaurant Payments Work:**
+1. When order is confirmed, full amount (food + delivery fee) is added to restaurant wallet
+2. Restaurant receives SMS showing only the meal cost for clarity
+3. Restaurant pays delivery riders from their own funds
+4. Restaurant can withdraw earnings via withdrawal system
+
+**Key Points:**
+- Restaurants get full payment (meal cost + delivery fee)
+- SMS notifications show only meal cost for clarity
+- Restaurants handle delivery payments independently
+- Wallet balance includes all fees and meal costs
+
+---
+
+## ERROR CODES
+
+**400 Bad Request:**
+- Invalid additional fee value
+- Insufficient balance
+- Order cannot be accepted/canceled at current stage
+
+**401 Unauthorized:**
+- Missing or invalid authentication token
+
+**403 Forbidden:**
+- Wrong user type (not a restaurant)
+
+**404 Not Found:**
+- Order not found
+- Restaurant not found
+- User not found
+
+**500 Internal Server Error:**
+- Server-side errors
+- Database connection issues
+
+---
+
+## TESTING ENDPOINTS
+
+Use tools like Postman or curl to test:
+
+```bash
+# Get restaurant orders
+curl -X GET "https://mongobyte.vercel.app/api/v1/orders/restaurant/YOUR_RESTAURANT_ID" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+
+# Confirm order without additional fee
+curl -X POST "https://mongobyte.vercel.app/api/v1/orders/ORD123456789/confirm" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "Content-Type: application/json"
+
+# Confirm order with additional fee
+curl -X POST "https://mongobyte.vercel.app/api/v1/orders/ORD123456789/confirm" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"additionalFee": 800, "requestDescription": "Extra distance delivery"}'
+
+# Mark as delivered
+curl -X PATCH "https://mongobyte.vercel.app/api/v1/orders/deliver/ORD123456789"
+```
+
+---
+
+## FRONTEND INTEGRATION TIPS
+
+1. **Real-time Updates:** Consider implementing WebSocket or polling for real-time order updates
+2. **Order States:** Handle all order statuses appropriately in your UI
+3. **Fee Requests:** Provide clear UI for requesting additional fees with descriptions
+4. **Notifications:** Display restaurant notifications prominently
+5. **Revenue Dashboard:** Use the revenue endpoint with pagination for performance
+6. **Error Handling:** Implement proper error handling for all error codes
+7. **Loading States:** Show loading indicators during API calls
+8. **SMS Integration:** Inform restaurants they'll receive SMS notifications
+
+---
+
+## IMPORTANT NOTES
+
+1. **Authentication Required:** Most endpoints require restaurant authentication
+2. **Order IDs:** Use customId (e.g., "ORD123456789") for user-facing operations
+3. **Fee Logic:** Additional fees exceeding the permitted limit require user approval
+4. **SMS Content:** Shows only meal cost, not total price including delivery
+5. **Wallet System:** Restaurants receive full payment and handle delivery costs
+6. **Real-time:** Consider implementing real-time notifications for better UX
+7. **Error Handling:** Always handle potential errors gracefully
+8. **Testing:** Test with various scenarios including edge cases

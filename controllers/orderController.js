@@ -571,14 +571,18 @@ exports.orderConfirmation = async (request, response) => {
       if (parsedFee <= currentFee) {
         console.log(`[Fee Approved] Fee ${parsedFee} is within limit of ${currentFee}`);
         order.status = 'Confirmed';
-        order.fee = parsedFee;
+        // Keep original fee, update total price with new fee amount
+        order.totalPrice = order.foodAmount + parsedFee;
+        order.fee = parsedFee; // Update fee since it's within limit
       } else {
         console.log(`[Fee Requires Approval] Fee ${parsedFee} exceeds limit of ${currentFee}`);
         // Fee exceeds permitted limit - require user approval
         console.log(`[Fee Request] Setting order ${order.customId} status to Fee Requested`);
         order.status = 'Fee Requested';
-        order.fee = parsedFee;
+        // DON'T change order.fee - keep user's original fee
         order.requestedFee = parsedFee; // Store the requested fee explicitly
+        // Update total price with requested fee for user to see what they'd pay
+        order.totalPrice = order.foodAmount + parsedFee;
         await order.save();
         console.log(`[Fee Request] Order saved with Fee Requested status.`);
         
@@ -1328,6 +1332,11 @@ exports.handleOrderStatus = async (request, response) => {
       restaurant.walletBalance += Number(order.totalPrice);
       await restaurant.save();
 
+      // When user accepts, update the fee to the requested fee
+      if (order.requestedFee) {
+        order.fee = order.requestedFee;
+      }
+      
       order.status = 'Confirmed';
       await order.save();
 
@@ -1660,8 +1669,9 @@ exports.handleOrderStatus = async (request, response) => {
       
       // Send SMS to restaurant about fee rejection/cancellation
       const formattedNumber = formatPhoneNumber(restaurant.contactNumber);
-      const foodAmountOnly = order.foodAmount || (order.totalPrice - order.fee);
-      const smsMessage = `Fee Rejected! Order #${order.customId} was canceled by customer due to the requested fee of ₦${order.fee}. Meal cost was: ₦${foodAmountOnly}. No action needed.`;
+      const foodAmountOnly = order.foodAmount || (order.totalPrice - (order.requestedFee || order.fee));
+      const rejectedFee = order.requestedFee || order.fee;
+      const smsMessage = `Fee Rejected! Order #${order.customId} was canceled by customer due to the requested fee of ₦${rejectedFee}. Meal cost was: ₦${foodAmountOnly}. No action needed.`;
       sendSMS(formattedNumber, smsMessage);
 
       if (user.email) {
