@@ -365,5 +365,51 @@ router.get('/restaurants/:id', authenticate, superAdminController.getRestaurantB
  */
 router.delete('/restaurants/:id', authenticate, superAdminController.deleteRestaurant);
 
+/**
+ * @swagger
+ * /api/v1/superadmin/restaurants/{restaurantId}/nearest-landmarks:
+ *   put:
+ *     tags: [Admin]
+ *     summary: Update nearest landmarks for a restaurant
+ *     description: Add or update the nearest landmarks list for a restaurant (Super Admin only)
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: restaurantId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Restaurant ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - nearestLandmarks
+ *             properties:
+ *               nearestLandmarks:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 description: List of nearest landmarks
+ *     responses:
+ *       200:
+ *         description: Nearest landmarks updated successfully
+ *       400:
+ *         description: Invalid input
+ *       401:
+ *         description: Unauthorized - Admin access required
+ *       403:
+ *         description: Only super admins can update nearest landmarks
+ *       404:
+ *         description: Restaurant not found
+ *       500:
+ *         description: Internal server error
+ */
+router.put('/restaurants/:restaurantId/nearest-landmarks', authenticate, superAdminController.updateRestaurantNearestLandmarks);
+
 module.exports = router;
 

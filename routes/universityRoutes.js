@@ -128,4 +128,42 @@ router.get('/:id', getUniversity);
  */
 router.put('/:id/status', authenticate, updateUniversityStatus);
 
+/**
+ * @swagger
+ * /universities/{id}/landmarks:
+ *   get:
+ *     tags: [Universities]
+ *     summary: Get all nearest landmarks for a university
+ *     description: Retrieve a deduplicated list of all nearest landmarks for all restaurants under a university
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: University ID
+ *     responses:
+ *       200:
+ *         description: List of nearest landmarks
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 university:
+ *                   type: string
+ *                 universityId:
+ *                   type: string
+ *                 landmarks:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *       404:
+ *         description: University not found
+ */
+router.get('/:id/landmarks', require('../controllers/universityControllers').getUniversityLandmarks);
+
 module.exports = router;

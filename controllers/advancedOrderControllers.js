@@ -709,55 +709,15 @@ const processGroupOrderPayment = async (req, res) => {
 <html>
 <head>
   <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f8f9fa;
-      color: #333333;
-      margin: 0;
-      padding: 0;
-    }
-    .email-container {
-      width: 90%;
-      max-width: 600px;
-      margin: 30px auto;
-      background-color: #ffffff;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-      overflow: hidden;
-    }
-    .header {
-      text-align: center;
-      padding: 40px 20px 30px;
-      background: #28a745;
-      color: #ffffff;
-    }
-    .header h1 {
-      margin: 0;
-      font-size: 28px;
-      font-weight: 600;
-    }
-    .content {
-      padding: 40px 30px;
-      line-height: 1.6;
-    }
-    .payment-info {
-      background-color: #f8f9fa;
-      border-left: 4px solid #28a745;
-      padding: 20px;
-      margin: 20px 0;
-      border-radius: 4px;
-    }
-    .footer {
-      text-align: center;
-      padding: 30px;
-      background-color: #f8f9fa;
-      color: #666666;
-      font-size: 14px;
-    }
-    .brand {
-      color: #28a745;
-      font-weight: 600;
-    }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #fff; color: #000; margin: 0; padding: 0; }
+    .container, .email-container { width: 90%; max-width: 600px; margin: 30px auto; background-color: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); overflow: hidden; }
+    .header { text-align: center; padding: 40px 20px 30px; background-color: #990000; color: #fff; }
+    .header h1 { margin: 0; font-size: 28px; font-weight: 700; }
+    .brand-text, .brand { color: #FFCC00; font-weight: bold; }
+    .content { font-size: 16px; line-height: 1.6; padding: 30px; color: #000; background-color: #fff; }
+    .content p { margin: 15px 0; }
+    .highlight, .success-box, .alert-box, .fee-info, .bonus-info, .reward-info, .update-info, .order-info { background-color: #FFCC00; color: #000; border-radius: 8px; padding: 20px; margin: 20px 0; font-weight: bold; }
+    .footer { background-color: #000; color: #fff; text-align: center; padding: 20px; font-size: 14px; }
   </style>
 </head>
 <body>
@@ -835,55 +795,15 @@ const processGroupOrderPayment = async (req, res) => {
 <html>
 <head>
   <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f8f9fa;
-      color: #333333;
-      margin: 0;
-      padding: 0;
-    }
-    .email-container {
-      width: 90%;
-      max-width: 600px;
-      margin: 30px auto;
-      background-color: #ffffff;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-      overflow: hidden;
-    }
-    .header {
-      text-align: center;
-      padding: 40px 20px 30px;
-      background: #007bff;
-      color: #ffffff;
-    }
-    .header h1 {
-      margin: 0;
-      font-size: 28px;
-      font-weight: 600;
-    }
-    .content {
-      padding: 40px 30px;
-      line-height: 1.6;
-    }
-    .order-info {
-      background-color: #f8f9fa;
-      border-left: 4px solid #007bff;
-      padding: 20px;
-      margin: 20px 0;
-      border-radius: 4px;
-    }
-    .footer {
-      text-align: center;
-      padding: 30px;
-      background-color: #f8f9fa;
-      color: #666666;
-      font-size: 14px;
-    }
-    .brand {
-      color: #007bff;
-      font-weight: 600;
-    }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #fff; color: #000; margin: 0; padding: 0; }
+    .container, .email-container { width: 90%; max-width: 600px; margin: 30px auto; background-color: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); overflow: hidden; }
+    .header { text-align: center; padding: 40px 20px 30px; background-color: #990000; color: #fff; }
+    .header h1 { margin: 0; font-size: 28px; font-weight: 700; }
+    .brand-text, .brand { color: #FFCC00; font-weight: bold; }
+    .content { font-size: 16px; line-height: 1.6; padding: 30px; color: #000; background-color: #fff; }
+    .content p { margin: 15px 0; }
+    .order-info { background-color: #FFCC00; color: #000; border-radius: 8px; padding: 20px; margin: 20px 0; font-weight: bold; }
+    .footer { background-color: #000; color: #fff; text-align: center; padding: 20px; font-size: 14px; }
   </style>
 </head>
 <body>
@@ -928,55 +848,14 @@ const processGroupOrderPayment = async (req, res) => {
 <html>
 <head>
   <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f8f9fa;
-      color: #333333;
-      margin: 0;
-      padding: 0;
-    }
-    .email-container {
-      width: 90%;
-      max-width: 600px;
-      margin: 30px auto;
-      background-color: #ffffff;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-      overflow: hidden;
-    }
-    .header {
-      text-align: center;
-      padding: 40px 20px 30px;
-      background: #28a745;
-      color: #ffffff;
-    }
-    .header h1 {
-      margin: 0;
-      font-size: 28px;
-      font-weight: 600;
-    }
-    .content {
-      padding: 40px 30px;
-      line-height: 1.6;
-    }
-    .order-info {
-      background-color: #f8f9fa;
-      border-left: 4px solid #28a745;
-      padding: 20px;
-      margin: 20px 0;
-      border-radius: 4px;
-    }
-    .footer {
-      text-align: center;
-      padding: 30px;
-      background-color: #f8f9fa;
-      color: #666666;
-      font-size: 14px;
-    }
-    .brand {
-      color: #28a745;
-      font-weight: 600;
-    }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #fff; color: #000; margin: 0; padding: 0; }
+    .container, .email-container { width: 90%; max-width: 600px; margin: 30px auto; background-color: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); overflow: hidden; }
+    .header { text-align: center; padding: 40px 20px 30px; background-color: #990000; color: #fff; }
+    .header h1 { margin: 0; font-size: 28px; font-weight: 700; }
+    .brand-text, .brand { color: #FFCC00; font-weight: bold; }
+    .content { font-size: 16px; line-height: 1.6; padding: 30px; color: #000; background-color: #fff; }
+    .order-info { background-color: #FFCC00; color: #000; border-radius: 8px; padding: 20px; margin: 20px 0; font-weight: bold; }
+    .footer { background-color: #000; color: #fff; text-align: center; padding: 20px; font-size: 14px; }
   </style>
 </head>
 <body>

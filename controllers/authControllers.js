@@ -32,68 +32,15 @@ exports.register = async (request, response) => {
         <html>
         <head>
           <style>
-            body { 
-              font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-              color: #000000; 
-              margin: 0;
-              padding: 0;
-              background-color: #f8f9fa;
-            }
-            .container { 
-              width: 90%; 
-              max-width: 600px; 
-              margin: 30px auto; 
-              padding: 0; 
-              border-radius: 12px; 
-              background-color: #ffffff; 
-              box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-              overflow: hidden;
-            }
-            .header { 
-              text-align: center; 
-              padding: 40px 20px 30px; 
-              background-color: #990000;
-              color: #ffffff;
-            }
-            .header h1 {
-              margin: 0;
-              font-size: 32px;
-              font-weight: 700;
-            }
-            .brand-text {
-              color: #FFCC00;
-              font-weight: 800;
-              font-size: 36px;
-            }
-            .content { 
-              font-size: 16px; 
-              line-height: 1.6; 
-              padding: 30px;
-              color: #333333;
-            }
-            .verification-code {
-              background-color: #FFCC00;
-              color: #000000;
-              font-size: 28px;
-              font-weight: 800;
-              text-align: center;
-              padding: 20px;
-              margin: 25px 0;
-              border-radius: 8px;
-              letter-spacing: 3px;
-              box-shadow: 0 3px 10px rgba(255, 204, 0, 0.3);
-            }
-            .footer {
-              background-color: #000000;
-              color: #ffffff;
-              text-align: center;
-              padding: 20px;
-              font-size: 14px;
-            }
-            .footer .brand {
-              color: #FFCC00;
-              font-weight: bold;
-            }
+            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #fff; color: #000; margin: 0; padding: 0; }
+            .container, .email-container { width: 90%; max-width: 600px; margin: 30px auto; background-color: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); overflow: hidden; }
+            .header { text-align: center; padding: 40px 20px 30px; background-color: #990000; color: #fff; }
+            .header h1 { margin: 0; font-size: 28px; font-weight: 700; }
+            .brand-text, .brand { color: #FFCC00; font-weight: bold; }
+            .content { font-size: 16px; line-height: 1.6; padding: 30px; color: #000; background-color: #fff; }
+            .content p { margin: 15px 0; }
+            .highlight, .success-box, .alert-box, .fee-info, .bonus-info, .reward-info, .update-info { background-color: #FFCC00; color: #000; border-radius: 8px; padding: 20px; margin: 20px 0; font-weight: bold; }
+            .footer { background-color: #000; color: #fff; text-align: center; padding: 20px; font-size: 14px; }
           </style>
         </head>
         <body>
@@ -104,7 +51,7 @@ exports.register = async (request, response) => {
             <div class="content">
               <p>🎉 <strong>Congratulations!</strong> You've successfully joined the Byte community!</p>
               <p>We're excited to have you on board. To complete your registration and start enjoying delicious meals, please verify your email using the code below:</p>
-              <div class="verification-code">${verificationCode}</div>
+              <div class="highlight">${verificationCode}</div>
               <p>Simply enter this code in the app to activate your account and start your food journey with us!</p>
               <p>Can't wait to serve you! 🍽️</p>
             </div>
@@ -160,68 +107,15 @@ exports.login = async (request, response) => {
             <html>
             <head>
               <style>
-                body { 
-                  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-                  color: #000000; 
-                  margin: 0;
-                  padding: 0;
-                  background-color: #f8f9fa;
-                }
-                .container { 
-                  width: 90%; 
-                  max-width: 600px; 
-                  margin: 30px auto; 
-                  padding: 0; 
-                  border-radius: 12px; 
-                  background-color: #ffffff; 
-                  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-                  overflow: hidden;
-                }
-                .header { 
-                  text-align: center; 
-                  padding: 40px 20px 30px; 
-                  background: #cc0000;
-                  color: #ffffff;
-                }
-                .header h1 {
-                  margin: 0;
-                  font-size: 28px;
-                  font-weight: 700;
-                  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-                }
-                .brand-text {
-                  color: #FFCC00;
-                  font-weight: 800;
-                }
-                .content { 
-                  font-size: 16px; 
-                  line-height: 1.6; 
-                  padding: 30px;
-                  color: #333333;
-                }
-                .code { 
-                  background: #FFCC00;
-                  color: #000000;
-                  font-size: 32px;
-                  font-weight: 800;
-                  text-align: center;
-                  padding: 25px;
-                  margin: 25px 0;
-                  border-radius: 8px;
-                  letter-spacing: 4px;
-                  box-shadow: 0 3px 10px rgba(255, 204, 0, 0.3);
-                }
-                .footer {
-                  background-color: #000000;
-                  color: #ffffff;
-                  text-align: center;
-                  padding: 20px;
-                  font-size: 14px;
-                }
-                .footer .brand {
-                  color: #FFCC00;
-                  font-weight: bold;
-                }
+                body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #fff; color: #000; margin: 0; padding: 0; }
+                .container, .email-container { width: 90%; max-width: 600px; margin: 30px auto; background-color: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); overflow: hidden; }
+                .header { text-align: center; padding: 40px 20px 30px; background-color: #990000; color: #fff; }
+                .header h1 { margin: 0; font-size: 28px; font-weight: 700; }
+                .brand-text, .brand { color: #FFCC00; font-weight: bold; }
+                .content { font-size: 16px; line-height: 1.6; padding: 30px; color: #000; background-color: #fff; }
+                .content p { margin: 15px 0; }
+                .highlight, .success-box, .alert-box, .fee-info, .bonus-info, .reward-info, .update-info { background-color: #FFCC00; color: #000; border-radius: 8px; padding: 20px; margin: 20px 0; font-weight: bold; }
+                .footer { background-color: #000; color: #fff; text-align: center; padding: 20px; font-size: 14px; }
               </style>
             </head>
             <body>
@@ -232,7 +126,7 @@ exports.login = async (request, response) => {
                 <div class="content">
                   <p>Hello there! 👋</p>
                   <p>We noticed you tried to log in, but your email isn't verified yet. No worries! We've sent you a fresh verification code:</p>
-                  <div class="code">${newVerificationCode}</div>
+                  <div class="highlight">${newVerificationCode}</div>
                   <p>Enter this code in the app to unlock your account and start exploring amazing food options!</p>
                   <p>If you didn't request this, you can safely ignore this message. 🛡️</p>
                 </div>
@@ -365,75 +259,15 @@ exports.forgotPassword = async (request, response) => {
         <html>
         <head>
           <style>
-            body { 
-              font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-              color: #000000; 
-              margin: 0;
-              padding: 0;
-              background-color: #f8f9fa;
-            }
-            .container { 
-              width: 90%; 
-              max-width: 600px; 
-              margin: 30px auto; 
-              padding: 0; 
-              border-radius: 12px; 
-              background-color: #ffffff; 
-              box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-              overflow: hidden;
-            }
-            .header { 
-              text-align: center; 
-              padding: 40px 20px 30px; 
-              background: #cc0000;
-              color: #ffffff;
-            }
-            .header h1 {
-              margin: 0;
-              font-size: 28px;
-              font-weight: 700;
-              text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-            }
-            .brand-text {
-              color: #FFCC00;
-              font-weight: 800;
-            }
-            .content { 
-              font-size: 16px; 
-              line-height: 1.6; 
-              padding: 30px;
-              color: #333333;
-            }
-            .reset-code { 
-              background: #FFCC00;
-              color: #000000;
-              font-size: 32px;
-              font-weight: 800;
-              text-align: center;
-              padding: 25px;
-              margin: 25px 0;
-              border-radius: 8px;
-              letter-spacing: 4px;
-              box-shadow: 0 3px 10px rgba(255, 204, 0, 0.3);
-            }
-            .security-note {
-              background-color: #fff3cd;
-              border-left: 4px solid #FFCC00;
-              padding: 15px;
-              margin: 20px 0;
-              border-radius: 4px;
-            }
-            .footer {
-              background-color: #000000;
-              color: #ffffff;
-              text-align: center;
-              padding: 20px;
-              font-size: 14px;
-            }
-            .footer .brand {
-              color: #FFCC00;
-              font-weight: bold;
-            }
+            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #fff; color: #000; margin: 0; padding: 0; }
+            .container, .email-container { width: 90%; max-width: 600px; margin: 30px auto; background-color: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); overflow: hidden; }
+            .header { text-align: center; padding: 40px 20px 30px; background-color: #990000; color: #fff; }
+            .header h1 { margin: 0; font-size: 28px; font-weight: 700; }
+            .brand-text, .brand { color: #FFCC00; font-weight: bold; }
+            .content { font-size: 16px; line-height: 1.6; padding: 30px; color: #000; background-color: #fff; }
+            .content p { margin: 15px 0; }
+            .highlight, .success-box, .alert-box, .fee-info, .bonus-info, .reward-info, .update-info { background-color: #FFCC00; color: #000; border-radius: 8px; padding: 20px; margin: 20px 0; font-weight: bold; }
+            .footer { background-color: #000; color: #fff; text-align: center; padding: 20px; font-size: 14px; }
           </style>
         </head>
         <body>
@@ -444,8 +278,8 @@ exports.forgotPassword = async (request, response) => {
             <div class="content">
               <p>Hello! 👋</p>
               <p>We received a request to reset your password. Use the secure code below to create a new password:</p>
-              <div class="reset-code">${resetCode}</div>
-              <div class="security-note">
+              <div class="highlight">${resetCode}</div>
+              <div class="alert-box">
                 <p><strong>🛡️ Security Notice:</strong></p>
                 <p>This code will expire in 1 hour for your security. If you didn't request this reset, please contact our support team immediately.</p>
               </div>
@@ -634,76 +468,15 @@ exports.resendVerification = async (request, response) => {
         <html>
         <head>
           <style>
-            body { 
-              font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-              color: #000000; 
-              margin: 0;
-              padding: 0;
-              background-color: #f8f9fa;
-            }
-            .container { 
-              width: 90%; 
-              max-width: 600px; 
-              margin: 30px auto; 
-              padding: 0; 
-              border-radius: 12px; 
-              background-color: #ffffff; 
-              box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-              overflow: hidden;
-            }
-            .header { 
-              text-align: center; 
-              padding: 40px 20px 30px; 
-              background: #cc0000;
-              color: #ffffff;
-            }
-            .header h1 {
-              margin: 0;
-              font-size: 28px;
-              font-weight: 700;
-              text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-            }
-            .brand-text {
-              color: #FFCC00;
-              font-weight: 800;
-            }
-            .content { 
-              font-size: 16px; 
-              line-height: 1.6; 
-              padding: 30px;
-              color: #333333;
-            }
-            .code { 
-              background: #FFCC00;
-              color: #000000;
-              font-size: 32px;
-              font-weight: 800;
-              text-align: center;
-              padding: 25px;
-              margin: 25px 0;
-              border-radius: 8px;
-              letter-spacing: 4px;
-              box-shadow: 0 3px 10px rgba(255, 204, 0, 0.3);
-            }
-            .expiry-note {
-              background-color: #e7f3ff;
-              border-left: 4px solid #0066cc;
-              padding: 15px;
-              margin: 20px 0;
-              border-radius: 4px;
-              font-size: 14px;
-            }
-            .footer {
-              background-color: #000000;
-              color: #ffffff;
-              text-align: center;
-              padding: 20px;
-              font-size: 14px;
-            }
-            .footer .brand {
-              color: #FFCC00;
-              font-weight: bold;
-            }
+            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #fff; color: #000; margin: 0; padding: 0; }
+            .container, .email-container { width: 90%; max-width: 600px; margin: 30px auto; background-color: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); overflow: hidden; }
+            .header { text-align: center; padding: 40px 20px 30px; background-color: #990000; color: #fff; }
+            .header h1 { margin: 0; font-size: 28px; font-weight: 700; }
+            .brand-text, .brand { color: #FFCC00; font-weight: bold; }
+            .content { font-size: 16px; line-height: 1.6; padding: 30px; color: #000; background-color: #fff; }
+            .content p { margin: 15px 0; }
+            .highlight, .success-box, .alert-box, .fee-info, .bonus-info, .reward-info, .update-info { background-color: #FFCC00; color: #000; border-radius: 8px; padding: 20px; margin: 20px 0; font-weight: bold; }
+            .footer { background-color: #000; color: #fff; text-align: center; padding: 20px; font-size: 14px; }
           </style>
         </head>
         <body>
@@ -714,12 +487,12 @@ exports.resendVerification = async (request, response) => {
             <div class="content">
               <p>Hey there! 🎉</p>
               <p>Thanks for requesting a new verification code. We've got you covered! Here's your fresh verification code:</p>
-              <div class="code">${newVerificationCode}</div>
-              <div class="expiry-note">
+              <div class="highlight">${newVerificationCode}</div>
+              <div class="alert-box">
                 <p><strong>⏰ Quick reminder:</strong> This code will expire in 24 hours for security reasons.</p>
               </div>
               <p>If you didn't request this code, no worries – just ignore this email and your account stays secure! 🛡️</p>
-              <p>Ready to start your food adventure? Let's go! 🚀</p>
+              <p>Ready to start your food adventure? Let's go! ��</p>
             </div>
             <div class="footer">
               <p>© ${new Date().getFullYear()} <span class="brand">Byte</span> - Your Campus Food Companion</p>

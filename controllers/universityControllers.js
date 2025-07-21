@@ -1,4 +1,5 @@
 const University = require('../models/University');
+const Restaurant = require('../models/Restaurants');
 
 // Add a new university
 const addUniversity = async (req, res) => {
@@ -116,9 +117,40 @@ const getUniversity = async (req, res) => {
     }
 };
 
+// Get all nearest landmarks for all restaurants under a university
+const getUniversityLandmarks = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const university = await University.findById(id);
+        if (!university) {
+            return res.status(404).json({ status: 'error', message: 'University not found' });
+        }
+        // Find all restaurants for this university
+        const restaurants = await Restaurant.find({ university: university._id });
+        // Collect all nearestLandmarks arrays
+        let allLandmarks = [];
+        for (const rest of restaurants) {
+            if (Array.isArray(rest.nearestLandmarks)) {
+                allLandmarks = allLandmarks.concat(rest.nearestLandmarks);
+            }
+        }
+        // Deduplicate
+        const uniqueLandmarks = [...new Set(allLandmarks.filter(Boolean))];
+        res.status(200).json({
+            status: 'success',
+            university: university.name,
+            universityId: university._id,
+            landmarks: uniqueLandmarks
+        });
+    } catch (error) {
+        res.status(500).json({ status: 'error', message: error.message });
+    }
+};
+
 module.exports = {
     addUniversity,
     getAllUniversities,
     updateUniversityStatus,
-    getUniversity
+    getUniversity,
+    getUniversityLandmarks
 };

@@ -295,3 +295,31 @@ exports.deleteOrder = async (request, response) => {
         response.status(500).json({ message: 'Internal server error' });
     }
 };
+
+// Add or update nearest landmarks for a restaurant (super admin only)
+exports.updateRestaurantNearestLandmarks = async (req, res) => {
+    const { restaurantId } = req.params;
+    const { nearestLandmarks } = req.body;
+
+    // Authorization: Only super admins
+    if (!req.user || !req.user.superAdmin) {
+        return res.status(403).json({ message: 'Only super admins can update nearest landmarks.' });
+    }
+    if (!Array.isArray(nearestLandmarks)) {
+        return res.status(400).json({ message: 'nearestLandmarks must be an array of strings.' });
+    }
+    try {
+        const restaurant = await Restaurant.findByIdAndUpdate(
+            restaurantId,
+            { nearestLandmarks },
+            { new: true, runValidators: true }
+        );
+        if (!restaurant) {
+            return res.status(404).json({ message: 'Restaurant not found' });
+        }
+        res.json({ message: 'Nearest landmarks updated successfully', restaurant });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error', error: error.message });
+    }
+};

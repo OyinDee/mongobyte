@@ -189,72 +189,20 @@ const TERMII_SENDER_ID = process.env.TERMII_SENDER_ID;
                 <html>
                 <head>
                   <style>
-                    body {
-                      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                      background-color: #f8f9fa;
-                      color: #000000;
-                      margin: 0;
-                      padding: 0;
-                    }
-                    .container {
-                      width: 90%;
-                      max-width: 600px;
-                      margin: 30px auto;
-                      padding: 0;
-                      border-radius: 12px;
-                      background-color: #ffffff;
-                      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-                      overflow: hidden;
-                    }
-                    .header {
-                      text-align: center;
-                      padding: 40px 20px 30px;
-                      background-color: #28a745;
-                      color: #ffffff;
-                    }
-                    .header h1 {
-                      margin: 0;
-                      font-size: 28px;
-                      font-weight: 700;
-                    }
-                    .brand-text {
-                      color: #FFCC00;
-                      font-weight: 800;
-                    }
-                    .content {
-                      font-size: 16px;
-                      line-height: 1.6;
-                      padding: 30px;
-                      color: #333333;
-                    }
-                    .surprise-box {
-                      background-color: #FFCC00;
-                      color: #000000;
-                      text-align: center;
-                      padding: 20px;
-                      margin: 20px 0;
-                      border-radius: 8px;
-                      font-weight: bold;
-                      font-size: 18px;
-                    }
-                    .order-details {
-                      background-color: #d4edda;
-                      border-left: 4px solid #28a745;
-                      padding: 20px;
-                      border-radius: 8px;
-                      margin: 20px 0;
-                    }
-                    .footer {
-                      background-color: #000000;
-                      color: #ffffff;
-                      text-align: center;
-                      padding: 20px;
-                      font-size: 14px;
-                    }
+                    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #fff; color: #000; margin: 0; padding: 0; }
+                    .container, .email-container { width: 90%; max-width: 600px; margin: 30px auto; background-color: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); overflow: hidden; }
+                    .header { text-align: center; padding: 40px 20px 30px; background-color: #990000; color: #fff; }
+                    .header h1 { margin: 0; font-size: 28px; font-weight: 700; }
+                    .brand-text, .brand { color: #FFCC00; font-weight: bold; }
+                    .content { font-size: 16px; line-height: 1.6; padding: 30px; color: #000; background-color: #fff; }
+                    .content p { margin: 15px 0; }
+                    .order-details, .order-info, .fee-info, .wallet-update, .success-box, .delivery-banner, .balance-warning, .next-steps, .surprise-box { background-color: #FFCC00; color: #000; border-radius: 8px; padding: 20px; margin: 20px 0; font-weight: bold; }
+                    .alert-box { background-color: #990000; color: #fff; border-radius: 8px; padding: 20px; margin: 20px 0; font-weight: bold; }
+                    .footer { background-color: #000; color: #fff; text-align: center; padding: 20px; font-size: 14px; }
                   </style>
                 </head>
                 <body>
-                  <div class="container">
+                  <div class="email-container">
                     <div class="header">
                       <h1>🎁 Someone Ordered For You!</h1>
                     </div>
@@ -322,81 +270,20 @@ sendSMS(formattedNumber, smsMessage);
         <html>
         <head>
           <style>
-            body {
-              font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-              background-color: #f8f9fa;
-              color: #000000;
-              margin: 0;
-              padding: 0;
-            }
-            .container {
-              width: 90%;
-              max-width: 600px;
-              margin: 30px auto;
-              padding: 0;
-              border-radius: 12px;
-              background-color: #ffffff;
-              box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-              overflow: hidden;
-            }
-            .header {
-              text-align: center;
-              padding: 40px 20px 30px;
-              background-color: #990000;
-              color: #ffffff;
-            }
-            .header h1 {
-              margin: 0;
-              font-size: 28px;
-              font-weight: 700;
-            }
-            .brand-text {
-              color: #FFCC00;
-              font-weight: 800;
-            }
-            .content {
-              font-size: 16px;
-              line-height: 1.6;
-              padding: 30px;
-              color: #333333;
-            }
-            .content p {
-              margin: 15px 0;
-            }
-            .order-details {
-              background-color: #fff3cd;
-              border-left: 4px solid #FFCC00;
-              padding: 20px;
-              border-radius: 8px;
-              margin: 20px 0;
-            }
-            .order-details p {
-              color: #000000;
-              font-weight: 600;
-              margin: 8px 0;
-            }
-            .alert-box {
-              background-color: #d1ecf1;
-              border-left: 4px solid #17a2b8;
-              padding: 15px;
-              margin: 20px 0;
-              border-radius: 4px;
-            }
-            .footer {
-              background-color: #000000;
-              color: #ffffff;
-              text-align: center;
-              padding: 20px;
-              font-size: 14px;
-            }
-            .footer .brand {
-              color: #FFCC00;
-              font-weight: bold;
-            }
+            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #fff; color: #000; margin: 0; padding: 0; }
+            .container, .email-container { width: 90%; max-width: 600px; margin: 30px auto; background-color: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); overflow: hidden; }
+            .header { text-align: center; padding: 40px 20px 30px; background-color: #990000; color: #fff; }
+            .header h1 { margin: 0; font-size: 28px; font-weight: 700; }
+            .brand-text, .brand { color: #FFCC00; font-weight: bold; }
+            .content { font-size: 16px; line-height: 1.6; padding: 30px; color: #000; background-color: #fff; }
+            .content p { margin: 15px 0; }
+            .order-details, .order-info, .fee-info, .wallet-update, .success-box, .delivery-banner, .balance-warning, .next-steps, .surprise-box { background-color: #FFCC00; color: #000; border-radius: 8px; padding: 20px; margin: 20px 0; font-weight: bold; }
+            .alert-box { background-color: #990000; color: #fff; border-radius: 8px; padding: 20px; margin: 20px 0; font-weight: bold; }
+            .footer { background-color: #000; color: #fff; text-align: center; padding: 20px; font-size: 14px; }
           </style>
         </head>
         <body>
-          <div class="container">
+          <div class="email-container">
             <div class="header">
               <h1>🍽️ New <span class="brand-text">Byte</span> Order!</h1>
             </div>
@@ -606,83 +493,19 @@ exports.orderConfirmation = async (request, response) => {
           <html>
           <head>
             <style>
-              body {
-                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                background-color: #f8f9fa;
-                color: #333333;
-                margin: 0;
-                padding: 0;
-              }
-              .email-container {
-                width: 90%;
-                max-width: 600px;
-                margin: 30px auto;
-                background-color: #ffffff;
-                border-radius: 12px;
-                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-                overflow: hidden;
-              }
-              .header {
-                text-align: center;
-                padding: 40px 20px 30px;
-                background-color: #990000;
-                color: #ffffff;
-              }
-              .header h1 {
-                margin: 0;
-                font-size: 28px;
-                font-weight: 700;
-              }
-              .brand-text {
-                color: #FFCC00;
-                font-weight: 800;
-              }
-              .content {
-                padding: 30px;
-              }
-              .content p {
-                color: #333333;
-                font-size: 16px;
-                line-height: 1.6;
-                margin-bottom: 15px;
-              }
-              .fee-info {
-                background-color: #fff3cd;
-                border-left: 4px solid #FFCC00;
-                padding: 20px;
-                border-radius: 8px;
-                margin: 20px 0;
-              }
-              .fee-info p {
-                color: #000000;
-                font-weight: 600;
-                margin: 8px 0;
-              }
-              .highlight {
-                background-color: #FFCC00;
-                color: #000000;
-                font-weight: 800;
-                padding: 4px 8px;
-                border-radius: 4px;
-              }
-              .alert-box {
-                background-color: #f8d7da;
-                border-left: 4px solid #dc3545;
-                padding: 15px;
-                margin: 20px 0;
-                border-radius: 4px;
-              }
-              .footer {
-                background-color: #000000;
-                color: #ffffff;
-                text-align: center;
-                padding: 20px;
-                font-size: 14px;
-              }
-              .footer .brand {
-                color: #FFCC00;
-                font-weight: bold;
-              }
+              body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #fff; color: #000; margin: 0; padding: 0; }
+              .email-container { width: 90%; max-width: 600px; margin: 30px auto; background-color: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); overflow: hidden; }
+              .header { text-align: center; padding: 40px 20px 30px; background-color: #990000; color: #fff; }
+              .header h1 { margin: 0; font-size: 28px; font-weight: 700; }
+              .brand-text, .brand { color: #FFCC00; font-weight: bold; }
+              .content { font-size: 16px; line-height: 1.6; padding: 30px; color: #000; background-color: #fff; }
+              .content p { margin: 15px 0; }
+              .fee-info { background-color: #FFCC00; color: #000; border-radius: 8px; padding: 20px; margin: 20px 0; font-weight: bold; }
+              .fee-info p { color: #000; font-weight: 600; margin: 8px 0; }
+              .highlight { background-color: #FFCC00; color: #000; font-weight: 800; padding: 4px 8px; border-radius: 4px; }
+              .alert-box { background-color: #990000; color: #fff; border-radius: 8px; padding: 20px; margin: 20px 0; font-weight: bold; }
+              .footer { background-color: #000; color: #fff; text-align: center; padding: 20px; font-size: 14px; }
+              .footer .brand { color: #FFCC00; font-weight: bold; }
             </style>
           </head>
           <body>
@@ -813,87 +636,19 @@ exports.orderConfirmation = async (request, response) => {
 <html>
 <head>
   <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f8f9fa;
-      color: #333333;
-      margin: 0;
-      padding: 0;
-    }
-    .email-container {
-      width: 90%;
-      max-width: 600px;
-      margin: 30px auto;
-      background-color: #ffffff;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-      overflow: hidden;
-    }
-    .header {
-      text-align: center;
-      padding: 40px 20px 30px;
-      background-color: #dc3545;
-      color: #ffffff;
-    }
-    .header h1 {
-      margin: 0;
-      font-size: 28px;
-      font-weight: 700;
-    }
-    .brand-text {
-      color: #FFCC00;
-      font-weight: 800;
-    }
-    .content {
-      padding: 30px;
-    }
-    .content p {
-      color: #333333;
-      font-size: 16px;
-      line-height: 1.6;
-      margin-bottom: 15px;
-    }
-    .order-info {
-      background-color: #f8d7da;
-      border-left: 4px solid #dc3545;
-      padding: 20px;
-      border-radius: 8px;
-      margin: 20px 0;
-    }
-    .order-info p {
-      color: #000000;
-      font-weight: 600;
-      margin: 8px 0;
-    }
-    .balance-warning {
-      background-color: #fff3cd;
-      border-left: 4px solid #FFCC00;
-      padding: 15px;
-      margin: 20px 0;
-      border-radius: 4px;
-    }
-    .action-button {
-      background-color: #FFCC00;
-      color: #000000;
-      text-decoration: none;
-      padding: 12px 24px;
-      border-radius: 8px;
-      font-weight: bold;
-      display: inline-block;
-      margin: 15px 0;
-      text-align: center;
-    }
-    .footer {
-      background-color: #000000;
-      color: #ffffff;
-      text-align: center;
-      padding: 20px;
-      font-size: 14px;
-    }
-    .footer .brand {
-      color: #FFCC00;
-      font-weight: bold;
-    }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #fff; color: #000; margin: 0; padding: 0; }
+    .email-container { width: 90%; max-width: 600px; margin: 30px auto; background-color: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); overflow: hidden; }
+    .header { text-align: center; padding: 40px 20px 30px; background-color: #990000; color: #fff; }
+    .header h1 { margin: 0; font-size: 28px; font-weight: 700; }
+    .brand-text, .brand { color: #FFCC00; font-weight: bold; }
+    .content { font-size: 16px; line-height: 1.6; padding: 30px; color: #000; background-color: #fff; }
+    .content p { margin: 15px 0; }
+    .order-info { background-color: #FFCC00; color: #000; border-radius: 8px; padding: 20px; margin: 20px 0; font-weight: bold; }
+    .order-info p { color: #000; font-weight: 600; margin: 8px 0; }
+    .balance-warning { background-color: #FFCC00; color: #000; border-radius: 8px; padding: 15px; margin: 20px 0; font-weight: bold; }
+    .action-button { background-color: #FFCC00; color: #000; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: bold; display: inline-block; margin: 15px 0; text-align: center; }
+    .footer { background-color: #000; color: #fff; text-align: center; padding: 20px; font-size: 14px; }
+    .footer .brand { color: #FFCC00; font-weight: bold; }
   </style>
 </head>
 <body>
@@ -965,89 +720,20 @@ exports.orderConfirmation = async (request, response) => {
 <html>
 <head>
   <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f8f9fa;
-      color: #333333;
-      margin: 0;
-      padding: 0;
-    }
-    .email-container {
-      width: 90%;
-      max-width: 600px;
-      margin: 30px auto;
-      background-color: #ffffff;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-      overflow: hidden;
-    }
-    .header {
-      text-align: center;
-      padding: 40px 20px 30px;
-      background-color: #28a745;
-      color: #ffffff;
-    }
-    .header h1 {
-      margin: 0;
-      font-size: 28px;
-      font-weight: 700;
-    }
-    .brand-text {
-      color: #FFCC00;
-      font-weight: 800;
-    }
-    .content {
-      padding: 30px;
-    }
-    .content p {
-      color: #333333;
-      font-size: 16px;
-      line-height: 1.6;
-      margin-bottom: 15px;
-    }
-    .order-info {
-      background-color: #d4edda;
-      border-left: 4px solid #28a745;
-      padding: 20px;
-      border-radius: 8px;
-      margin: 20px 0;
-    }
-    .order-info p {
-      color: #000000;
-      font-weight: 600;
-      margin: 8px 0;
-    }
-    .success-box {
-      background-color: #FFCC00;
-      color: #000000;
-      text-align: center;
-      padding: 20px;
-      margin: 20px 0;
-      border-radius: 8px;
-      font-weight: bold;
-      font-size: 18px;
-    }
-    .timeline {
-      background-color: #f8f9fa;
-      padding: 20px;
-      border-radius: 8px;
-      margin: 20px 0;
-    }
-    .timeline h3 {
-      color: #990000;
-      margin-top: 0;
-    }
-    .footer {
-      background-color: #000000;
-      color: #ffffff;
-      text-align: center;
-      padding: 20px;
-      font-size: 14px;
-    }
-    .footer .brand {
-      color: #FFCC00;
-      font-weight: bold;
-    }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #fff; color: #000; margin: 0; padding: 0; }
+    .email-container { width: 90%; max-width: 600px; margin: 30px auto; background-color: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); overflow: hidden; }
+    .header { text-align: center; padding: 40px 20px 30px; background-color: #990000; color: #fff; }
+    .header h1 { margin: 0; font-size: 28px; font-weight: 700; }
+    .brand-text, .brand { color: #FFCC00; font-weight: bold; }
+    .content { font-size: 16px; line-height: 1.6; padding: 30px; color: #000; background-color: #fff; }
+    .content p { margin: 15px 0; }
+    .order-info { background-color: #d4edda; color: #000; border-radius: 8px; padding: 20px; margin: 20px 0; font-weight: bold; }
+    .order-info p { color: #000; font-weight: 600; margin: 8px 0; }
+    .success-box { background-color: #FFCC00; color: #000; text-align: center; padding: 20px; margin: 20px 0; border-radius: 8px; font-weight: bold; font-size: 18px; }
+    .timeline { background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; }
+    .timeline h3 { color: #990000; margin-top: 0; }
+    .footer { background-color: #000; color: #fff; text-align: center; padding: 20px; font-size: 14px; }
+    .footer .brand { color: #FFCC00; font-weight: bold; }
   </style>
 </head>
 <body>
@@ -1094,6 +780,13 @@ exports.orderConfirmation = async (request, response) => {
       await sendEmail(user.email, 'Order Confirmed', 'Your order status has been updated.', emailHtml);
     }
 
+    // After order is confirmed and before returning response in orderConfirmation:
+    if (order.status === 'Confirmed' && order.recipient && !order.orderForUsername && order.recipient.phone) {
+        const recipientSMS = `Hi ${order.recipient.name}, your Byte food delivery is confirmed! Order ID: ${order.customId}. Delivery to: ${order.location}. Contact: ${order.phoneNumber}. Enjoy your meal!`;
+        const formattedRecipientNumber = formatPhoneNumber(order.recipient.phone);
+        sendSMS(formattedRecipientNumber, recipientSMS);
+    }
+
     await order.save();
 
     return response.status(200).json({ message: 'Order updated successfully!', order });
@@ -1131,86 +824,19 @@ exports.markOrderAsDelivered = async (request, response) => {
 <html>
 <head>
   <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f8f9fa;
-      color: #333333;
-      margin: 0;
-      padding: 0;
-    }
-    .email-container {
-      width: 90%;
-      max-width: 600px;
-      margin: 30px auto;
-      background-color: #ffffff;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-      overflow: hidden;
-    }
-    .header {
-      text-align: center;
-      padding: 40px 20px 30px;
-      background-color: #990000;
-      color: #ffffff;
-    }
-    .header h1 {
-      margin: 0;
-      font-size: 28px;
-      font-weight: 700;
-    }
-    .brand-text {
-      color: #FFCC00;
-      font-weight: 800;
-    }
-    .content {
-      padding: 30px;
-    }
-    .content p {
-      color: #333333;
-      font-size: 16px;
-      line-height: 1.6;
-      margin-bottom: 15px;
-    }
-    .delivery-banner {
-      background-color: #FFCC00;
-      color: #000000;
-      text-align: center;
-      padding: 20px;
-      margin: 20px 0;
-      border-radius: 8px;
-      font-weight: bold;
-      font-size: 18px;
-    }
-    .order-info {
-      background-color: #fff3cd;
-      border-left: 4px solid #FFCC00;
-      padding: 20px;
-      border-radius: 8px;
-      margin: 20px 0;
-    }
-    .order-info p {
-      color: #000000;
-      font-weight: 600;
-      margin: 8px 0;
-    }
-    .delivery-tips {
-      background-color: #d1ecf1;
-      border-left: 4px solid #17a2b8;
-      padding: 15px;
-      margin: 20px 0;
-      border-radius: 4px;
-    }
-    .footer {
-      background-color: #000000;
-      color: #ffffff;
-      text-align: center;
-      padding: 20px;
-      font-size: 14px;
-    }
-    .footer .brand {
-      color: #FFCC00;
-      font-weight: bold;
-    }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #fff; color: #000; margin: 0; padding: 0; }
+    .email-container { width: 90%; max-width: 600px; margin: 30px auto; background-color: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); overflow: hidden; }
+    .header { text-align: center; padding: 40px 20px 30px; background-color: #990000; color: #fff; }
+    .header h1 { margin: 0; font-size: 28px; font-weight: 700; }
+    .brand-text, .brand { color: #FFCC00; font-weight: bold; }
+    .content { font-size: 16px; line-height: 1.6; padding: 30px; color: #000; background-color: #fff; }
+    .content p { margin: 15px 0; }
+    .delivery-banner { background-color: #FFCC00; color: #000; text-align: center; padding: 20px; margin: 20px 0; border-radius: 8px; font-weight: bold; font-size: 18px; }
+    .order-info { background-color: #fff3cd; color: #000; border-left: 4px solid #FFCC00; padding: 20px; border-radius: 8px; margin: 20px 0; font-weight: 600; }
+    .order-info p { color: #000; margin: 8px 0; }
+    .delivery-tips { background-color: #d1ecf1; color: #000; border-left: 4px solid #17a2b8; padding: 15px; margin: 20px 0; border-radius: 4px; font-weight: 600; }
+    .footer { background-color: #000; color: #fff; text-align: center; padding: 20px; font-size: 14px; }
+    .footer .brand { color: #FFCC00; font-weight: bold; }
   </style>
 </head>
 <body>
@@ -1368,89 +994,20 @@ exports.handleOrderStatus = async (request, response) => {
 <html>
 <head>
   <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f8f9fa;
-      color: #333333;
-      margin: 0;
-      padding: 0;
-    }
-    .email-container {
-      width: 90%;
-      max-width: 600px;
-      margin: 30px auto;
-      background-color: #ffffff;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-      overflow: hidden;
-    }
-    .header {
-      text-align: center;
-      padding: 40px 20px 30px;
-      background-color: #28a745;
-      color: #ffffff;
-    }
-    .header h1 {
-      margin: 0;
-      font-size: 28px;
-      font-weight: 700;
-    }
-    .brand-text {
-      color: #FFCC00;
-      font-weight: 800;
-    }
-    .content {
-      padding: 30px;
-    }
-    .content p {
-      color: #333333;
-      font-size: 16px;
-      line-height: 1.6;
-      margin-bottom: 15px;
-    }
-    .order-info {
-      background-color: #d4edda;
-      border-left: 4px solid #28a745;
-      padding: 20px;
-      border-radius: 8px;
-      margin: 20px 0;
-    }
-    .order-info p {
-      color: #000000;
-      font-weight: 600;
-      margin: 8px 0;
-    }
-    .fee-approval {
-      background-color: #FFCC00;
-      color: #000000;
-      text-align: center;
-      padding: 20px;
-      margin: 20px 0;
-      border-radius: 8px;
-      font-weight: bold;
-      font-size: 18px;
-    }
-    .timeline {
-      background-color: #f8f9fa;
-      padding: 20px;
-      border-radius: 8px;
-      margin: 20px 0;
-    }
-    .timeline h3 {
-      color: #990000;
-      margin-top: 0;
-    }
-    .footer {
-      background-color: #000000;
-      color: #ffffff;
-      text-align: center;
-      padding: 20px;
-      font-size: 14px;
-    }
-    .footer .brand {
-      color: #FFCC00;
-      font-weight: bold;
-    }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #fff; color: #000; margin: 0; padding: 0; }
+    .email-container { width: 90%; max-width: 600px; margin: 30px auto; background-color: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); overflow: hidden; }
+    .header { text-align: center; padding: 40px 20px 30px; background-color: #990000; color: #fff; }
+    .header h1 { margin: 0; font-size: 28px; font-weight: 700; }
+    .brand-text, .brand { color: #FFCC00; font-weight: bold; }
+    .content { font-size: 16px; line-height: 1.6; padding: 30px; color: #000; background-color: #fff; }
+    .content p { margin: 15px 0; }
+    .order-info { background-color: #d4edda; color: #000; border-radius: 8px; padding: 20px; margin: 20px 0; font-weight: bold; }
+    .order-info p { color: #000; font-weight: 600; margin: 8px 0; }
+    .fee-approval { background-color: #FFCC00; color: #000; text-align: center; padding: 20px; margin: 20px 0; border-radius: 8px; font-weight: bold; font-size: 18px; }
+    .timeline { background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; }
+    .timeline h3 { color: #990000; margin-top: 0; }
+    .footer { background-color: #000; color: #fff; text-align: center; padding: 20px; font-size: 14px; }
+    .footer .brand { color: #FFCC00; font-weight: bold; }
   </style>
 </head>
 <body>
@@ -1501,93 +1058,20 @@ exports.handleOrderStatus = async (request, response) => {
 <html>
 <head>
   <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f8f9fa;
-      color: #333333;
-      margin: 0;
-      padding: 0;
-    }
-    .email-container {
-      width: 90%;
-      max-width: 600px;
-      margin: 30px auto;
-      background-color: #ffffff;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-      overflow: hidden;
-    }
-    .header {
-      text-align: center;
-      padding: 40px 20px 30px;
-      background-color: #990000;
-      color: #ffffff;
-    }
-    .header h1 {
-      margin: 0;
-      font-size: 28px;
-      font-weight: 700;
-    }
-    .brand-text {
-      color: #FFCC00;
-      font-weight: 800;
-    }
-    .content {
-      padding: 30px;
-    }
-    .content p {
-      color: #333333;
-      font-size: 16px;
-      line-height: 1.6;
-      margin-bottom: 15px;
-    }
-    .success-banner {
-      background-color: #FFCC00;
-      color: #000000;
-      text-align: center;
-      padding: 20px;
-      margin: 20px 0;
-      border-radius: 8px;
-      font-weight: bold;
-      font-size: 18px;
-    }
-    .order-info {
-      background-color: #fff3cd;
-      border-left: 4px solid #FFCC00;
-      padding: 20px;
-      border-radius: 8px;
-      margin: 20px 0;
-    }
-    .order-info p {
-      color: #000000;
-      font-weight: 600;
-      margin: 8px 0;
-    }
-    .wallet-update {
-      background-color: #d4edda;
-      border-left: 4px solid #28a745;
-      padding: 20px;
-      border-radius: 8px;
-      margin: 20px 0;
-    }
-    .next-steps {
-      background-color: #d1ecf1;
-      border-left: 4px solid #17a2b8;
-      padding: 15px;
-      margin: 20px 0;
-      border-radius: 4px;
-    }
-    .footer {
-      background-color: #000000;
-      color: #ffffff;
-      text-align: center;
-      padding: 20px;
-      font-size: 14px;
-    }
-    .footer .brand {
-      color: #FFCC00;
-      font-weight: bold;
-    }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #fff; color: #000; margin: 0; padding: 0; }
+    .email-container { width: 90%; max-width: 600px; margin: 30px auto; background-color: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); overflow: hidden; }
+    .header { text-align: center; padding: 40px 20px 30px; background-color: #990000; color: #fff; }
+    .header h1 { margin: 0; font-size: 28px; font-weight: 700; }
+    .brand-text, .brand { color: #FFCC00; font-weight: bold; }
+    .content { font-size: 16px; line-height: 1.6; padding: 30px; color: #000; background-color: #fff; }
+    .content p { margin: 15px 0; }
+    .success-banner { background-color: #FFCC00; color: #000; text-align: center; padding: 20px; margin: 20px 0; border-radius: 8px; font-weight: bold; font-size: 18px; }
+    .order-info { background-color: #fff3cd; color: #000; border-left: 4px solid #FFCC00; padding: 20px; border-radius: 8px; margin: 20px 0; font-weight: 600; }
+    .order-info p { color: #000; margin: 8px 0; }
+    .wallet-update { background-color: #d4edda; color: #000; border-left: 4px solid #28a745; padding: 20px; border-radius: 8px; margin: 20px 0; font-weight: 600; }
+    .next-steps { background-color: #d1ecf1; color: #000; border-left: 4px solid #17a2b8; padding: 15px; margin: 20px 0; border-radius: 4px; font-weight: 600; }
+    .footer { background-color: #000; color: #fff; text-align: center; padding: 20px; font-size: 14px; }
+    .footer .brand { color: #FFCC00; font-weight: bold; }
   </style>
 </head>
 <body>
@@ -1679,74 +1163,60 @@ exports.handleOrderStatus = async (request, response) => {
 <html>
 <head>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f5f5f5;
-      color: #333333;
-      margin: 0;
-      padding: 0;
-    }
-    .email-container {
-      width: 95%;
-      max-width: 600px;
-      margin: 0 auto;
-      background-color: #ffffff;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      overflow: hidden;
-      padding: 20px;
-      box-sizing: border-box;
-    }
-    h1 {
-      color: #333333;
-      font-size: 24px;
-      margin-bottom: 20px;
-    }
-    p {
-      color: #666666;
-      font-size: 16px;
-      line-height: 1.6;
-      margin-bottom: 15px;
-    }
-    .order-info {
-      background-color: #f8f8f8;
-      padding: 15px;
-      border-radius: 8px;
-      margin-bottom: 20px;
-    }
-    .order-info p {
-      color: #333333;
-      font-weight: bold;
-    }
-    .footer {
-      text-align: center;
-      font-size: 12px;
-      color: #999999;
-      margin-top: 20px;
-    }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #fff; color: #000; margin: 0; padding: 0; }
+    .email-container { width: 90%; max-width: 600px; margin: 30px auto; background-color: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); overflow: hidden; }
+    .header { text-align: center; padding: 40px 20px 30px; background-color: #990000; color: #fff; }
+    .header h1 { margin: 0; font-size: 28px; font-weight: 700; }
+    .brand-text, .brand { color: #FFCC00; font-weight: bold; }
+    .content { font-size: 16px; line-height: 1.6; padding: 30px; color: #000; background-color: #fff; }
+    .content p { margin: 15px 0; }
+    .order-info { background-color: #FFCC00; color: #000; border-radius: 8px; padding: 20px; margin: 20px 0; font-weight: bold; }
+    .order-info p { color: #000; font-weight: 600; margin: 8px 0; }
+    .balance-warning { background-color: #FFCC00; color: #000; border-radius: 8px; padding: 15px; margin: 20px 0; font-weight: bold; }
+    .action-button { background-color: #FFCC00; color: #000; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: bold; display: inline-block; margin: 15px 0; text-align: center; }
+    .footer { background-color: #000; color: #fff; text-align: center; padding: 20px; font-size: 14px; }
+    .footer .brand { color: #FFCC00; font-weight: bold; }
   </style>
 </head>
 <body>
   <div class="email-container">
-    <h1>Order Canceled</h1>
-    <p>Order with ID <strong>${order.customId}</strong> has been canceled.</p>
-    
-    <div class="order-info">
-      <p>Order ID: ${order.customId}</p>
-      <p>Status: Canceled</p>
-      <p>Total Price: ₦${(order.totalPrice).toFixed(2)}</p>
+    <div class="header">
+      <h1>😔 <span class="brand-text">Byte</span> Order Update</h1>
     </div>
+    <div class="content">
+      <p>Hi there! 👋</p>
+      <p>We're sorry to inform you that your order has been canceled due to insufficient balance in your Byte wallet.</p>
+      
+      <div class="order-info">
+        <p>📦 <strong>Order ID:</strong> #${order.customId}</p>
+        <p>📊 <strong>Status:</strong> ${order.status}</p>
+        <p>💰 <strong>Total Amount:</strong> ₦${(order.totalPrice).toFixed(2)}</p>
+        <p>📝 <strong>Note:</strong> ${requestDescription || "No description provided"}</p>
+      </div>
 
-    <p>We apologize for the inconvenience. If you have any questions or need assistance, feel free to contact us.</p>
+      <div class="balance-warning">
+        <p><strong>💳 What happened?</strong></p>
+        <p>Your Byte balance wasn't sufficient to cover the total order amount including any additional fees.</p>
+      </div>
 
+      <p><strong>🚀 What's next?</strong></p>
+      <ul>
+        <li>💰 Top up your Byte balance</li>
+        <li>🛒 Place your order again</li>
+        <li>🍽️ Enjoy your delicious meal!</li>
+      </ul>
+
+      <p>Don't let hunger wait - top up now and get back to enjoying great food! 😋</p>
+    </div>
     <div class="footer">
-      <p>&copy; ${new Date().getFullYear()} Byte. All rights reserved.</p>
+      <p>© ${new Date().getFullYear()} <span class="brand">Byte</span> - Your Campus Food Companion</p>
+      <p>We'll be here when you're ready to bite again! 🍕</p>
     </div>
   </div>
 </body>
 </html>
         `;
-        await sendEmail(user.email, 'Order Canceled', 'Your order has been canceled', emailHtml);
+        await sendEmail(user.email, 'Order Cancelled', 'Your order has been canceled', emailHtml);
         await sendEmail(restaurant.email, 'Order Canceled', 'Order has been canceled', emailHtml);
 
       }
@@ -1789,51 +1259,16 @@ exports.createWithdrawal = async (req, res) => {
 <html>
 <head>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f5f5f5;
-      color: #333333;
-      margin: 0;
-      padding: 0;
-    }
-    .email-container {
-      width: 95%;
-      max-width: 600px;
-      margin: 0 auto;
-      background-color: #ffffff;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      overflow: hidden;
-      padding: 20px;
-      box-sizing: border-box;
-    }
-    h1 {
-      color: #333333;
-      font-size: 24px;
-      margin-bottom: 20px;
-    }
-    p {
-      color: #666666;
-      font-size: 16px;
-      line-height: 1.6;
-      margin-bottom: 15px;
-    }
-    .order-info {
-      background-color: #f8f8f8;
-      padding: 15px;
-      border-radius: 8px;
-      margin-bottom: 20px;
-    }
-    .order-info p {
-      color: #333333;
-      font-weight: bold;
-    }
-    .footer {
-      text-align: center;
-      font-size: 12px;
-      color: #999999;
-      margin-top: 20px;
-    }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #fff; color: #000; margin: 0; padding: 0; }
+    .email-container { width: 90%; max-width: 600px; margin: 30px auto; background-color: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); overflow: hidden; }
+    .header { text-align: center; padding: 40px 20px 30px; background-color: #990000; color: #fff; }
+    .header h1 { margin: 0; font-size: 28px; font-weight: 700; }
+    .brand-text, .brand { color: #FFCC00; font-weight: bold; }
+    .content { font-size: 16px; line-height: 1.6; padding: 30px; color: #000; background-color: #fff; }
+    .content p { margin: 15px 0; }
+    .order-info { background-color: #f8f8f8; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+    .order-info p { color: #333333; font-weight: bold; margin: 8px 0; }
+    .footer { text-align: center; font-size: 12px; color: #999999; margin-top: 20px; }
   </style>
 </head>
 <body>
@@ -1863,6 +1298,229 @@ exports.createWithdrawal = async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Internal server error', error: error.message });
+    }
+};
+
+// Helper to format phone numbers for SMS
+function formatPhoneNumber(number) {
+    const strNumber = String(number);
+    if (strNumber.startsWith("234")) {
+        return strNumber;
+    }
+    if (strNumber.startsWith("0")) {
+        return "234" + strNumber.slice(1);
+    }
+    if (/^[789]/.test(strNumber)) {
+        return "234" + strNumber;
+    }
+    return strNumber;
+}
+// New: Order for non-app user (external recipient)
+exports.createOrderForExternalRecipient = async (request, response) => {
+    const { meals, note, totalPrice, location, phoneNumber, restaurantCustomId, nearestLandmark, fee, recipientName, recipientPhone, recipientEmail } = request.body;
+    const userId = request.user._id;
+
+    try {
+        const restaurant = await findRestaurantByIdHelper(restaurantCustomId);
+        if (!restaurant) {
+            return response.status(404).json({ message: 'Restaurant not found' });
+        }
+        if (!restaurant.isActive) {
+            return response.status(403).json({ message: 'Restaurant is currently closed' });
+        }
+        if (!recipientName || !recipientPhone) {
+            return response.status(400).json({ message: 'Recipient name and phone are required for external orders.' });
+        }
+        if (!location || !phoneNumber) {
+            return response.status(400).json({ message: 'Delivery location and phone number are required.' });
+        }
+        const mealDetails = await Promise.all(
+            meals.map(async ({ mealId, quantity }) => {
+                const meal = await Meal.findOne({ customId: mealId });
+                if (!meal) {
+                    throw new Error(`Meal with customId ${mealId} not found`);
+                }
+                return { meal: meal._id, quantity };
+            })
+        );
+        const newOrder = new Order({
+            user: userId,
+            meals: mealDetails,
+            note,
+            totalPrice,
+            foodAmount: totalPrice - (fee || 0),
+            location,
+            nearestLandmark,
+            phoneNumber,
+            restaurant: restaurant._id,
+            fee,
+            recipient: {
+                name: recipientName,
+                phone: recipientPhone,
+                instructions: `Order for external recipient${recipientEmail ? ' (' + recipientEmail + ')' : ''}`,
+            },
+        });
+        await newOrder.save();
+        const userDoc = await User.findById(userId);
+        if (!userDoc) {
+            return response.status(404).json({ message: 'User not found' });
+        }
+        if (userDoc.byteBalance < totalPrice) {
+            return response.status(400).json({
+                message: 'Insufficient balance. Please top up your Byte wallet before placing an order.',
+                currentBalance: userDoc.byteBalance,
+                requiredAmount: totalPrice
+            });
+        }
+        // Notify ordering user only
+        const userNotification = new Notification({
+            userId: userDoc._id,
+            message: `You placed an order for ${recipientName} (external recipient)! Order ID: ${newOrder.customId}.`,
+        });
+        await userNotification.save();
+        userDoc.notifications.push(userNotification._id);
+        userDoc.orderHistory.push(newOrder._id);
+        await userDoc.save();
+        // Notify restaurant (email, SMS, notification)
+        const restaurantNotification = new Notification({
+            restaurantId: restaurant._id,
+            message: `You have received a new external gift order with ID: ${newOrder.customId}.`,
+        });
+        await restaurantNotification.save();
+        restaurant.notifications.push(restaurantNotification._id);
+        await restaurant.save();
+        // Send SMS to restaurant
+        const foodAmountForSMS = totalPrice - (fee || 0);
+        const smsMessage = `New order #${newOrder.customId}! Items: ${meals.length}, Meal cost: ₦${foodAmountForSMS}. ${note ? 'Note: ' + note.substring(0, 30) + (note.length > 30 ? '...' : '') : ''} Delivery: ${location.substring(0, 20)}${location.length > 20 ? '...' : ''}. Check dashboard now.`;
+        const formattedRestaurantNumber = formatPhoneNumber(restaurant.contactNumber);
+        sendSMS(formattedRestaurantNumber, smsMessage);
+        // Send email to restaurant
+        const restaurantEmailHtml = `
+        <html>
+        <head>
+          <style>
+            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #fff; color: #000; margin: 0; padding: 0; }
+            .container, .email-container { width: 90%; max-width: 600px; margin: 30px auto; background-color: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); overflow: hidden; }
+            .header { text-align: center; padding: 40px 20px 30px; background-color: #990000; color: #fff; }
+            .header h1 { margin: 0; font-size: 28px; font-weight: 700; }
+            .brand-text, .brand { color: #FFCC00; font-weight: bold; }
+            .content { font-size: 16px; line-height: 1.6; padding: 30px; color: #000; background-color: #fff; }
+            .content p { margin: 15px 0; }
+            .order-details, .order-info, .fee-info, .wallet-update, .success-box, .delivery-banner, .balance-warning, .next-steps, .surprise-box { background-color: #FFCC00; color: #000; border-radius: 8px; padding: 20px; margin: 20px 0; font-weight: bold; }
+            .alert-box { background-color: #990000; color: #fff; border-radius: 8px; padding: 20px; margin: 20px 0; font-weight: bold; }
+            .footer { background-color: #000; color: #fff; text-align: center; padding: 20px; font-size: 14px; }
+          </style>
+        </head>
+        <body>
+          <div class="email-container">
+            <div class="header">
+              <h1>🍽️ New <span class="brand-text">Byte</span> Order!</h1>
+            </div>
+            <div class="content">
+              <p>Exciting news! 🎉 You have received a new order from a hungry customer!</p>
+              <div class="order-details">
+                <p>📍 <strong>Delivery Location:</strong> ${location}</p>
+                <p>🏘️ <strong>Nearest Landmark:</strong> ${nearestLandmark || 'Not specified'}</p>
+                <p>📱 <strong>Contact Phone:</strong> ${phoneNumber}</p>
+                <p>📝 <strong>Special Instructions:</strong> ${note || 'No special notes'}</p>
+                <p>👤 <strong>Recipient:</strong> ${recipientName}</p>
+                <p>🛒 <strong>Ordered by:</strong> ${userDoc.username}</p>
+              </div>
+              <div class="alert-box">
+                <p><strong>📋 Next Steps:</strong></p>
+                <ul>
+                  <li>Check your restaurant dashboard for full meal details</li>
+                  <li>Prepare the order with care</li>
+                  <li>Contact the recipient if needed</li>
+                  <li>Update order status as you progress</li>
+                </ul>
+              </div>
+              <p>Let's make this customer's day delicious! 🚀</p>
+            </div>
+            <div class="footer">
+              <p>© ${new Date().getFullYear()} <span class="brand">Byte</span> - Your Campus Food Partner</p>
+              <p>Cooking up happiness, one order at a time! 👨‍🍳</p>
+            </div>
+          </div>
+        </body>
+        </html>
+        `;
+        await sendEmail(
+            restaurant.email,
+            'New Order Received',
+            `You have received a new order. Please check the dashboard for details.`,
+            restaurantEmailHtml
+        );
+        // Send SMS to external recipient
+        const formattedRecipientNumber = formatPhoneNumber(recipientPhone);
+        const recipientSMS = `Hi ${recipientName}, you have a Byte food delivery coming! Order ID: ${newOrder.customId}. Delivery to: ${location}. Contact: ${phoneNumber}. Enjoy your meal!`;
+        sendSMS(formattedRecipientNumber, recipientSMS);
+        // Send email to external recipient if provided
+        if (recipientEmail) {
+            const recipientEmailHtml = `
+            <html>
+            <head>
+              <style>
+                body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #fff; color: #000; margin: 0; padding: 0; }
+                .container, .email-container { width: 90%; max-width: 600px; margin: 30px auto; background-color: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); overflow: hidden; }
+                .header { text-align: center; padding: 40px 20px 30px; background-color: #990000; color: #fff; }
+                .header h1 { margin: 0; font-size: 28px; font-weight: 700; }
+                .brand-text, .brand { color: #FFCC00; font-weight: bold; }
+                .content { font-size: 16px; line-height: 1.6; padding: 30px; color: #000; background-color: #fff; }
+                .content p { margin: 15px 0; }
+                .surprise-box { background-color: #FFCC00; color: #000; text-align: center; padding: 20px; margin: 20px 0; border-radius: 8px; font-weight: bold; font-size: 18px; }
+                .order-details { background-color: #d4edda; color: #000; border-left: 4px solid #28a745; padding: 20px; border-radius: 8px; margin: 20px 0; font-weight: 600; }
+                .order-details p { color: #000; margin: 8px 0; }
+                .footer { background-color: #000; color: #fff; text-align: center; padding: 20px; font-size: 14px; }
+              </style>
+            </head>
+            <body>
+              <div class="email-container">
+                <div class="header">
+                  <h1>🎁 Someone Ordered For You!</h1>
+                </div>
+                <div class="content">
+                  <div class="surprise-box">
+                    🎉 ${userDoc.username} just treated you to a meal! 🎉
+                  </div>
+                  <p>What a thoughtful friend! ${userDoc.username} has ordered delicious food for you through <span class="brand-text">Byte</span>!</p>
+                  <div class="order-details">
+                    <p><strong>📦 Order ID:</strong> ${newOrder.customId}</p>
+                    <p><strong>👤 Ordered by:</strong> ${userDoc.username}</p>
+                    <p><strong>📍 Delivery to:</strong> ${location}</p>
+                    <p><strong>📱 Contact:</strong> ${phoneNumber}</p>
+                    <p><strong>🏘️ Landmark:</strong> ${nearestLandmark || 'Not specified'}</p>
+                  </div>
+                  <p>Your meal is being prepared and will be delivered to you soon. Make sure to be available at the delivery location!</p>
+                  <p>Don't forget to thank ${userDoc.username} for this awesome treat! 😊</p>
+                </div>
+                <div class="footer">
+                  <p>© ${new Date().getFullYear()} Byte - Bringing friends together through food! 🍕</p>
+                </div>
+              </div>
+            </body>
+            </html>
+            `;
+            await sendEmail(
+                recipientEmail,
+                'Someone Ordered Food For You!',
+                `${userDoc.username} has ordered food for you through Byte!`,
+                recipientEmailHtml
+            );
+        }
+        // Return response
+        return response.status(201).json({
+            message: `Order created successfully for external recipient ${recipientName}!`,
+            order: newOrder,
+            recipientInfo: {
+                name: recipientName,
+                phone: recipientPhone,
+                email: recipientEmail || null,
+            }
+        });
+    } catch (error) {
+        console.error(error);
+        return response.status(500).json({ message: 'Internal server error', error: error.message });
     }
 };
 

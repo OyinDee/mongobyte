@@ -169,7 +169,7 @@ exports.updateUserProfile = async (req, res) => {
 
       // Send email notification if university was updated
       if (university !== undefined) {
-        const emailHtml = `<html><head><style>body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #FFFFFF; color: #000000; margin: 0; padding: 0; }.email-container { width: 90%; max-width: 600px; margin: 30px auto; background-color: #FFFFFF; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); overflow: hidden; }.header { text-align: center; padding: 40px 20px 30px; background: #990000; color: #FFFFFF; }.header h1 { margin: 0; font-size: 28px; font-weight: 600; }.content { padding: 40px 30px; line-height: 1.6; }.update-info { background-color: #FFCC00; border-left: 4px solid #990000; padding: 20px; margin: 20px 0; border-radius: 4px; color: #000000; }.footer { text-align: center; padding: 30px; background-color: #FFFFFF; color: #990000; font-size: 14px; }.brand { color: #990000; font-weight: 600; }</style></head><body><div class="email-container"><div class="header"><h1>Profile Updated! ✅</h1></div><div class="content"><p>Hi ${updatedUser.username}! 👋</p><p>Great news! Your profile has been successfully updated. Here's what changed:</p><div class="update-info">${university ? `<p><strong>🏫 University:</strong> ${updatedUser.university?.name || 'Updated'}</p>` : ''}${bio !== undefined ? `<p><strong>📝 Bio:</strong> ${bio || 'Cleared'}</p>` : ''}${location !== undefined ? `<p><strong>📍 Location:</strong> ${location || 'Cleared'}</p>` : ''}${nearestLandmark !== undefined ? `<p><strong>🗺️ Nearest Landmark:</strong> ${nearestLandmark || 'Cleared'}</p>` : ''}${imageUrl !== undefined ? `<p><strong>📸 Profile Picture:</strong> Updated</p>` : ''}</div><p>Your profile is now more complete and will help you get a better experience on our platform! 🎉</p><p>Ready to order some delicious food? Let's go! 🍕</p></div><div class="footer"><p>© ${new Date().getFullYear()} <span class="brand">Byte</span> - Your Campus Food Companion</p><p>Keeping your profile fresh! 😋</p></div></div></body></html>`;
+        const emailHtml = `<html><head><style>body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #fff; color: #000; margin: 0; padding: 0; } .container, .email-container { width: 90%; max-width: 600px; margin: 30px auto; background-color: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); overflow: hidden; } .header { text-align: center; padding: 40px 20px 30px; background-color: #990000; color: #fff; } .header h1 { margin: 0; font-size: 28px; font-weight: 700; } .brand-text, .brand { color: #FFCC00; font-weight: bold; } .content { font-size: 16px; line-height: 1.6; padding: 30px; color: #000; background-color: #fff; } .content p { margin: 15px 0; } .highlight, .success-box, .alert-box, .fee-info, .bonus-info, .reward-info, .update-info { background-color: #FFCC00; color: #000; border-radius: 8px; padding: 20px; margin: 20px 0; font-weight: bold; } .footer { background-color: #000; color: #fff; text-align: center; padding: 20px; font-size: 14px; }</style></head><body><div class="email-container"><div class="header"><h1>Profile Updated! ✅</h1></div><div class="content"><p>Hi ${updatedUser.username}! 👋</p><p>Great news! Your profile has been successfully updated. Here's what changed:</p><div class="update-info">${university ? `<p><strong>🏫 University:</strong> ${updatedUser.university?.name || 'Updated'}</p>` : ''}${bio !== undefined ? `<p><strong>📝 Bio:</strong> ${bio || 'Cleared'}</p>` : ''}${location !== undefined ? `<p><strong>📍 Location:</strong> ${location || 'Cleared'}</p>` : ''}${nearestLandmark !== undefined ? `<p><strong>🗺️ Nearest Landmark:</strong> ${nearestLandmark || 'Cleared'}</p>` : ''}${imageUrl !== undefined ? `<p><strong>📸 Profile Picture:</strong> Updated</p>` : ''}</div><p>Your profile is now more complete and will help you get a better experience on our platform! 🎉</p><p>Ready to order some delicious food? Let's go! 🍕</p></div><div class="footer"><p>© ${new Date().getFullYear()} <span class="brand">Byte</span> - Your Campus Food Companion</p><p>Keeping your profile fresh! 😋</p></div></div></body></html>`;
         // Send email notification (non-blocking)
         setImmediate(async () => {
           try {
@@ -425,81 +425,11 @@ exports.transferBytes = async (request, response) => {
 <html>
 <head>
   <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #FFFFFF;
-      color: #000000;
-      margin: 0;
-      padding: 0;
-    }
-    .email-container {
-      width: 90%;
-      max-width: 600px;
-      margin: 30px auto;
-      background-color: #FFFFFF;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-      overflow: hidden;
-    }
-    .header {
-      text-align: center;
-      padding: 40px 20px 30px;
-      background: #990000;
-      color: #FFFFFF;
-    }
-    .header h1 {
-      margin: 0;
-      font-size: 28px;
-      font-weight: 600;
-    }
-    .content {
-      padding: 40px 30px;
-      line-height: 1.6;
-    }
-    .transfer-info {
-      background-color: #FFCC00;
-      border-left: 4px solid #990000;
-      padding: 20px;
-      margin: 20px 0;
-      border-radius: 4px;
-      color: #000000;
-    }
-    .footer {
-      text-align: center;
-      padding: 30px;
-      background-color: #FFFFFF;
-      color: #990000;
-      font-size: 14px;
-    }
-    .brand {
-      color: #990000;
-      font-weight: 600;
-    }
-  </style>
-</head>
-<body>
-  <div class="email-container">
-    <div class="header">
-      <h1>Bytes Sent! 💸</h1>
-    </div>
-    <div class="content">
-      <p>Hi ${sender.username}! 👋</p>
-      <p>You have successfully transferred bytes to another user. Here are the details:</p>
-      <div class="transfer-info">
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #fff; color: #000; margin: 0; padding: 0; } .container, .email-container { width: 90%; max-width: 600px; margin: 30px auto; background-color: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); overflow: hidden; } .header { text-align: center; padding: 40px 20px 30px; background-color: #990000; color: #fff; } .header h1 { margin: 0; font-size: 28px; font-weight: 700; } .brand-text, .brand { color: #FFCC00; font-weight: bold; } .content { font-size: 16px; line-height: 1.6; padding: 30px; color: #000; background-color: #fff; } .content p { margin: 15px 0; } .highlight, .success-box, .alert-box, .fee-info, .bonus-info, .reward-info, .update-info { background-color: #FFCC00; color: #000; border-radius: 8px; padding: 20px; margin: 20px 0; font-weight: bold; } .footer { background-color: #000; color: #fff; text-align: center; padding: 20px; font-size: 14px; }</style></head><body><div class="email-container"><div class="header"><h1>Bytes Sent! 💸</h1></div><div class="content"><p>Hi ${sender.username}! 👋</p><p>You have successfully transferred bytes to another user. Here are the details:</p><div class="update-info">
         <p><strong>💰 Amount Sent:</strong> ${amount} bytes</p>
         <p><strong>👤 Recipient:</strong> ${recipient.username}</p>
         <p><strong>💳 Your New Balance:</strong> ${sender.byteBalance} bytes</p>
-      </div>
-      <p>Thank you for using Byte to share with your friends! 🤝</p>
-      <p>Ready to order some food? Let's go! 🍕</p>
-    </div>
-    <div class="footer">
-      <p>© ${new Date().getFullYear()} <span class="brand">Byte</span> - Your Campus Food Companion</p>
-      <p>Sharing made easy! 😋</p>
-    </div>
-  </div>
-</body>
-</html>
+      </div><p>Thank you for using Byte to share with your friends! 🤝</p><p>Ready to order some food? Let's go! 🍕</p></div><div class="footer"><p>© ${new Date().getFullYear()} <span class="brand">Byte</span> - Your Campus Food Companion</p><p>Sharing made easy! 😋</p></div></div></body></html>
           `;
           await sendEmail(sender.email, 'Bytes Transfer Confirmation', 'You have successfully sent bytes.', senderEmailHtml);
         }
@@ -509,81 +439,11 @@ exports.transferBytes = async (request, response) => {
 <html>
 <head>
   <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #FFFFFF;
-      color: #000000;
-      margin: 0;
-      padding: 0;
-    }
-    .email-container {
-      width: 90%;
-      max-width: 600px;
-      margin: 30px auto;
-      background-color: #FFFFFF;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-      overflow: hidden;
-    }
-    .header {
-      text-align: center;
-      padding: 40px 20px 30px;
-      background: #990000;
-      color: #FFFFFF;
-    }
-    .header h1 {
-      margin: 0;
-      font-size: 28px;
-      font-weight: 600;
-    }
-    .content {
-      padding: 40px 30px;
-      line-height: 1.6;
-    }
-    .transfer-info {
-      background-color: #FFCC00;
-      border-left: 4px solid #990000;
-      padding: 20px;
-      margin: 20px 0;
-      border-radius: 4px;
-      color: #000000;
-    }
-    .footer {
-      text-align: center;
-      padding: 30px;
-      background-color: #FFFFFF;
-      color: #990000;
-      font-size: 14px;
-    }
-    .brand {
-      color: #990000;
-      font-weight: 600;
-    }
-  </style>
-</head>
-<body>
-  <div class="email-container">
-    <div class="header">
-      <h1>Bytes Received! 💰</h1>
-    </div>
-    <div class="content">
-      <p>Hi ${recipient.username}! 👋</p>
-      <p>Great news! You have received bytes from another user. Here are the details:</p>
-      <div class="transfer-info">
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #fff; color: #000; margin: 0; padding: 0; } .container, .email-container { width: 90%; max-width: 600px; margin: 30px auto; background-color: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); overflow: hidden; } .header { text-align: center; padding: 40px 20px 30px; background-color: #990000; color: #fff; } .header h1 { margin: 0; font-size: 28px; font-weight: 700; } .brand-text, .brand { color: #FFCC00; font-weight: bold; } .content { font-size: 16px; line-height: 1.6; padding: 30px; color: #000; background-color: #fff; } .content p { margin: 15px 0; } .highlight, .success-box, .alert-box, .fee-info, .bonus-info, .reward-info, .update-info { background-color: #FFCC00; color: #000; border-radius: 8px; padding: 20px; margin: 20px 0; font-weight: bold; } .footer { background-color: #000; color: #fff; text-align: center; padding: 20px; font-size: 14px; }</style></head><body><div class="email-container"><div class="header"><h1>Bytes Received! 💰</h1></div><div class="content"><p>Hi ${recipient.username}! 👋</p><p>Great news! You have received bytes from another user. Here are the details:</p><div class="update-info">
         <p><strong>💰 Amount Received:</strong> ${amount} bytes</p>
         <p><strong>👤 From:</strong> ${sender.username}</p>
         <p><strong>💳 Your New Balance:</strong> ${recipient.byteBalance} bytes</p>
-      </div>
-      <p>Your account has been credited! Time to treat yourself to some delicious food! 🎉</p>
-      <p>Ready to place an order? Let's go! 🍕</p>
-    </div>
-    <div class="footer">
-      <p>© ${new Date().getFullYear()} <span class="brand">Byte</span> - Your Campus Food Companion</p>
-      <p>Receiving made sweet! 😋</p>
-    </div>
-  </div>
-</body>
-</html>
+      </div><p>Your account has been credited! Time to treat yourself to some delicious food! 🎉</p><p>Ready to place an order? Let's go! 🍕</p></div><div class="footer"><p>© ${new Date().getFullYear()} <span class="brand">Byte</span> - Your Campus Food Companion</p><p>Receiving made sweet! 😋</p></div></div></body></html>
           `;
           await sendEmail(recipient.email, 'Bytes Received!', 'You have received bytes from another user.', recipientEmailHtml);
         }
@@ -1019,81 +879,7 @@ exports.useReferralCode = async (req, res) => {
 <html>
 <head>
   <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #FFFFFF;
-      color: #000000;
-      margin: 0;
-      padding: 0;
-    }
-    .email-container {
-      width: 90%;
-      max-width: 600px;
-      margin: 30px auto;
-      background-color: #FFFFFF;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-      overflow: hidden;
-    }
-    .header {
-      text-align: center;
-      padding: 40px 20px 30px;
-      background: #990000;
-      color: #FFFFFF;
-    }
-    .header h1 {
-      margin: 0;
-      font-size: 28px;
-      font-weight: 600;
-    }
-    .content {
-      padding: 40px 30px;
-      line-height: 1.6;
-    }
-    .bonus-info {
-      background-color: #FFCC00;
-      border-left: 4px solid #990000;
-      padding: 20px;
-      margin: 20px 0;
-      border-radius: 4px;
-      color: #000000;
-    }
-    .footer {
-      text-align: center;
-      padding: 30px;
-      background-color: #FFFFFF;
-      color: #990000;
-      font-size: 14px;
-    }
-    .brand {
-      color: #990000;
-      font-weight: 600;
-    }
-  </style>
-</head>
-<body>
-  <div class="email-container">
-    <div class="header">
-      <h1>Welcome Bonus Received! 🎉</h1>
-    </div>
-    <div class="content">
-      <p>Hi ${newUser.username}! 👋</p>
-      <p>Congratulations! You've successfully used a referral code and earned a welcome bonus!</p>
-      <div class="bonus-info">
-        <p><strong>🎁 Welcome Bonus:</strong> ${referral.bonusAmount} bytes</p>
-        <p><strong>💳 Your New Balance:</strong> ${newUser.byteBalance} bytes</p>
-        <p><strong>👤 Referred by:</strong> ${referrer.username}</p>
-      </div>
-      <p>Thanks to your friend ${referrer.username} for inviting you to join Byte! Now you have extra bytes to enjoy delicious food on campus! 🍕</p>
-      <p>Ready to place your first order? Let's get started! 🚀</p>
-    </div>
-    <div class="footer">
-      <p>© ${new Date().getFullYear()} <span class="brand">Byte</span> - Your Campus Food Companion</p>
-      <p>Welcome to the family! 😋</p>
-    </div>
-  </div>
-</body>
-</html>
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #fff; color: #000; margin: 0; padding: 0; } .container, .email-container { width: 90%; max-width: 600px; margin: 30px auto; background-color: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); overflow: hidden; } .header { text-align: center; padding: 40px 20px 30px; background-color: #990000; color: #fff; } .header h1 { margin: 0; font-size: 28px; font-weight: 700; } .brand-text, .brand { color: #FFCC00; font-weight: bold; } .content { font-size: 16px; line-height: 1.6; padding: 30px; color: #000; background-color: #fff; } .content p { margin: 15px 0; } .bonus-info { background-color: #FFCC00; color: #000; border-radius: 8px; padding: 20px; margin: 20px 0; font-weight: bold; } .footer { background-color: #000; color: #fff; text-align: center; padding: 20px; font-size: 14px; }</style></head><body><div class="email-container"><div class="header"><h1>Welcome Bonus Received! 🎉</h1></div><div class="content"><p>Hi ${newUser.username}! 👋</p><p>Congratulations! You've successfully used a referral code and earned a welcome bonus!</p><div class="bonus-info"><p><strong>🎁 Welcome Bonus:</strong> ${referral.bonusAmount} bytes</p><p><strong>💳 Your New Balance:</strong> ${newUser.byteBalance} bytes</p><p><strong>👤 Referred by:</strong> ${referrer.username}</p></div><p>Thanks to your friend ${referrer.username} for inviting you to join Byte! Now you have extra bytes to enjoy delicious food on campus! 🍕</p><p>Ready to place your first order? Let's get started! 🚀</p></div><div class="footer"><p>© ${new Date().getFullYear()} <span class="brand">Byte</span> - Your Campus Food Companion</p><p>Welcome to the family! 😋</p></div></div></body></html>
                     `;
                     await sendEmail(newUser.email, 'Welcome Bonus - Referral Success!', 'You have earned a welcome bonus!', newUserEmailHtml);
                 }
@@ -1104,82 +890,7 @@ exports.useReferralCode = async (req, res) => {
 <html>
 <head>
   <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #FFFFFF;
-      color: #000000;
-      margin: 0;
-      padding: 0;
-    }
-    .email-container {
-      width: 90%;
-      max-width: 600px;
-      margin: 30px auto;
-      background-color: #FFFFFF;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-      overflow: hidden;
-    }
-    .header {
-      text-align: center;
-      padding: 40px 20px 30px;
-      background: #990000;
-      color: #FFFFFF;
-    }
-    .header h1 {
-      margin: 0;
-      font-size: 28px;
-      font-weight: 600;
-    }
-    .content {
-      padding: 40px 30px;
-      line-height: 1.6;
-    }
-    .reward-info {
-      background-color: #FFCC00;
-      border-left: 4px solid #990000;
-      padding: 20px;
-      margin: 20px 0;
-      border-radius: 4px;
-      color: #000000;
-    }
-    .footer {
-      text-align: center;
-      padding: 30px;
-      background-color: #FFFFFF;
-      color: #990000;
-      font-size: 14px;
-    }
-    .brand {
-      color: #990000;
-      font-weight: 600;
-    }
-  </style>
-</head>
-<body>
-  <div class="email-container">
-    <div class="header">
-      <h1>Referral Reward Earned! 💰</h1>
-    </div>
-    <div class="content">
-      <p>Hi ${referrer.username}! 👋</p>
-      <p>Awesome news! Someone just used your referral code and you've earned a reward!</p>
-      <div class="reward-info">
-        <p><strong>🎁 Referral Reward:</strong> ${referral.rewardAmount} bytes</p>
-        <p><strong>💳 Your New Balance:</strong> ${referrer.byteBalance} bytes</p>
-        <p><strong>👤 New Member:</strong> ${newUser.username}</p>
-        <p><strong>🔗 Referral Code:</strong> ${referralCode}</p>
-      </div>
-      <p>Thank you for spreading the word about Byte! Your friend ${newUser.username} has joined our platform and earned their welcome bonus too! 🎉</p>
-      <p>Keep sharing and earning! Generate more referral codes to invite more friends! 🚀</p>
-    </div>
-    <div class="footer">
-      <p>© ${new Date().getFullYear()} <span class="brand">Byte</span> - Your Campus Food Companion</p>
-      <p>Thank you for growing our community! 😋</p>
-    </div>
-  </div>
-</body>
-</html>
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #fff; color: #000; margin: 0; padding: 0; } .container, .email-container { width: 90%; max-width: 600px; margin: 30px auto; background-color: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); overflow: hidden; } .header { text-align: center; padding: 40px 20px 30px; background-color: #990000; color: #fff; } .header h1 { margin: 0; font-size: 28px; font-weight: 700; } .brand-text, .brand { color: #FFCC00; font-weight: bold; } .content { font-size: 16px; line-height: 1.6; padding: 30px; color: #000; background-color: #fff; } .content p { margin: 15px 0; } .reward-info { background-color: #FFCC00; color: #000; border-radius: 8px; padding: 20px; margin: 20px 0; font-weight: bold; } .footer { background-color: #000; color: #fff; text-align: center; padding: 20px; font-size: 14px; }</style></head><body><div class="email-container"><div class="header"><h1>Referral Reward Earned! 💰</h1></div><div class="content"><p>Hi ${referrer.username}! 👋</p><p>Awesome news! Someone just used your referral code and you've earned a reward!</p><div class="reward-info"><p><strong>🎁 Referral Reward:</strong> ${referral.rewardAmount} bytes</p><p><strong>💳 Your New Balance:</strong> ${referrer.byteBalance} bytes</p><p><strong>👤 New Member:</strong> ${newUser.username}</p><p><strong>🔗 Referral Code:</strong> ${referralCode}</p></div><p>Thank you for spreading the word about Byte! Your friend ${newUser.username} has joined our platform and earned their welcome bonus too! 🎉</p><p>Keep sharing and earning! Generate more referral codes to invite more friends! 🚀</p></div><div class="footer"><p>© ${new Date().getFullYear()} <span class="brand">Byte</span> - Your Campus Food Companion</p><p>Thank you for growing our community! 😋</p></div></div></body></html>
                     `;
                     await sendEmail(referrer.email, 'Referral Reward Earned!', 'Your referral was successful - reward earned!', referrerEmailHtml);
                 }

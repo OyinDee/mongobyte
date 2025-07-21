@@ -78,6 +78,9 @@ const restaurantSchema = new mongoose.Schema({
         type: Boolean,
         default: true,
     },
+    nearestLandmarks: [{
+        type: String
+    }],
     // Rating System Fields
     averageRating: {
         type: Number,

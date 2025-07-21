@@ -139,75 +139,17 @@ exports.createRestaurant = async (request, response) => {
         <html>
         <head>
           <style>
-            body {
-              font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-              color: #000000;
-              margin: 0;
-              padding: 0;
-              background-color: #f8f9fa;
-            }
-            .container {
-              width: 90%;
-              max-width: 600px;
-              margin: 30px auto;
-              padding: 0;
-              border-radius: 12px;
-              background-color: #ffffff;
-              box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-              overflow: hidden;
-            }
-            .header {
-              text-align: center;
-              padding: 40px 20px 30px;
-              background: #cc0000;
-              color: #ffffff;
-            }
-            .header h1 {
-              margin: 0;
-              font-size: 32px;
-              font-weight: 700;
-              text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-            }
-            .brand-text {
-              color: #FFCC00;
-              font-weight: 800;
-            }
-            .content {
-              font-size: 16px;
-              line-height: 1.6;
-              padding: 30px;
-              color: #333333;
-            }
-            .password {
-              background: #FFCC00;
-              color: #000000;
-              font-size: 28px;
-              font-weight: 800;
-              text-align: center;
-              padding: 25px;
-              margin: 25px 0;
-              border-radius: 8px;
-              letter-spacing: 2px;
-              box-shadow: 0 3px 10px rgba(255, 204, 0, 0.3);
-            }
-            .welcome-box {
-              background: #fff3cd;
-              border-left: 4px solid #FFCC00;
-              padding: 20px;
-              margin: 20px 0;
-              border-radius: 8px;
-            }
-            .footer {
-              background-color: #000000;
-              color: #ffffff;
-              text-align: center;
-              padding: 20px;
-              font-size: 14px;
-            }
-            .footer .brand {
-              color: #FFCC00;
-              font-weight: bold;
-            }
+            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #fff; color: #000; margin: 0; padding: 0; }
+            .container { width: 90%; max-width: 600px; margin: 30px auto; padding: 0; border-radius: 12px; background-color: #fff; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); overflow: hidden; }
+            .header { text-align: center; padding: 40px 20px 30px; background-color: #990000; color: #fff; }
+            .header h1 { margin: 0; font-size: 28px; font-weight: 700; }
+            .brand-text { color: #FFCC00; font-weight: bold; }
+            .content { font-size: 16px; line-height: 1.6; padding: 30px; color: #000; background-color: #fff; }
+            .content p { margin: 15px 0; }
+            .password { background: #FFCC00; color: #000000; font-size: 28px; font-weight: 800; text-align: center; padding: 25px; margin: 25px 0; border-radius: 8px; letter-spacing: 2px; box-shadow: 0 3px 10px rgba(255, 204, 0, 0.3); }
+            .welcome-box { background: #FFCC00; border-left: 4px solid #FFCC00; padding: 20px; margin: 20px 0; border-radius: 8px; }
+            .footer { background-color: #000; color: #fff; text-align: center; padding: 20px; font-size: 14px; }
+            .footer .brand { color: #FFCC00; font-weight: bold; }
           </style>
         </head>
         <body>
@@ -476,81 +418,18 @@ exports.createWithdrawal = async (req, res) => {
 <html>
 <head>
   <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f8f9fa;
-      color: #333333;
-      margin: 0;
-      padding: 0;
-    }
-    .email-container {
-      width: 90%;
-      max-width: 600px;
-      margin: 30px auto;
-      background-color: #ffffff;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-      overflow: hidden;
-    }
-    .header {
-      text-align: center;
-      padding: 40px 20px 30px;
-      background: #cc0000;
-      color: #ffffff;
-    }
-    .header h1 {
-      margin: 0;
-      font-size: 28px;
-      font-weight: 700;
-      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-    }
-    .brand-text {
-      color: #FFCC00;
-      font-weight: 800;
-    }
-    .content {
-      padding: 30px;
-    }
-    .content p {
-      color: #333333;
-      font-size: 16px;
-      line-height: 1.6;
-      margin-bottom: 15px;
-    }
-    .withdrawal-info {
-      background: #fff3cd;
-      border-left: 4px solid #FFCC00;
-      padding: 20px;
-      border-radius: 8px;
-      margin: 20px 0;
-    }
-    .withdrawal-info p {
-      color: #000000;
-      font-weight: 600;
-      margin: 8px 0;
-    }
-    .amount {
-      background: #FFCC00;
-      color: #000000;
-      font-size: 24px;
-      font-weight: 800;
-      text-align: center;
-      padding: 15px;
-      margin: 20px 0;
-      border-radius: 8px;
-      letter-spacing: 1px;
-    }
-    .footer {
-      background-color: #000000;
-      color: #ffffff;
-      text-align: center;
-      padding: 20px;
-      font-size: 14px;
-    }
-    .footer .brand {
-      color: #FFCC00;
-      font-weight: bold;
-    }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #fff; color: #000; margin: 0; padding: 0; }
+    .email-container { width: 90%; max-width: 600px; margin: 30px auto; background-color: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); overflow: hidden; }
+    .header { text-align: center; padding: 40px 20px 30px; background-color: #990000; color: #fff; }
+    .header h1 { margin: 0; font-size: 28px; font-weight: 700; }
+    .brand-text { color: #FFCC00; font-weight: bold; }
+    .content { font-size: 16px; line-height: 1.6; padding: 30px; color: #000; background-color: #fff; }
+    .content p { margin: 15px 0; }
+    .withdrawal-info { background: #FFCC00; border-left: 4px solid #FFCC00; padding: 20px; border-radius: 8px; margin: 20px 0; }
+    .withdrawal-info p { color: #000000; font-weight: 600; margin: 8px 0; }
+    .amount { background: #FFCC00; color: #000000; font-size: 24px; font-weight: 800; text-align: center; padding: 15px; margin: 20px 0; border-radius: 8px; letter-spacing: 1px; }
+    .footer { background-color: #000; color: #fff; text-align: center; padding: 20px; font-size: 14px; }
+    .footer .brand { color: #FFCC00; font-weight: bold; }
   </style>
 </head>
 <body>
@@ -595,91 +474,19 @@ exports.createWithdrawal = async (req, res) => {
 <html>
 <head>
   <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f8f9fa;
-      color: #333333;
-      margin: 0;
-      padding: 0;
-    }
-    .email-container {
-      width: 90%;
-      max-width: 600px;
-      margin: 30px auto;
-      background-color: #ffffff;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-      overflow: hidden;
-    }
-    .header {
-      text-align: center;
-      padding: 40px 20px 30px;
-      background: #cc0000;
-      color: #ffffff;
-    }
-    .header h1 {
-      margin: 0;
-      font-size: 28px;
-      font-weight: 700;
-      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-    }
-    .brand-text {
-      color: #FFCC00;
-      font-weight: 800;
-    }
-    .content {
-      padding: 30px;
-    }
-    .content p {
-      color: #333333;
-      font-size: 16px;
-      line-height: 1.6;
-      margin-bottom: 15px;
-    }
-    .withdrawal-info {
-      background: #fff3cd;
-      border-left: 4px solid #FFCC00;
-      padding: 20px;
-      border-radius: 8px;
-      margin: 20px 0;
-    }
-    .withdrawal-info p {
-      color: #000000;
-      font-weight: 600;
-      margin: 8px 0;
-    }
-    .amount {
-      background: #FFCC00;
-      color: #000000;
-      font-size: 28px;
-      font-weight: 800;
-      text-align: center;
-      padding: 20px;
-      margin: 20px 0;
-      border-radius: 8px;
-      letter-spacing: 1px;
-    }
-    .urgent-tag {
-      background-color: #dc3545;
-      color: #ffffff;
-      padding: 8px 16px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: bold;
-      display: inline-block;
-      margin-bottom: 15px;
-    }
-    .footer {
-      background-color: #000000;
-      color: #ffffff;
-      text-align: center;
-      padding: 20px;
-      font-size: 14px;
-    }
-    .footer .brand {
-      color: #FFCC00;
-      font-weight: bold;
-    }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #fff; color: #000; margin: 0; padding: 0; }
+    .email-container { width: 90%; max-width: 600px; margin: 30px auto; background-color: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); overflow: hidden; }
+    .header { text-align: center; padding: 40px 20px 30px; background-color: #990000; color: #fff; }
+    .header h1 { margin: 0; font-size: 28px; font-weight: 700; }
+    .brand-text { color: #FFCC00; font-weight: bold; }
+    .content { font-size: 16px; line-height: 1.6; padding: 30px; color: #000; background-color: #fff; }
+    .content p { margin: 15px 0; }
+    .withdrawal-info { background: #FFCC00; border-left: 4px solid #FFCC00; padding: 20px; border-radius: 8px; margin: 20px 0; }
+    .withdrawal-info p { color: #000000; font-weight: 600; margin: 8px 0; }
+    .amount { background: #FFCC00; color: #000000; font-size: 28px; font-weight: 800; text-align: center; padding: 20px; margin: 20px 0; border-radius: 8px; letter-spacing: 1px; }
+    .urgent-tag { background-color: #990000; color: #fff; padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: bold; display: inline-block; margin-bottom: 15px; }
+    .footer { background-color: #000; color: #fff; text-align: center; padding: 20px; font-size: 14px; }
+    .footer .brand { color: #FFCC00; font-weight: bold; }
   </style>
 </head>
 <body>
