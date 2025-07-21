@@ -117,7 +117,7 @@ const getUniversity = async (req, res) => {
     }
 };
 
-// Get all nearest landmarks for all restaurants under a university
+// Get all nearest landmarks for a university
 const getUniversityLandmarks = async (req, res) => {
     try {
         const { id } = req.params;
@@ -125,17 +125,8 @@ const getUniversityLandmarks = async (req, res) => {
         if (!university) {
             return res.status(404).json({ status: 'error', message: 'University not found' });
         }
-        // Find all restaurants for this university
-        const restaurants = await Restaurant.find({ university: university._id });
-        // Collect all nearestLandmarks arrays
-        let allLandmarks = [];
-        for (const rest of restaurants) {
-            if (Array.isArray(rest.nearestLandmarks)) {
-                allLandmarks = allLandmarks.concat(rest.nearestLandmarks);
-            }
-        }
-        // Deduplicate
-        const uniqueLandmarks = [...new Set(allLandmarks.filter(Boolean))];
+        // Use university.nearestLandmarks directly
+        const uniqueLandmarks = [...new Set((university.nearestLandmarks || []).filter(Boolean))];
         res.status(200).json({
             status: 'success',
             university: university.name,

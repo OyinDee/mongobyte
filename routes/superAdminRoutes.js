@@ -367,20 +367,20 @@ router.delete('/restaurants/:id', authenticate, superAdminController.deleteResta
 
 /**
  * @swagger
- * /api/v1/superadmin/restaurants/{restaurantId}/nearest-landmarks:
+ * /api/v1/superadmin/universities/{universityId}/nearest-landmarks:
  *   put:
  *     tags: [Admin]
- *     summary: Update nearest landmarks for a restaurant
- *     description: Add or update the nearest landmarks list for a restaurant (Super Admin only)
+ *     summary: Update nearest landmarks for a university
+ *     description: Add or update the nearest landmarks list for a university (Super Admin only)
  *     security:
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
- *         name: restaurantId
+ *         name: universityId
  *         required: true
  *         schema:
  *           type: string
- *         description: Restaurant ID
+ *         description: University ID
  *     requestBody:
  *       required: true
  *       content:
@@ -405,11 +405,11 @@ router.delete('/restaurants/:id', authenticate, superAdminController.deleteResta
  *       403:
  *         description: Only super admins can update nearest landmarks
  *       404:
- *         description: Restaurant not found
+ *         description: University not found
  *       500:
  *         description: Internal server error
  */
-router.put('/restaurants/:restaurantId/nearest-landmarks', authenticate, superAdminController.updateRestaurantNearestLandmarks);
+router.put('/universities/:universityId/nearest-landmarks', authenticate, superAdminController.updateUniversityNearestLandmarks);
 
 module.exports = router;
 

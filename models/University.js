@@ -14,6 +14,9 @@ const universitySchema = new mongoose.Schema({
         type: Boolean,
         default: true
     },
+    nearestLandmarks: [{
+        type: String
+    }],
     restaurants: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Restaurant'

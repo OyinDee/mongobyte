@@ -296,9 +296,9 @@ exports.deleteOrder = async (request, response) => {
     }
 };
 
-// Add or update nearest landmarks for a restaurant (super admin only)
-exports.updateRestaurantNearestLandmarks = async (req, res) => {
-    const { restaurantId } = req.params;
+// Add or update nearest landmarks for a university (super admin only)
+exports.updateUniversityNearestLandmarks = async (req, res) => {
+    const { universityId } = req.params;
     const { nearestLandmarks } = req.body;
 
     // Authorization: Only super admins
@@ -309,15 +309,15 @@ exports.updateRestaurantNearestLandmarks = async (req, res) => {
         return res.status(400).json({ message: 'nearestLandmarks must be an array of strings.' });
     }
     try {
-        const restaurant = await Restaurant.findByIdAndUpdate(
-            restaurantId,
+        const university = await require('../models/University').findByIdAndUpdate(
+            universityId,
             { nearestLandmarks },
             { new: true, runValidators: true }
         );
-        if (!restaurant) {
-            return res.status(404).json({ message: 'Restaurant not found' });
+        if (!university) {
+            return res.status(404).json({ message: 'University not found' });
         }
-        res.json({ message: 'Nearest landmarks updated successfully', restaurant });
+        res.json({ message: 'Nearest landmarks updated successfully', university });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Internal server error', error: error.message });
