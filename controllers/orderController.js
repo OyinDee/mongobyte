@@ -1524,3 +1524,87 @@ exports.createOrderForExternalRecipient = async (request, response) => {
     }
 };
 
+// Place a new order by referencing another order's customId
+exports.createOrderByOrderCustomId = async (req, res) => {
+    const { orderCustomId } = req.body;
+    const userId = req.user._id;
+    const { note, location, phoneNumber, nearestLandmark, fee, mealsOverride } = req.body;
+
+    if (!orderCustomId) {
+        return res.status(400).json({ message: 'orderCustomId is required.' });
+    }
+    try {
+        // Find the referenced order
+        const refOrder = await require('../models/Orders').findOne({ customId: orderCustomId }).populate('meals.meal').populate('restaurant');
+        if (!refOrder) {
+            return res.status(404).json({ message: 'Referenced order not found.' });
+        }
+        // Use the same restaurant and meals (allow override)
+        const restaurant = refOrder.restaurant;
+        if (!restaurant || !restaurant.isActive) {
+            return res.status(400).json({ message: 'Referenced restaurant is not available.' });
+        }
+        // Use meals from referenced order, or override if provided
+        let meals = refOrder.meals.map(m => ({ mealId: m.meal.customId, quantity: m.quantity }));
+        if (Array.isArray(mealsOverride) && mealsOverride.length > 0) {
+            meals = mealsOverride;
+        }
+        // Calculate total price
+        let totalPrice = 0;
+        for (const m of meals) {
+            const mealDoc = await require('../models/Meals').findOne({ customId: m.mealId });
+            if (!mealDoc) return res.status(400).json({ message: `Meal with customId ${m.mealId} not found.` });
+            totalPrice += (mealDoc.price || 0) * (m.quantity || 1);
+        }
+        totalPrice += parseFloat(fee || refOrder.fee || 0);
+        // Use delivery info from referenced order, or override
+        const user = await require('../models/User').findById(userId);
+        const finalLocation = location || user.location || refOrder.location;
+        const finalPhone = phoneNumber || user.phoneNumber || refOrder.phoneNumber;
+        const finalLandmark = nearestLandmark || user.nearestLandmark || refOrder.nearestLandmark;
+        if (!finalLocation || !finalPhone) {
+            return res.status(400).json({ message: 'Delivery location and phone number are required.' });
+        }
+        // Check user balance
+        if (user.byteBalance < totalPrice) {
+            return res.status(400).json({ message: 'Insufficient balance. Please top up your Byte wallet before placing an order.', currentBalance: user.byteBalance, requiredAmount: totalPrice });
+        }
+        // Create the new order
+        const mealDetails = await Promise.all(meals.map(async ({ mealId, quantity }) => {
+            const meal = await require('../models/Meals').findOne({ customId: mealId });
+            if (!meal) throw new Error(`Meal with customId ${mealId} not found`);
+            return { meal: meal._id, quantity };
+        }));
+        const newOrder = new (require('../models/Orders'))({
+            user: userId,
+            meals: mealDetails,
+            note: note || refOrder.note,
+            totalPrice,
+            foodAmount: totalPrice - (fee || refOrder.fee || 0),
+            location: finalLocation,
+            nearestLandmark: finalLandmark,
+            phoneNumber: finalPhone,
+            restaurant: restaurant._id,
+            fee: parseFloat(fee || refOrder.fee || 0),
+        });
+        await newOrder.save();
+        // Update user balance and notifications
+        user.byteBalance -= totalPrice;
+        user.orderHistory.push(newOrder._id);
+        await user.save();
+        // Notify restaurant
+        const Notification = require('../models/Notifications');
+        const restaurantNotification = new Notification({
+            restaurantId: restaurant._id,
+            message: `You have received a new order (by reference) with ID: ${newOrder.customId}.`,
+        });
+        await restaurantNotification.save();
+        restaurant.notifications.push(restaurantNotification._id);
+        await restaurant.save();
+        res.status(201).json({ message: 'Order placed successfully by reference.', order: newOrder });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error', error: error.message });
+    }
+};
+

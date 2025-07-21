@@ -6,6 +6,7 @@ const authenticate = require('../middlewares/authenticateRestaurant.js');
 const authController = require('../controllers/authControllers');
 const restaurantAdvancedOrdersController = require('../controllers/restaurantAdvancedOrdersController');
 const { getRestaurantNotifications } = require('../controllers/restaurantControllers');
+const { authenticateUser } = require('../middlewares/authenticateUser');
 
 /**
  * @swagger
@@ -635,6 +636,19 @@ router.put('/advanced-orders/group/:orderId/status', authenticate, restaurantAdv
  */
 router.get('/advanced-orders/stats', authenticate, restaurantAdvancedOrdersController.getAdvancedOrdersStats);
 
+/**
+ * @swagger
+ * /restaurants/by-university:
+ *   get:
+ *     summary: Get all restaurants for the authenticated user's university
+ *     tags: [Restaurants]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of restaurants for the authenticated user's university
+ */
+router.get('/by-university', authenticateUser, restaurantController.getRestaurantsByUserUniversity);
 
 
 module.exports = router;

@@ -267,4 +267,54 @@ router.post('/:orderId/status', orderController.handleOrderStatus);
 // New endpoint: Order for non-app user (external recipient)
 router.post('/gift-external', authenticate, orderController.createOrderForExternalRecipient);
 
+/**
+ * @swagger
+ * /orders/by-reference:
+ *   post:
+ *     tags: [Orders]
+ *     summary: Place a new order by referencing another order's customId
+ *     description: Place a new order using the restaurant and meals from an existing order (optionally override delivery info, note, etc.)
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - orderCustomId
+ *             properties:
+ *               orderCustomId:
+ *                 type: string
+ *                 description: The customId of the order to reference
+ *               note:
+ *                 type: string
+ *               location:
+ *                 type: string
+ *               phoneNumber:
+ *                 type: string
+ *               nearestLandmark:
+ *                 type: string
+ *               fee:
+ *                 type: number
+ *               mealsOverride:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     mealId:
+ *                       type: string
+ *                     quantity:
+ *                       type: number
+ *     responses:
+ *       201:
+ *         description: Order placed successfully by reference
+ *       400:
+ *         description: Validation error
+ *       404:
+ *         description: Referenced order not found
+ */
+router.post('/by-reference', authenticateUser, orderController.createOrderByOrderCustomId);
+
 module.exports = router;

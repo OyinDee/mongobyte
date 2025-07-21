@@ -657,3 +657,18 @@ exports.getRestaurantNotifications = async (req, res) => {
     }
 };
 
+// Get all restaurants for the authenticated user's university
+exports.getRestaurantsByUserUniversity = async (request, response) => {
+    try {
+        if (!request.user || !request.user.university) {
+            return response.status(400).json({ message: 'User does not have a university set.' });
+        }
+        const universityId = request.user.university;
+        const restaurants = await Restaurant.find({ university: universityId, isActive: true }).populate('meals');
+        response.json(restaurants);
+    } catch (error) {
+        console.error('Error in getRestaurantsByUserUniversity:', error);
+        response.status(500).json({ message: 'Internal server error', error: error.message });
+    }
+};
+
