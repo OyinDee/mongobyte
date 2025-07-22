@@ -12,7 +12,7 @@ const authenticate = async (request, response, next) => {
 
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         if (decoded.user && decoded.user.superAdmin) {
-            request.user = decoded;
+            request.user = decoded.user;
             return next();
         }
 

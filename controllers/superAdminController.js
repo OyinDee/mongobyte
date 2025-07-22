@@ -299,22 +299,15 @@ exports.deleteOrder = async (request, response) => {
 
 // Add or update nearest landmarks for a university (super admin only)
 exports.updateUniversityNearestLandmarks = async (req, res) => {
-    // console.log('--- updateUniversityNearestLandmarks called ---');
-    // // Extract user from req.user.user or req.user
-    // const user = req.user && req.user.user ? req.user.user : req.user;
-    // console.log('user:', user);
-    // console.log('req.headers.authorization:', req.headers.authorization);
-    // console.log('Body.nearestLandmarks:', req.body.nearestLandmarks);
+    const user = req.user;
     const { universityId } = req.params;
     const { nearestLandmarks } = req.body;
 
     // Authorization: Only super admins
     if (!user || !user.superAdmin) {
-        console.log('Authorization failed: user missing or not superAdmin');
         return res.status(403).json({ message: 'Only super admins can update nearest landmarks.' });
     }
     if (!Array.isArray(nearestLandmarks)) {
-        console.log('Invalid nearestLandmarks payload:', nearestLandmarks);
         return res.status(400).json({ message: 'nearestLandmarks must be an array of strings.' });
     }
     try {
@@ -324,13 +317,10 @@ exports.updateUniversityNearestLandmarks = async (req, res) => {
             { new: true }
         );
         if (!university) {
-            console.log('University not found:', universityId);
             return res.status(404).json({ message: 'University not found.' });
         }
-        console.log('Landmarks updated successfully for university:', universityId);
         res.json({ message: 'Nearest landmarks updated successfully.', university });
     } catch (error) {
-        console.log('Error updating university landmarks:', error);
         res.status(500).json({ message: 'Server error.' });
     }
 };
