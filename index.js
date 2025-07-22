@@ -160,8 +160,10 @@ server.listen(PORT, () => {
 
 mongoose.connect(`${process.env.MONGODB_URI}`, {})
     .then(() => {
-        console.log('MongoDB connected');
+        // console.log('MongoDB connected');
         // Initialize scheduler after database connection
         initializeScheduler();
     })
-    .catch(err => console.error('MongoDB connection error:', err));
+    .catch(err => {
+        // console.error('MongoDB connection error:', err);
+    });

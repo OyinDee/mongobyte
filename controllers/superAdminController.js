@@ -23,7 +23,6 @@ exports.getTopCustomers = async (req, res) => {
     }).filter(Boolean);
     res.json({ customers });
   } catch (error) {
-    console.error('getTopCustomers error:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
@@ -147,7 +146,6 @@ exports.getDashboard = async (req, res) => {
       pendingWithdrawals: pendingWithdrawalsArr
     });
   } catch (error) {
-    console.error('Dashboard error:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
@@ -160,7 +158,6 @@ exports.getGlobalRevenue = async (req, res) => {
     const breakdown = await getBreakdown(orders, true);
     res.json({ totalRevenue, breakdown });
   } catch (error) {
-    console.error('getGlobalRevenue error:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
@@ -176,7 +173,6 @@ exports.deleteRestaurant = async (request, response) => {
         }
         response.json({ message: 'Restaurant deleted successfully!' });
     } catch (error) {
-        console.error(error);
         response.status(500).json({ message: 'Internal server error' });
     }
 };
@@ -188,7 +184,6 @@ exports.createRestaurant = async (request, response) => {
         await restaurant.save();
         response.status(201).json({ message: 'Restaurant created successfully!', restaurant });
     } catch (error) {
-        console.error(error);
         response.status(500).json({ message: 'Internal server error' });
     }
 };
@@ -204,7 +199,6 @@ exports.getRestaurantById = async (request, response) => {
         }
         response.json(restaurant);
     } catch (error) {
-        console.error(error);
         response.status(500).json({ message: 'Internal server error' });
     }
 };
@@ -217,7 +211,6 @@ exports.getUserOrders = async (request, response) => {
         const orders = await Order.find({ user: userId }).populate('meals.meal');
         response.json(orders);
     } catch (error) {
-        console.error(error);
         response.status(500).json({ message: 'Internal server error' });
     }
 };
@@ -243,7 +236,6 @@ exports.updateOrderStatus = async (request, response) => {
             order,
         });
     } catch (error) {
-        console.error(error);
         response.status(500).json({ message: 'Internal server error' });
     }
 };
@@ -260,7 +252,6 @@ exports.getAllOrders = async (request, response) => {
         });
         response.json(ordersWithRestaurantName);
     } catch (error) {
-        console.error(error);
         response.status(500).json({ message: 'Internal server error' });
     }
 };
@@ -277,7 +268,6 @@ exports.getOrderById = async (request, response) => {
         obj.restaurantName = order.restaurant && order.restaurant.name ? order.restaurant.name : undefined;
         response.json(obj);
     } catch (error) {
-        console.error(error);
         response.status(500).json({ message: 'Internal server error' });
     }
 };
@@ -292,7 +282,6 @@ exports.deleteOrder = async (request, response) => {
         }
         response.json({ message: 'Order deleted successfully' });
     } catch (error) {
-        console.error(error);
         response.status(500).json({ message: 'Internal server error' });
     }
 };

@@ -37,7 +37,6 @@ const authenticate = async (request, response, next) => {
 
         return response.status(401).json({ message: 'Invalid token structure' });
     } catch (error) {
-        console.error(error);
         response.status(401).json({ message: 'Invalid token' });
     }
 };

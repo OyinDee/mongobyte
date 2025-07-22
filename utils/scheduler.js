@@ -69,10 +69,7 @@ const processScheduledOrders = async () => {
                 });
                 await notification.save();
 
-                console.log(`Scheduled order ${scheduledOrder._id} executed successfully`);
-
             } catch (error) {
-                console.error(`Error executing scheduled order ${scheduledOrder._id}:`, error);
                 
                 // Mark order as failed
                 scheduledOrder.status = 'failed';
@@ -88,7 +85,7 @@ const processScheduledOrders = async () => {
         }
 
     } catch (error) {
-        console.error('Error processing scheduled orders:', error);
+        
     }
 };
 
@@ -152,12 +149,12 @@ const processGroupOrderDeadlines = async () => {
                 await groupOrder.save();
 
             } catch (error) {
-                console.error(`Error processing group order ${groupOrder._id}:`, error);
+                
             }
         }
 
     } catch (error) {
-        console.error('Error processing group order deadlines:', error);
+        
     }
 };
 
@@ -196,16 +193,15 @@ const processReferralRewards = async () => {
                     });
                     await notification.save();
 
-                    console.log(`Referral reward processed for user ${referral.referrer._id}`);
                 }
 
             } catch (error) {
-                console.error(`Error processing referral ${referral._id}:`, error);
+                
             }
         }
 
     } catch (error) {
-        console.error('Error processing referral rewards:', error);
+        
     }
 };
 
@@ -258,7 +254,6 @@ const initializeScheduler = () => {
     // Run every hour to process referral rewards
     cron.schedule('0 * * * *', processReferralRewards);
     
-    console.log('Scheduler initialized for advanced orders');
 };
 
 module.exports = {

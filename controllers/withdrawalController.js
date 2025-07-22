@@ -48,7 +48,6 @@ exports.getRestaurantWithdrawals = async (req, res) => {
             
         res.status(200).json(withdrawals);
     } catch (error) {
-        console.error('Error fetching restaurant withdrawals:', error);
         res.status(500).json({ message: 'Internal server error', error: error.message });
     }
 };
