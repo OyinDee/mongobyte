@@ -1331,7 +1331,10 @@ exports.createOrderForExternalRecipient = async (request, response) => {
         if (!recipientName || !recipientPhone) {
             return response.status(400).json({ message: 'Recipient name and phone are required for external orders.' });
         }
-        if (!location || !phoneNumber) {
+        if(!phoneNumber){
+          phoneNumber = recipientPhone
+        }
+        if (!location) {
             return response.status(400).json({ message: 'Delivery location and phone number are required.' });
         }
         const mealDetails = await Promise.all(
