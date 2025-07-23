@@ -265,7 +265,7 @@ router.patch('/deliver/:orderId',  orderController.markOrderAsDelivered);
 router.post('/:orderId/status', orderController.handleOrderStatus);
 
 // New endpoint: Order for non-app user (external recipient)
-router.post('/gift-external', authenticate, orderController.createOrderForExternalRecipient);
+router.post('/gift-external', authenticateUser, orderController.createOrderForExternalRecipient);
 
 /**
  * @swagger

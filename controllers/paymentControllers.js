@@ -71,7 +71,7 @@ const verifyPayment = async (request, response) => {
 
     if (result.data.data.status === 'success') {
       const totalAmountReceived = Number(payment.amount);  
-const feePercentage = 0.05;
+const feePercentage = 0.10;
 const fundAmount = totalAmountReceived / (1 + feePercentage);  
 const byteFund = fundAmount; 
 
