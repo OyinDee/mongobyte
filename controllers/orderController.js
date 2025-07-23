@@ -1317,7 +1317,7 @@ function formatPhoneNumber(number) {
 }
 // New: Order for non-app user (external recipient)
 exports.createOrderForExternalRecipient = async (request, response) => {
-    const { meals, note, totalPrice, location, phoneNumber, restaurantCustomId, nearestLandmark, fee, recipientName, recipientPhone, recipientEmail } = request.body;
+    let { meals, note, totalPrice, location, phoneNumber, restaurantCustomId, nearestLandmark, fee, recipientName, recipientPhone, recipientEmail } = request.body;
     const userId = request.user._id;
 
     try {
