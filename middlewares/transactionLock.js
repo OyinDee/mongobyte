@@ -24,9 +24,12 @@ const lockSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now,
-    expires: 30 // Auto-expire after 30 seconds
+    expires: 30 // Auto-expire after 30 seconds using MongoDB TTL index
   }
 });
+
+// Ensure TTL index is created
+lockSchema.index({ createdAt: 1 }, { expireAfterSeconds: 30 });
 
 const TransactionLock = mongoose.model('TransactionLock', lockSchema);
 
@@ -102,24 +105,7 @@ const releaseLock = async (req) => {
   }
 };
 
-/**
- * Cleanup expired locks (run periodically)
- */
-const cleanupExpiredLocks = async () => {
-  try {
-    const result = await TransactionLock.deleteMany({
-      createdAt: { $lt: new Date(Date.now() - 30000) } // Older than 30 seconds
-    });
-    if (result.deletedCount > 0) {
-      console.log(`Cleaned up ${result.deletedCount} expired locks`);
-    }
-  } catch (error) {
-    console.error('Error cleaning up expired locks:', error);
-  }
-};
-
-// Run cleanup every minute
-setInterval(cleanupExpiredLocks, 60000);
+// No need for manual cleanup - MongoDB TTL index will handle it automatically
 
 module.exports = {
   transactionLock,
