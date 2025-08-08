@@ -56,7 +56,7 @@ exports.createMeal = async (request, response) => {
 
 exports.getAllMeals = async (request, response) => {
     try {
-        const meals = await Meal.find().populate('restaurant', 'name location imageUrl university isActive averageRating totalRatings');
+        const meals = await Meal.find().populate('restaurant', 'customId name location imageUrl university isActive averageRating totalRatings');
         response.json(meals);
     } catch (error) {
         console.error(error);
@@ -70,10 +70,10 @@ exports.getMealById = async (request, response) => {
     try {
         let meal = null;
         // Try by customId first
-        meal = await Meal.findOne({ customId: id }).populate('restaurant', 'name location imageUrl university isActive averageRating totalRatings');
+        meal = await Meal.findOne({ customId: id }).populate('restaurant', 'customId name location imageUrl university isActive averageRating totalRatings');
         // If not found and id looks like ObjectId, try by _id
         if (!meal && id.match(/^[0-9a-fA-F]{24}$/)) {
-            meal = await Meal.findById(id).populate('restaurant', 'name location imageUrl university isActive averageRating totalRatings');
+            meal = await Meal.findById(id).populate('restaurant', 'customId name location imageUrl university isActive averageRating totalRatings');
         }
         if (!meal) {
             return response.status(404).json({ message: 'Meal not found' });
@@ -91,7 +91,7 @@ exports.updateMeal = async (request, response) => {
     const restaurantId  = request.restaurant.customId; 
 
     try {
-        const meal = await Meal.findOne({ customId: id }).populate('restaurant', 'name location imageUrl university isActive averageRating totalRatings');
+        const meal = await Meal.findOne({ customId: id }).populate('restaurant', 'customId name location imageUrl university isActive averageRating totalRatings');
 
         if (!meal) {
             return response.status(404).json({ message: 'Meal not found' });

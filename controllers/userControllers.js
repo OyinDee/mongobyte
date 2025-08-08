@@ -779,7 +779,7 @@ exports.getMyOrders = async (req, res) => {
           {
             path: 'restaurant',
             model: 'Restaurant',
-            select: 'name location imageUrl'
+            select: 'customId name location imageUrl'
           }
         ],
         options: {

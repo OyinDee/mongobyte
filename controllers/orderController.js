@@ -380,11 +380,11 @@ exports.getOrderById = async (request, response) => {
 
     try {
         // Try to find order by customId first
-        let order = await Order.findOne({ customId: orderId }).populate('user meals.meal');
+        let order = await Order.findOne({ customId: orderId }).populate('user meals.meal').populate('restaurant', 'customId name location imageUrl');
         
         // If not found and orderId is a valid MongoDB ObjectId, try finding by _id
         if (!order && orderId.match(/^[0-9a-fA-F]{24}$/)) {
-            order = await Order.findById(orderId).populate('user meals.meal');
+            order = await Order.findById(orderId).populate('user meals.meal').populate('restaurant', 'customId name location imageUrl');
         }
 
         if (!order) {
@@ -414,7 +414,7 @@ exports.orderConfirmation = async (request, response) => {
   console.log(`Additional Fee: ${additionalFee}, Description: ${requestDescription}`);
 
   try {
-    const order = await Order.findOne({ customId: orderId }).populate('user meals.meal').populate('restaurant', 'name location imageUrl university');
+    const order = await Order.findOne({ customId: orderId }).populate('user meals.meal').populate('restaurant', 'customId name location imageUrl university');
 
     if (!order) {
       return response.status(404).json({ message: 'Order not found' });
@@ -803,7 +803,7 @@ exports.markOrderAsDelivered = async (request, response) => {
   const { orderId } = request.params;
 
   try {
-    const order = await Order.findOne({ customId: orderId }).populate('user').populate('restaurant', 'name location imageUrl');
+    const order = await Order.findOne({ customId: orderId }).populate('user').populate('restaurant', 'customId name location imageUrl');
 
     if (!order) {
       return response.status(404).json({ message: 'Order not found' });
@@ -908,7 +908,7 @@ exports.handleOrderStatus = async (request, response) => {
     const { orderId } = request.params;
     const { action } = request.body; 
 
-    const order = await Order.findOne({ customId: orderId }).populate('restaurant', 'name location imageUrl').populate('user');
+    const order = await Order.findOne({ customId: orderId }).populate('restaurant', 'customId name location imageUrl').populate('user');
     if (!order) return response.status(404).json({ message: 'Order not found' });
 
     const user = await User.findById(order.user._id);
@@ -1540,7 +1540,7 @@ exports.createOrderByOrderCustomId = async (req, res) => {
     }
     try {
         // Find the referenced order
-        const refOrder = await require('../models/Orders').findOne({ customId: orderCustomId }).populate('meals.meal').populate('restaurant', 'name location imageUrl isActive');
+        const refOrder = await require('../models/Orders').findOne({ customId: orderCustomId }).populate('meals.meal').populate('restaurant', 'customId name location imageUrl isActive');
         if (!refOrder) {
             return res.status(404).json({ message: 'Referenced order not found.' });
         }

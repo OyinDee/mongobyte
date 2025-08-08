@@ -11,6 +11,13 @@ const generateId = require('../utils/generateID');
  * 
  * Always use .select() to exclude these fields when fetching restaurants for client responses:
  * .select('-password -bankName -accountNumber -accountHolder -walletBalance -verificationCode')
+ * 
+ * SAFE FIELDS that can be exposed in API responses:
+ * - customId: Restaurant's unique identifier (required for frontend routing)
+ * - name, location, imageUrl: Public restaurant information
+ * - university, isActive: Business logic fields
+ * - averageRating, totalRatings: Public rating information
+ * - description, contactNumber: Public business information
  */
 
 const restaurantSchema = new mongoose.Schema({
