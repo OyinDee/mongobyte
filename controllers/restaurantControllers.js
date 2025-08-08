@@ -258,8 +258,8 @@ exports.getRestaurantById = async (request, response) => {
         
         let restaurant = null;
         
-        // Always exclude sensitive fields for public access
-        const selectFields = '-password -bankName -accountNumber -accountHolder -walletBalance -verificationCode';
+        // Exclude sensitive fields but include walletBalance for public access
+        const selectFields = '-password -bankName -accountNumber -accountHolder -verificationCode';
         
         // Check if it's a valid MongoDB ObjectId format
         if (id.match(/^[0-9a-fA-F]{24}$/)) {
