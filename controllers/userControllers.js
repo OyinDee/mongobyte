@@ -5,6 +5,7 @@ const Meal = require('../models/Meals');
 const Restaurant = require('../models/Restaurants');
 const Notification = require('../models/Notifications');
 const University = require('../models/University');
+const TransferLog = require('../models/TransferLog');
 const sendEmail = require('../configs/nodemailer');
 // Get user balance by username
 exports.getUserBalanceByUsername = async (req, res) => {
@@ -479,7 +480,6 @@ exports.transferBytes = async (request, response) => {
     );
 
     // Log the transfer for audit trail
-    const TransferLog = require('../models/TransferLog');
     const transferLog = new TransferLog({
       senderId: senderId,
       recipientId: recipient._id,
