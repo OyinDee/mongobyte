@@ -163,7 +163,14 @@ exports.login = async (request, response) => {
             return;
         }
 
-        const token = jwt.sign({ user }, process.env.JWT_SECRET);
+        // Sign only the user ID and username for security
+        const token = jwt.sign({ 
+            userId: user._id,
+            username: user.username,
+            superAdmin: user.superAdmin,
+            university: user.university,
+            type: 'user'
+        }, process.env.JWT_SECRET, { expiresIn: '7d' });
 
         // Send response first
         response.status(202).json({
@@ -174,12 +181,6 @@ exports.login = async (request, response) => {
                 email: user.email,
                 phoneNumber: user.phoneNumber,
                 university: user.university,
-                byteBalance: user.byteBalance,
-                bio: user.bio,
-                imageUrl: user.imageUrl,
-                location: user.location || '',
-                nearestLandmark: user.nearestLandmark || '',
-                isVerified: user.isVerified,
                 superAdmin: user.superAdmin
             },
             token,
@@ -423,8 +424,12 @@ exports.loginRestaurant = async (request, response) => {
             return response.status(401).json({ message: 'Invalid password.' });
         }
 
-        const token = jwt.sign({ restaurant }, process.env.JWT_SECRET);
-
+        // Sign only the restaurant ID and essential info for security
+        const token = jwt.sign({ 
+            restaurantId: restaurant._id,
+            customId: restaurant.customId,
+            type: 'restaurant'
+        }, process.env.JWT_SECRET, { expiresIn: '7d' });
 
         response.status(200).json({
             message: 'Login successful!',

@@ -23,9 +23,25 @@ const path = require('path');
 const { initializeScheduler } = require('./utils/scheduler');
 const withdrawalRoutes = require('./routes/withdrawalRoutes');
 
+// Import security middleware
+const { 
+  globalRateLimit, 
+  authRateLimit, 
+  passwordResetRateLimit, 
+  helmetConfig, 
+  mongoSanitizeConfig, 
+  securityLogger 
+} = require('./middlewares/security');
+
 const app = express();
 const server = http.createServer(app);
 const io = socketIO(server);
+
+// Apply security middleware first
+app.use(helmetConfig);
+app.use(globalRateLimit);
+app.use(mongoSanitizeConfig);
+app.use(securityLogger);
 
 app.use(cookieParser());
 app.use(cors({
@@ -138,8 +154,8 @@ app.get('/api-docs', swaggerUi.setup(swaggerSpec, {
   customSiteTitle: "Byte! API Documentation"
 }));
 
-// API routes
-app.use('/api/v1/auth', authRoutes);
+// API routes with specific rate limiting
+app.use('/api/v1/auth', authRateLimit, authRoutes);
 app.use('/api/v1/restaurants', restaurantRoutes);
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/meals', mealRoutes);

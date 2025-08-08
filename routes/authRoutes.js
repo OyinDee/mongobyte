@@ -2,6 +2,14 @@ const express = require('express');
 const router = express.Router();
 
 const authController = require('../controllers/authControllers');
+const { 
+  sanitizeInput, 
+  loginValidation, 
+  registerValidation, 
+  emailValidation, 
+  passwordResetValidation, 
+  handleValidationErrors 
+} = require('../middlewares/inputValidation');
 
 /**
  * @swagger
@@ -89,7 +97,7 @@ const authController = require('../controllers/authControllers');
  *                   type: string
  *                   example: "Email already exists"
  */
-router.post('/register', authController.register);
+router.post('/register', sanitizeInput, registerValidation, handleValidationErrors, authController.register);
 
 /**
  * @swagger
@@ -133,7 +141,7 @@ router.post('/register', authController.register);
  *       401:
  *         description: Invalid credentials
  */
-router.post('/login', authController.login);
+router.post('/login', sanitizeInput, loginValidation, handleValidationErrors, authController.login);
 
 /**
  * @swagger
@@ -183,7 +191,7 @@ router.get('/verify-email', authController.verifyEmail);
  *       404:
  *         description: User not found
  */
-router.post('/resend-verification', authController.resendVerification);
+router.post('/resend-verification', sanitizeInput, emailValidation, handleValidationErrors, authController.resendVerification);
 
 /**
  * @swagger
@@ -211,7 +219,7 @@ router.post('/resend-verification', authController.resendVerification);
  *       404:
  *         description: User not found
  */
-router.post('/forgot-password', authController.forgotPassword);
+router.post('/forgot-password', sanitizeInput, emailValidation, handleValidationErrors, authController.forgotPassword);
 
 /**
  * @swagger
@@ -249,6 +257,6 @@ router.post('/forgot-password', authController.forgotPassword);
  *       400:
  *         description: Invalid or expired reset code
  */
-router.post('/reset-password', authController.resetPassword);
+router.post('/reset-password', sanitizeInput, passwordResetValidation, handleValidationErrors, authController.resetPassword);
 
 module.exports = router;

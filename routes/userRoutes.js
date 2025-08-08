@@ -7,7 +7,14 @@ const superAdminController = require('../controllers/superAdminController')
 const { transferLimiter, financialOperationsLimiter } = require('../middlewares/rateLimiter');
 const { transactionLock } = require('../middlewares/transactionLock');
 const { concurrencyGuard } = require('../middlewares/concurrencyGuard');
-const { transferValidation, handleValidationErrors, sanitizeAmount, securityChecks } = require('../middlewares/inputValidation');
+const { 
+  sanitizeInput, 
+  transferValidation, 
+  profileUpdateValidation, 
+  handleValidationErrors, 
+  sanitizeAmount, 
+  securityChecks 
+} = require('../middlewares/inputValidation');
 
 /**
  * @swagger
@@ -312,7 +319,7 @@ router.get('/getProfile', authenticateUser, userControllers.getProfile);
  *       400:
  *         description: Validation errors
  */
-router.put('/updateProfile', authenticateUser, userControllers.updateUserProfile);
+router.put('/updateProfile', sanitizeInput, authenticateUser, profileUpdateValidation, handleValidationErrors, userControllers.updateUserProfile);
 
 /**
  * @swagger
@@ -397,6 +404,7 @@ router.get('/restaurants/public', userControllers.getAllRestaurantsPublic);
  *         description: Validation errors
  */
 router.post('/transfer', 
+  sanitizeInput,
   authenticateUser, 
   concurrencyGuard('transfer'),
   transferLimiter,
