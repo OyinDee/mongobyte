@@ -31,6 +31,11 @@ const authenticate = async (req, res, next) => {
                 return res.status(404).json({ message: 'Restaurant not found' });
             }
             req.restaurant = restaurant;
+            req.user = {
+                _id: restaurant._id,
+                customId: restaurant.customId,
+                type: 'restaurant'
+            };
             req.userType = 'restaurant';
             return next();
         }
@@ -54,6 +59,11 @@ const authenticate = async (req, res, next) => {
                 return res.status(404).json({ message: 'Restaurant not found' });
             }
             req.restaurant = restaurant;
+            req.user = {
+                _id: restaurant._id,
+                customId: restaurant.customId,
+                type: 'restaurant'
+            };
             req.userType = 'restaurant';
             return next();
         }

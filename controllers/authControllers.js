@@ -46,7 +46,7 @@ exports.register = async (request, response) => {
         <body>
           <div class="container">
             <div class="header">
-              <h1>Welcome to <span class="brand-text">Byte!</span></h1>
+              <h1>${username}, welcome to <span class="brand-text">Byte!</span></h1>
             </div>
             <div class="content">
               <p>🎉 <strong>Congratulations!</strong> You've successfully joined the Byte community!</p>
@@ -434,10 +434,14 @@ exports.loginRestaurant = async (request, response) => {
         response.status(200).json({
             message: 'Login successful!',
             restaurant: {
-                id: restaurant.customId,
+                id: restaurant._id,
+                customId: restaurant.customId,
                 name: restaurant.name,
                 email: restaurant.email,
                 location: restaurant.location,
+                description: restaurant.description,
+                imageUrl: restaurant.imageUrl,
+                isActive: restaurant.isActive,
                 meals: restaurant.meals,
                 contactNumber: restaurant.contactNumber,
                 walletBalance: restaurant.walletBalance
