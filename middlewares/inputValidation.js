@@ -1,4 +1,4 @@
-const { body, validationResult } = require('express-validator');
+const { body, param, validationResult } = require('express-validator');
 const validator = require('validator');
 const mongoSanitize = require('express-mongo-sanitize');
 
@@ -267,6 +267,90 @@ const profileUpdateValidation = [
     .withMessage('Nearest landmark must be less than 200 characters')
 ];
 
+/**
+ * Username parameter validation
+ */
+const usernameParamValidation = [
+  param('username')
+    .trim()
+    .isLength({ min: 3, max: 50 })
+    .matches(/^[a-zA-Z0-9_]+$/)
+    .withMessage('Username must be 3-50 characters and contain only letters, numbers, and underscores')
+];
+
+/**
+ * Balance access control middleware
+ */
+const balanceAccessControl = (req, res, next) => {
+  const requestedUsername = req.params.username;
+  const currentUser = req.user;
+  
+  // Allow super admins to check any balance
+  if (currentUser.superAdmin) {
+    return next();
+  }
+  
+  // Allow users to check only their own balance
+  if (currentUser.username === requestedUsername) {
+    return next();
+  }
+  
+  // Log unauthorized access attempt
+  console.warn('Unauthorized balance access attempt:', {
+    requestedUsername,
+    currentUser: currentUser.username,
+    ip: req.ip,
+    userAgent: req.headers['user-agent'],
+    timestamp: new Date().toISOString()
+  });
+  
+  return res.status(403).json({ 
+    error: 'Access denied. You can only check your own balance.' 
+  });
+};
+
+/**
+ * Balance update validation (super admin only)
+ */
+const balanceUpdateValidation = [
+  body('user_id')
+    .isMongoId()
+    .withMessage('Invalid user ID format'),
+  
+  body('byteFund')
+    .isFloat({ min: 100, max: 100000 })
+    .withMessage('Byte fund amount must be between 100 and 1,000,000')
+    .custom((value) => {
+      if (!/^-?\d+(\.\d{1,2})?$/.test(value.toString())) {
+        throw new Error('Amount can have at most 2 decimal places');
+      }
+      return true;
+    })
+];
+
+/**
+ * Super admin only access control
+ */
+const superAdminOnly = (req, res, next) => {
+  const currentUser = req.user;
+  
+  if (!currentUser.superAdmin) {
+    console.warn('Unauthorized admin action attempt:', {
+      action: 'balance_update',
+      user: currentUser.username,
+      ip: req.ip,
+      userAgent: req.headers['user-agent'],
+      timestamp: new Date().toISOString()
+    });
+    
+    return res.status(403).json({ 
+      error: 'Access denied. Super admin privileges required.' 
+    });
+  }
+  
+  next();
+};
+
 module.exports = {
   sanitizeInput,
   loginValidation,
@@ -277,6 +361,8 @@ module.exports = {
   paymentValidation,
   withdrawalValidation,
   profileUpdateValidation,
+  usernameParamValidation,
+  balanceAccessControl,
   handleValidationErrors,
   sanitizeAmount,
   securityChecks

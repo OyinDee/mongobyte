@@ -42,6 +42,22 @@ const passwordResetRateLimit = rateLimit({
   legacyHeaders: false,
 });
 
+// Rate limiting for balance checks
+const balanceCheckRateLimit = rateLimit({
+  windowMs: 5 * 60 * 1000, // 5 minutes
+  max: 20, // limit each IP to 20 balance checks per 5 minutes
+  keyGenerator: (req) => {
+    // Use combination of IP and user ID for more granular control
+    return `${req.ip}-${req.user?._id || 'anonymous'}`;
+  },
+  message: {
+    error: 'Too many balance check requests, please try again later.',
+    retryAfter: '5 minutes'
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 // Helmet configuration for security headers
 const helmetConfig = helmet({
   contentSecurityPolicy: {
@@ -124,6 +140,7 @@ module.exports = {
   globalRateLimit,
   authRateLimit,
   passwordResetRateLimit,
+  balanceCheckRateLimit,
   helmetConfig,
   mongoSanitizeConfig,
   securityLogger

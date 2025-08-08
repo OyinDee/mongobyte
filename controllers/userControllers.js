@@ -7,26 +7,40 @@ const Notification = require('../models/Notifications');
 const University = require('../models/University');
 const TransferLog = require('../models/TransferLog');
 const sendEmail = require('../configs/nodemailer');
-// Get user balance by username
+// Get user balance by username (Protected)
 exports.getUserBalanceByUsername = async (req, res) => {
   try {
     const { username } = req.params;
+    const currentUser = req.user;
     
-    // Check if username is provided
-    if (!username) {
-      return res.status(400).json({ message: 'Username is required' });
-    }
+    // Log balance access for security monitoring
+    console.log('Balance access request:', {
+      requestedUsername: username,
+      requestingUser: currentUser.username,
+      isSuperAdmin: currentUser.superAdmin,
+      ip: req.ip,
+      userAgent: req.headers['user-agent'],
+      timestamp: new Date().toISOString()
+    });
     
-    // Find the user by username
+    // Find the user by username (only select necessary fields)
     const user = await User.findOne({ username }, 'username byteBalance');
     if (!user) {
+      console.warn('Balance check for non-existent user:', {
+        requestedUsername: username,
+        requestingUser: currentUser.username,
+        ip: req.ip,
+        timestamp: new Date().toISOString()
+      });
       return res.status(404).json({ message: 'User not found' });
     }
     
-    // Return user's balance
+    // Return user's balance with additional security info
     res.status(200).json({
       username: user.username,
-      balance: user.byteBalance
+      balance: user.byteBalance,
+      accessedAt: new Date().toISOString(),
+      accessedBy: currentUser.superAdmin ? 'admin' : 'self'
     });
   } catch (error) {
     console.error('Error fetching user balance:', error);

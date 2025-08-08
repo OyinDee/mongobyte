@@ -10,11 +10,14 @@ const { concurrencyGuard } = require('../middlewares/concurrencyGuard');
 const { 
   sanitizeInput, 
   transferValidation, 
-  profileUpdateValidation, 
+  profileUpdateValidation,
+  usernameParamValidation,
+  balanceAccessControl,
   handleValidationErrors, 
   sanitizeAmount, 
   securityChecks 
 } = require('../middlewares/inputValidation');
+const { balanceCheckRateLimit } = require('../middlewares/security');
 
 /**
  * @swagger
@@ -131,11 +134,11 @@ router.get('/revenue/global', superAdminController.getGlobalRevenue);
 const { uploadImage } = require('../controllers/image');
 /**
  * @swagger
- * /users/balance/username:
+ * /users/balance/{username}:
  *   get:
  *     tags: [Users]
- *     summary: Get user balance by username
- *     description: Get a user's byte balance by their username
+ *     summary: Get user balance by username (Protected)
+ *     description: Get a user's byte balance by their username. Users can only check their own balance unless they are super admins.
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -144,7 +147,8 @@ const { uploadImage } = require('../controllers/image');
  *         required: true
  *         schema:
  *           type: string
- *         description: Username of the user to get balance for
+ *           pattern: '^[a-zA-Z0-9_]{3,50}$'
+ *         description: Username of the user to get balance for (3-50 characters, alphanumeric + underscore)
  *     responses:
  *       200:
  *         description: User balance retrieved successfully
@@ -157,14 +161,28 @@ const { uploadImage } = require('../controllers/image');
  *                   type: string
  *                 balance:
  *                   type: number
+ *       400:
+ *         description: Invalid username format
+ *       401:
+ *         description: Authentication required
+ *       403:
+ *         description: Access denied - can only check own balance
  *       404:
  *         description: User not found
- *       400:
- *         description: Username is required
+ *       429:
+ *         description: Too many requests - rate limit exceeded
  *       500:
  *         description: Server error
  */
-router.get('/balance/:username', authenticateUser, userControllers.getUserBalanceByUsername);
+router.get('/balance/:username', 
+  sanitizeInput,
+  balanceCheckRateLimit,
+  authenticateUser,
+  usernameParamValidation,
+  handleValidationErrors,
+  balanceAccessControl,
+  userControllers.getUserBalanceByUsername
+);
 
 /**
  * @swagger
@@ -203,7 +221,6 @@ router.get('/balance/:username', authenticateUser, userControllers.getUserBalanc
  */
 const authenticateSuperAdmin = require('../middlewares/authenticate');
 router.get('/notifications/:username', authenticateSuperAdmin, userControllers.getNotificationsByUsername);
-router.get('/balance/:username', authenticateUser, userControllers.getUserBalanceByUsername);
 
 
 /**
