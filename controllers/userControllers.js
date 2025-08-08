@@ -1,3 +1,11 @@
+const User = require('../models/User');
+const jwt = require('jsonwebtoken');
+const Order = require('../models/Orders');
+const Meal = require('../models/Meals');
+const Restaurant = require('../models/Restaurants');
+const Notification = require('../models/Notifications');
+const University = require('../models/University');
+const sendEmail = require('../configs/nodemailer');
 // Get user balance by username
 exports.getUserBalanceByUsername = async (req, res) => {
   try {
@@ -46,14 +54,6 @@ exports.getNotificationsByUsername = async (req, res) => {
     res.status(500).json({ message: 'Error fetching notifications' });
   }
 };
-const User = require('../models/User');
-const jwt = require('jsonwebtoken');
-const Order = require('../models/Orders');
-const Meal = require('../models/Meals');
-const Restaurant = require('../models/Restaurants');
-const Notification = require('../models/Notifications');
-const University = require('../models/University');
-const sendEmail = require('../configs/nodemailer');
 
 exports.getProfile = async (request, response) => {
     const userId = request.user._id; 
@@ -169,7 +169,7 @@ exports.updateUserProfile = async (req, res) => {
 
       // Send email notification if university was updated
       if (university !== undefined) {
-        const emailHtml = `<html><head><style>body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #fff; color: #000; margin: 0; padding: 0; } .container, .email-container { width: 90%; max-width: 600px; margin: 30px auto; background-color: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); overflow: hidden; } .header { text-align: center; padding: 40px 20px 30px; background-color: #990000; color: #fff; } .header h1 { margin: 0; font-size: 28px; font-weight: 700; } .brand-text, .brand { color: #FFCC00; font-weight: bold; } .content { font-size: 16px; line-height: 1.6; padding: 30px; color: #000; background-color: #fff; } .content p { margin: 15px 0; } .highlight, .success-box, .alert-box, .fee-info, .bonus-info, .reward-info, .update-info { background-color: #FFCC00; color: #000; border-radius: 8px; padding: 20px; margin: 20px 0; font-weight: bold; } .footer { background-color: #000; color: #fff; text-align: center; padding: 20px; font-size: 14px; }</style></head><body><div class="email-container"><div class="header"><h1>Profile Updated! ✅</h1></div><div class="content"><p>Hi ${updatedUser.username}! 👋</p><p>Great news! Your profile has been successfully updated. Here's what changed:</p><div class="update-info">${university ? `<p><strong>🏫 University:</strong> ${updatedUser.university?.name || 'Updated'}</p>` : ''}${bio !== undefined ? `<p><strong>📝 Bio:</strong> ${bio || 'Cleared'}</p>` : ''}${location !== undefined ? `<p><strong>📍 Location:</strong> ${location || 'Cleared'}</p>` : ''}${nearestLandmark !== undefined ? `<p><strong>🗺️ Nearest Landmark:</strong> ${nearestLandmark || 'Cleared'}</p>` : ''}${imageUrl !== undefined ? `<p><strong>📸 Profile Picture:</strong> Updated</p>` : ''}</div><p>Your profile is now more complete and will help you get a better experience on our platform! 🎉</p><p>Ready to order some delicious food? Let's go! 🍕</p></div><div class="footer"><p>© ${new Date().getFullYear()} <span class="brand">Byte</span> - Your Campus Food Companion</p><p>Keeping your profile fresh! 😋</p></div></div></body></html>`;
+        const emailHtml = `<html><head><style>body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #fff; color: #000; margin: 0; padding: 0; } .container, .email-container { width: 90%; max-width: 600px; margin: 30px auto; background-color: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); overflow: hidden; } .header { text-align: center; padding: 40px 20px 30px; background-color: #990000; color: #fff; } .header h1 { margin: 0; font-size: 28px; font-weight: 700; } .brand-text, .brand { color: #E6B805; font-weight: bold; } .content { font-size: 16px; line-height: 1.6; padding: 30px; color: #000; background-color: #fff; } .content p { margin: 15px 0; } .highlight, .success-box, .alert-box, .fee-info, .bonus-info, .reward-info, .update-info { background-color: #E6B805; color: #000; border-radius: 8px; padding: 20px; margin: 20px 0; font-weight: bold; } .footer { background-color: #000; color: #fff; text-align: center; padding: 20px; font-size: 14px; }</style></head><body><div class="email-container"><div class="header"><h1>Profile Updated! ✅</h1></div><div class="content"><p>Hi ${updatedUser.username}! 👋</p><p>Great news! Your profile has been successfully updated. Here's what changed:</p><div class="update-info">${university ? `<p><strong>🏫 University:</strong> ${updatedUser.university?.name || 'Updated'}</p>` : ''}${bio !== undefined ? `<p><strong>📝 Bio:</strong> ${bio || 'Cleared'}</p>` : ''}${location !== undefined ? `<p><strong>📍 Location:</strong> ${location || 'Cleared'}</p>` : ''}${nearestLandmark !== undefined ? `<p><strong>🗺️ Nearest Landmark:</strong> ${nearestLandmark || 'Cleared'}</p>` : ''}${imageUrl !== undefined ? `<p><strong>📸 Profile Picture:</strong> Updated</p>` : ''}</div><p>Your profile is now more complete and will help you get a better experience on our platform! 🎉</p><p>Ready to order some delicious food? Let's go! 🍕</p></div><div class="footer"><p>© ${new Date().getFullYear()} <span class="brand">Byte</span> - Your Campus Food Companion</p><p>Keeping your profile fresh! 😋</p></div></div></body></html>`;
         // Send email notification (non-blocking)
         setImmediate(async () => {
           try {
@@ -230,13 +230,33 @@ exports.updateByteBalance = async (request) => {
     const { user_id, byteFund } = request.body;
   
     try {
+      // Validate input to prevent script injection
+      if (typeof user_id !== 'string' || !/^[0-9a-fA-F]{24}$/.test(user_id)) {
+        throw new Error('Invalid user ID format');
+      }
+
+      // Validate byteFund to ensure it's a valid number
+      if (typeof byteFund !== 'number' || isNaN(byteFund) || !Number.isFinite(byteFund)) {
+        throw new Error('Invalid byte fund amount');
+      }
+
       const user = await User.findById(user_id);
       if (!user) {
         throw new Error('User not found');
       }
-  
-      user.byteBalance += byteFund;
-      await user.save();
+
+      // Use MongoDB's $inc operator for atomic update
+      const updatedUser = await User.findByIdAndUpdate(
+        user_id,
+        { $inc: { byteBalance: byteFund } },
+        { new: true }
+      );
+
+      if (!updatedUser) {
+        throw new Error('Failed to update balance');
+      }
+
+      return updatedUser;
     } catch (error) {
       console.error('Error updating byte balance:', error);
       throw error; 
@@ -372,37 +392,117 @@ exports.getUserOrderHistory = async (request, response) => {
 exports.transferBytes = async (request, response) => {
   const { recipientUsername, amount } = request.body;
   const senderId = request.user._id;
+  const mongoose = require('mongoose');
 
+  // Validate input to prevent script injection
+  if (typeof recipientUsername !== 'string' || recipientUsername.length > 50 || /[<>{}]/.test(recipientUsername)) {
+    return response.status(400).json({ message: 'Invalid recipient username format' });
+  }
+
+  // Validate amount to ensure it's a valid number
+  if (typeof amount !== 'number' || isNaN(amount) || !Number.isFinite(amount)) {
+    return response.status(400).json({ message: 'Invalid amount format' });
+  }
+
+  // Start a database session for transaction
+  const session = await mongoose.startSession();
+  
   try {
+    // Start transaction
+    await session.startTransaction();
+
+    // Additional security checks
     if (amount <= 0) {
+      await session.abortTransaction();
       return response.status(400).json({ message: 'Transfer amount must be greater than zero' });
     }
 
-    const sender = await User.findById(senderId);
+    // Check for self-transfer
+    if (request.user.username === recipientUsername) {
+      await session.abortTransaction();
+      return response.status(400).json({ message: 'Cannot transfer to yourself' });
+    }
+
+    // Find sender with session lock
+    const sender = await User.findById(senderId).session(session);
     if (!sender) {
+      await session.abortTransaction();
       return response.status(404).json({ message: 'Sender not found' });
     }
 
-    const recipient = await User.findOne({ username: recipientUsername });
+    // Find recipient with session lock
+    const recipient = await User.findOne({ username: recipientUsername }).session(session);
     if (!recipient) {
+      await session.abortTransaction();
       return response.status(404).json({ message: 'Recipient not found' });
     }
 
+    // Check sender balance with buffer for potential concurrent operations
     if (sender.byteBalance < amount) {
-      return response.status(400).json({ message: 'Insufficient byte balance' });
+      await session.abortTransaction();
+      return response.status(400).json({ 
+        message: 'Insufficient byte balance',
+        currentBalance: sender.byteBalance,
+        requestedAmount: amount
+      });
     }
 
-    sender.byteBalance -= amount;
-    recipient.byteBalance += amount;
+    // Additional fraud detection
+    const now = new Date();
+    const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
+    
+    // Check for excessive transfers in the last hour
+    const recentTransfers = await TransferLog.countDocuments({
+      senderId: senderId,
+      createdAt: { $gte: oneHourAgo },
+      status: 'completed'
+    }).session(session);
 
-    await sender.save();
-    await recipient.save();
+    if (recentTransfers >= 10) {
+      await session.abortTransaction();
+      return response.status(429).json({ 
+        message: 'Transfer limit exceeded. Maximum 10 transfers per hour.' 
+      });
+    }
 
+    // Perform the transfer atomically
+    const senderUpdate = await User.findByIdAndUpdate(
+      senderId,
+      { $inc: { byteBalance: -amount } },
+      { new: true, session }
+    );
+
+    const recipientUpdate = await User.findByIdAndUpdate(
+      recipient._id,
+      { $inc: { byteBalance: amount } },
+      { new: true, session }
+    );
+
+    // Log the transfer for audit trail
+    const TransferLog = require('../models/TransferLog');
+    const transferLog = new TransferLog({
+      senderId: senderId,
+      recipientId: recipient._id,
+      amount: amount,
+      senderBalanceBefore: sender.byteBalance,
+      senderBalanceAfter: senderUpdate.byteBalance,
+      recipientBalanceBefore: recipient.byteBalance,
+      recipientBalanceAfter: recipientUpdate.byteBalance,
+      status: 'completed',
+      ipAddress: request.ip,
+      userAgent: request.headers['user-agent']
+    });
+
+    await transferLog.save({ session });
+
+    // Commit the transaction
+    await session.commitTransaction();
 
     response.status(200).json({
       message: `Successfully transferred ${amount} bytes to ${recipient.username}`,
-      sender: { username: sender.username, byteBalance: sender.byteBalance },
-      recipient: { username: recipient.username, byteBalance: recipient.byteBalance },
+      transferId: transferLog._id,
+      sender: { username: senderUpdate.username, byteBalance: senderUpdate.byteBalance },
+      recipient: { username: recipientUpdate.username, byteBalance: recipientUpdate.byteBalance },
     });
 
     setImmediate(async () => {
@@ -425,7 +525,7 @@ exports.transferBytes = async (request, response) => {
 <html>
 <head>
   <style>
-    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #fff; color: #000; margin: 0; padding: 0; } .container, .email-container { width: 90%; max-width: 600px; margin: 30px auto; background-color: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); overflow: hidden; } .header { text-align: center; padding: 40px 20px 30px; background-color: #990000; color: #fff; } .header h1 { margin: 0; font-size: 28px; font-weight: 700; } .brand-text, .brand { color: #FFCC00; font-weight: bold; } .content { font-size: 16px; line-height: 1.6; padding: 30px; color: #000; background-color: #fff; } .content p { margin: 15px 0; } .highlight, .success-box, .alert-box, .fee-info, .bonus-info, .reward-info, .update-info { background-color: #FFCC00; color: #000; border-radius: 8px; padding: 20px; margin: 20px 0; font-weight: bold; } .footer { background-color: #000; color: #fff; text-align: center; padding: 20px; font-size: 14px; }</style></head><body><div class="email-container"><div class="header"><h1>Bytes Sent! 💸</h1></div><div class="content"><p>Hi ${sender.username}! 👋</p><p>You have successfully transferred bytes to another user. Here are the details:</p><div class="update-info">
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #fff; color: #000; margin: 0; padding: 0; } .container, .email-container { width: 90%; max-width: 600px; margin: 30px auto; background-color: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); overflow: hidden; } .header { text-align: center; padding: 40px 20px 30px; background-color: #990000; color: #fff; } .header h1 { margin: 0; font-size: 28px; font-weight: 700; } .brand-text, .brand { color: #E6B805; font-weight: bold; } .content { font-size: 16px; line-height: 1.6; padding: 30px; color: #000; background-color: #fff; } .content p { margin: 15px 0; } .highlight, .success-box, .alert-box, .fee-info, .bonus-info, .reward-info, .update-info { background-color: #E6B805; color: #000; border-radius: 8px; padding: 20px; margin: 20px 0; font-weight: bold; } .footer { background-color: #000; color: #fff; text-align: center; padding: 20px; font-size: 14px; }</style></head><body><div class="email-container"><div class="header"><h1>Bytes Sent! 💸</h1></div><div class="content"><p>Hi ${sender.username}! 👋</p><p>You have successfully transferred bytes to another user. Here are the details:</p><div class="update-info">
         <p><strong>💰 Amount Sent:</strong> ${amount} bytes</p>
         <p><strong>👤 Recipient:</strong> ${recipient.username}</p>
         <p><strong>💳 Your New Balance:</strong> ${sender.byteBalance} bytes</p>
@@ -439,7 +539,7 @@ exports.transferBytes = async (request, response) => {
 <html>
 <head>
   <style>
-    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #fff; color: #000; margin: 0; padding: 0; } .container, .email-container { width: 90%; max-width: 600px; margin: 30px auto; background-color: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); overflow: hidden; } .header { text-align: center; padding: 40px 20px 30px; background-color: #990000; color: #fff; } .header h1 { margin: 0; font-size: 28px; font-weight: 700; } .brand-text, .brand { color: #FFCC00; font-weight: bold; } .content { font-size: 16px; line-height: 1.6; padding: 30px; color: #000; background-color: #fff; } .content p { margin: 15px 0; } .highlight, .success-box, .alert-box, .fee-info, .bonus-info, .reward-info, .update-info { background-color: #FFCC00; color: #000; border-radius: 8px; padding: 20px; margin: 20px 0; font-weight: bold; } .footer { background-color: #000; color: #fff; text-align: center; padding: 20px; font-size: 14px; }</style></head><body><div class="email-container"><div class="header"><h1>Bytes Received! 💰</h1></div><div class="content"><p>Hi ${recipient.username}! 👋</p><p>Great news! You have received bytes from another user. Here are the details:</p><div class="update-info">
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #fff; color: #000; margin: 0; padding: 0; } .container, .email-container { width: 90%; max-width: 600px; margin: 30px auto; background-color: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); overflow: hidden; } .header { text-align: center; padding: 40px 20px 30px; background-color: #990000; color: #fff; } .header h1 { margin: 0; font-size: 28px; font-weight: 700; } .brand-text, .brand { color: #E6B805; font-weight: bold; } .content { font-size: 16px; line-height: 1.6; padding: 30px; color: #000; background-color: #fff; } .content p { margin: 15px 0; } .highlight, .success-box, .alert-box, .fee-info, .bonus-info, .reward-info, .update-info { background-color: #E6B805; color: #000; border-radius: 8px; padding: 20px; margin: 20px 0; font-weight: bold; } .footer { background-color: #000; color: #fff; text-align: center; padding: 20px; font-size: 14px; }</style></head><body><div class="email-container"><div class="header"><h1>Bytes Received! 💰</h1></div><div class="content"><p>Hi ${recipient.username}! 👋</p><p>Great news! You have received bytes from another user. Here are the details:</p><div class="update-info">
         <p><strong>💰 Amount Received:</strong> ${amount} bytes</p>
         <p><strong>👤 From:</strong> ${sender.username}</p>
         <p><strong>💳 Your New Balance:</strong> ${recipient.byteBalance} bytes</p>
@@ -453,8 +553,24 @@ exports.transferBytes = async (request, response) => {
     });
 
   } catch (error) {
+    // Abort transaction on error
+    await session.abortTransaction();
     console.error('Error during byte transfer:', error);
-    response.status(500).json({ message: 'Internal server error' });
+    
+    // Log security incident
+    console.error('Transfer failed:', {
+      senderId,
+      recipientUsername,
+      amount,
+      error: error.message,
+      ip: request.ip,
+      userAgent: request.headers['user-agent']
+    });
+    
+    response.status(500).json({ message: 'Transfer failed. Please try again.' });
+  } finally {
+    // End session
+    await session.endSession();
   }
 };
 
@@ -879,7 +995,7 @@ exports.useReferralCode = async (req, res) => {
 <html>
 <head>
   <style>
-    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #fff; color: #000; margin: 0; padding: 0; } .container, .email-container { width: 90%; max-width: 600px; margin: 30px auto; background-color: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); overflow: hidden; } .header { text-align: center; padding: 40px 20px 30px; background-color: #990000; color: #fff; } .header h1 { margin: 0; font-size: 28px; font-weight: 700; } .brand-text, .brand { color: #FFCC00; font-weight: bold; } .content { font-size: 16px; line-height: 1.6; padding: 30px; color: #000; background-color: #fff; } .content p { margin: 15px 0; } .bonus-info { background-color: #FFCC00; color: #000; border-radius: 8px; padding: 20px; margin: 20px 0; font-weight: bold; } .footer { background-color: #000; color: #fff; text-align: center; padding: 20px; font-size: 14px; }</style></head><body><div class="email-container"><div class="header"><h1>Welcome Bonus Received! 🎉</h1></div><div class="content"><p>Hi ${newUser.username}! 👋</p><p>Congratulations! You've successfully used a referral code and earned a welcome bonus!</p><div class="bonus-info"><p><strong>🎁 Welcome Bonus:</strong> ${referral.bonusAmount} bytes</p><p><strong>💳 Your New Balance:</strong> ${newUser.byteBalance} bytes</p><p><strong>👤 Referred by:</strong> ${referrer.username}</p></div><p>Thanks to your friend ${referrer.username} for inviting you to join Byte! Now you have extra bytes to enjoy delicious food on campus! 🍕</p><p>Ready to place your first order? Let's get started! 🚀</p></div><div class="footer"><p>© ${new Date().getFullYear()} <span class="brand">Byte</span> - Your Campus Food Companion</p><p>Welcome to the family! 😋</p></div></div></body></html>
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #fff; color: #000; margin: 0; padding: 0; } .container, .email-container { width: 90%; max-width: 600px; margin: 30px auto; background-color: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); overflow: hidden; } .header { text-align: center; padding: 40px 20px 30px; background-color: #990000; color: #fff; } .header h1 { margin: 0; font-size: 28px; font-weight: 700; } .brand-text, .brand { color: #E6B805; font-weight: bold; } .content { font-size: 16px; line-height: 1.6; padding: 30px; color: #000; background-color: #fff; } .content p { margin: 15px 0; } .bonus-info { background-color: #E6B805; color: #000; border-radius: 8px; padding: 20px; margin: 20px 0; font-weight: bold; } .footer { background-color: #000; color: #fff; text-align: center; padding: 20px; font-size: 14px; }</style></head><body><div class="email-container"><div class="header"><h1>Welcome Bonus Received! 🎉</h1></div><div class="content"><p>Hi ${newUser.username}! 👋</p><p>Congratulations! You've successfully used a referral code and earned a welcome bonus!</p><div class="bonus-info"><p><strong>🎁 Welcome Bonus:</strong> ${referral.bonusAmount} bytes</p><p><strong>💳 Your New Balance:</strong> ${newUser.byteBalance} bytes</p><p><strong>👤 Referred by:</strong> ${referrer.username}</p></div><p>Thanks to your friend ${referrer.username} for inviting you to join Byte! Now you have extra bytes to enjoy delicious food on campus! 🍕</p><p>Ready to place your first order? Let's get started! 🚀</p></div><div class="footer"><p>© ${new Date().getFullYear()} <span class="brand">Byte</span> - Your Campus Food Companion</p><p>Welcome to the family! 😋</p></div></div></body></html>
                     `;
                     await sendEmail(newUser.email, 'Welcome Bonus - Referral Success!', 'You have earned a welcome bonus!', newUserEmailHtml);
                 }
@@ -890,7 +1006,7 @@ exports.useReferralCode = async (req, res) => {
 <html>
 <head>
   <style>
-    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #fff; color: #000; margin: 0; padding: 0; } .container, .email-container { width: 90%; max-width: 600px; margin: 30px auto; background-color: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); overflow: hidden; } .header { text-align: center; padding: 40px 20px 30px; background-color: #990000; color: #fff; } .header h1 { margin: 0; font-size: 28px; font-weight: 700; } .brand-text, .brand { color: #FFCC00; font-weight: bold; } .content { font-size: 16px; line-height: 1.6; padding: 30px; color: #000; background-color: #fff; } .content p { margin: 15px 0; } .reward-info { background-color: #FFCC00; color: #000; border-radius: 8px; padding: 20px; margin: 20px 0; font-weight: bold; } .footer { background-color: #000; color: #fff; text-align: center; padding: 20px; font-size: 14px; }</style></head><body><div class="email-container"><div class="header"><h1>Referral Reward Earned! 💰</h1></div><div class="content"><p>Hi ${referrer.username}! 👋</p><p>Awesome news! Someone just used your referral code and you've earned a reward!</p><div class="reward-info"><p><strong>🎁 Referral Reward:</strong> ${referral.rewardAmount} bytes</p><p><strong>💳 Your New Balance:</strong> ${referrer.byteBalance} bytes</p><p><strong>👤 New Member:</strong> ${newUser.username}</p><p><strong>🔗 Referral Code:</strong> ${referralCode}</p></div><p>Thank you for spreading the word about Byte! Your friend ${newUser.username} has joined our platform and earned their welcome bonus too! 🎉</p><p>Keep sharing and earning! Generate more referral codes to invite more friends! 🚀</p></div><div class="footer"><p>© ${new Date().getFullYear()} <span class="brand">Byte</span> - Your Campus Food Companion</p><p>Thank you for growing our community! 😋</p></div></div></body></html>
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #fff; color: #000; margin: 0; padding: 0; } .container, .email-container { width: 90%; max-width: 600px; margin: 30px auto; background-color: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); overflow: hidden; } .header { text-align: center; padding: 40px 20px 30px; background-color: #990000; color: #fff; } .header h1 { margin: 0; font-size: 28px; font-weight: 700; } .brand-text, .brand { color: #E6B805; font-weight: bold; } .content { font-size: 16px; line-height: 1.6; padding: 30px; color: #000; background-color: #fff; } .content p { margin: 15px 0; } .reward-info { background-color: #E6B805; color: #000; border-radius: 8px; padding: 20px; margin: 20px 0; font-weight: bold; } .footer { background-color: #000; color: #fff; text-align: center; padding: 20px; font-size: 14px; }</style></head><body><div class="email-container"><div class="header"><h1>Referral Reward Earned! 💰</h1></div><div class="content"><p>Hi ${referrer.username}! 👋</p><p>Awesome news! Someone just used your referral code and you've earned a reward!</p><div class="reward-info"><p><strong>🎁 Referral Reward:</strong> ${referral.rewardAmount} bytes</p><p><strong>💳 Your New Balance:</strong> ${referrer.byteBalance} bytes</p><p><strong>👤 New Member:</strong> ${newUser.username}</p><p><strong>🔗 Referral Code:</strong> ${referralCode}</p></div><p>Thank you for spreading the word about Byte! Your friend ${newUser.username} has joined our platform and earned their welcome bonus too! 🎉</p><p>Keep sharing and earning! Generate more referral codes to invite more friends! 🚀</p></div><div class="footer"><p>© ${new Date().getFullYear()} <span class="brand">Byte</span> - Your Campus Food Companion</p><p>Thank you for growing our community! 😋</p></div></div></body></html>
                     `;
                     await sendEmail(referrer.email, 'Referral Reward Earned!', 'Your referral was successful - reward earned!', referrerEmailHtml);
                 }

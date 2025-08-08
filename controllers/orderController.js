@@ -193,10 +193,10 @@ const TERMII_SENDER_ID = process.env.TERMII_SENDER_ID;
                     .container, .email-container { width: 90%; max-width: 600px; margin: 30px auto; background-color: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); overflow: hidden; }
                     .header { text-align: center; padding: 40px 20px 30px; background-color: #990000; color: #fff; }
                     .header h1 { margin: 0; font-size: 28px; font-weight: 700; }
-                    .brand-text, .brand { color: #FFCC00; font-weight: bold; }
+                    .brand-text, .brand { color: #E6B805; font-weight: bold; }
                     .content { font-size: 16px; line-height: 1.6; padding: 30px; color: #000; background-color: #fff; }
                     .content p { margin: 15px 0; }
-                    .order-details, .order-info, .fee-info, .wallet-update, .success-box, .delivery-banner, .balance-warning, .next-steps, .surprise-box { background-color: #FFCC00; color: #000; border-radius: 8px; padding: 20px; margin: 20px 0; font-weight: bold; }
+                    .order-details, .order-info, .fee-info, .wallet-update, .success-box, .delivery-banner, .balance-warning, .next-steps, .surprise-box { background-color: #E6B805; color: #000; border-radius: 8px; padding: 20px; margin: 20px 0; font-weight: bold; }
                     .alert-box { background-color: #990000; color: #fff; border-radius: 8px; padding: 20px; margin: 20px 0; font-weight: bold; }
                     .footer { background-color: #000; color: #fff; text-align: center; padding: 20px; font-size: 14px; }
                   </style>
@@ -274,10 +274,10 @@ sendSMS(formattedNumber, smsMessage);
             .container, .email-container { width: 90%; max-width: 600px; margin: 30px auto; background-color: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); overflow: hidden; }
             .header { text-align: center; padding: 40px 20px 30px; background-color: #990000; color: #fff; }
             .header h1 { margin: 0; font-size: 28px; font-weight: 700; }
-            .brand-text, .brand { color: #FFCC00; font-weight: bold; }
+            .brand-text, .brand { color: #E6B805; font-weight: bold; }
             .content { font-size: 16px; line-height: 1.6; padding: 30px; color: #000; background-color: #fff; }
             .content p { margin: 15px 0; }
-            .order-details, .order-info, .fee-info, .wallet-update, .success-box, .delivery-banner, .balance-warning, .next-steps, .surprise-box { background-color: #FFCC00; color: #000; border-radius: 8px; padding: 20px; margin: 20px 0; font-weight: bold; }
+            .order-details, .order-info, .fee-info, .wallet-update, .success-box, .delivery-banner, .balance-warning, .next-steps, .surprise-box { background-color: #E6B805; color: #000; border-radius: 8px; padding: 20px; margin: 20px 0; font-weight: bold; }
             .alert-box { background-color: #990000; color: #fff; border-radius: 8px; padding: 20px; margin: 20px 0; font-weight: bold; }
             .footer { background-color: #000; color: #fff; text-align: center; padding: 20px; font-size: 14px; }
           </style>
@@ -497,15 +497,15 @@ exports.orderConfirmation = async (request, response) => {
               .email-container { width: 90%; max-width: 600px; margin: 30px auto; background-color: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); overflow: hidden; }
               .header { text-align: center; padding: 40px 20px 30px; background-color: #990000; color: #fff; }
               .header h1 { margin: 0; font-size: 28px; font-weight: 700; }
-              .brand-text, .brand { color: #FFCC00; font-weight: bold; }
+              .brand-text, .brand { color: #E6B805; font-weight: bold; }
               .content { font-size: 16px; line-height: 1.6; padding: 30px; color: #000; background-color: #fff; }
               .content p { margin: 15px 0; }
-              .fee-info { background-color: #FFCC00; color: #000; border-radius: 8px; padding: 20px; margin: 20px 0; font-weight: bold; }
+              .fee-info { background-color: #E6B805; color: #000; border-radius: 8px; padding: 20px; margin: 20px 0; font-weight: bold; }
               .fee-info p { color: #000; font-weight: 600; margin: 8px 0; }
-              .highlight { background-color: #FFCC00; color: #000; font-weight: 800; padding: 4px 8px; border-radius: 4px; }
+              .highlight { background-color: #E6B805; color: #000; font-weight: 800; padding: 4px 8px; border-radius: 4px; }
               .alert-box { background-color: #990000; color: #fff; border-radius: 8px; padding: 20px; margin: 20px 0; font-weight: bold; }
               .footer { background-color: #000; color: #fff; text-align: center; padding: 20px; font-size: 14px; }
-              .footer .brand { color: #FFCC00; font-weight: bold; }
+              .footer .brand { color: #E6B805; font-weight: bold; }
             </style>
           </head>
           <body>
@@ -640,15 +640,15 @@ exports.orderConfirmation = async (request, response) => {
     .email-container { width: 90%; max-width: 600px; margin: 30px auto; background-color: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); overflow: hidden; }
     .header { text-align: center; padding: 40px 20px 30px; background-color: #990000; color: #fff; }
     .header h1 { margin: 0; font-size: 28px; font-weight: 700; }
-    .brand-text, .brand { color: #FFCC00; font-weight: bold; }
+    .brand-text, .brand { color: #E6B805; font-weight: bold; }
     .content { font-size: 16px; line-height: 1.6; padding: 30px; color: #000; background-color: #fff; }
     .content p { margin: 15px 0; }
-    .order-info { background-color: #FFCC00; color: #000; border-radius: 8px; padding: 20px; margin: 20px 0; font-weight: bold; }
+    .order-info { background-color: #E6B805; color: #000; border-radius: 8px; padding: 20px; margin: 20px 0; font-weight: bold; }
     .order-info p { color: #000; font-weight: 600; margin: 8px 0; }
-    .balance-warning { background-color: #FFCC00; color: #000; border-radius: 8px; padding: 15px; margin: 20px 0; font-weight: bold; }
-    .action-button { background-color: #FFCC00; color: #000; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: bold; display: inline-block; margin: 15px 0; text-align: center; }
+    .balance-warning { background-color: #E6B805; color: #000; border-radius: 8px; padding: 15px; margin: 20px 0; font-weight: bold; }
+    .action-button { background-color: #E6B805; color: #000; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: bold; display: inline-block; margin: 15px 0; text-align: center; }
     .footer { background-color: #000; color: #fff; text-align: center; padding: 20px; font-size: 14px; }
-    .footer .brand { color: #FFCC00; font-weight: bold; }
+    .footer .brand { color: #E6B805; font-weight: bold; }
   </style>
 </head>
 <body>
@@ -724,16 +724,16 @@ exports.orderConfirmation = async (request, response) => {
     .email-container { width: 90%; max-width: 600px; margin: 30px auto; background-color: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); overflow: hidden; }
     .header { text-align: center; padding: 40px 20px 30px; background-color: #990000; color: #fff; }
     .header h1 { margin: 0; font-size: 28px; font-weight: 700; }
-    .brand-text, .brand { color: #FFCC00; font-weight: bold; }
+    .brand-text, .brand { color: #E6B805; font-weight: bold; }
     .content { font-size: 16px; line-height: 1.6; padding: 30px; color: #000; background-color: #fff; }
     .content p { margin: 15px 0; }
     .order-info { background-color: #d4edda; color: #000; border-radius: 8px; padding: 20px; margin: 20px 0; font-weight: bold; }
     .order-info p { color: #000; font-weight: 600; margin: 8px 0; }
-    .success-box { background-color: #FFCC00; color: #000; text-align: center; padding: 20px; margin: 20px 0; border-radius: 8px; font-weight: bold; font-size: 18px; }
+    .success-box { background-color: #E6B805; color: #000; text-align: center; padding: 20px; margin: 20px 0; border-radius: 8px; font-weight: bold; font-size: 18px; }
     .timeline { background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; }
     .timeline h3 { color: #990000; margin-top: 0; }
     .footer { background-color: #000; color: #fff; text-align: center; padding: 20px; font-size: 14px; }
-    .footer .brand { color: #FFCC00; font-weight: bold; }
+    .footer .brand { color: #E6B805; font-weight: bold; }
   </style>
 </head>
 <body>
@@ -828,15 +828,15 @@ exports.markOrderAsDelivered = async (request, response) => {
     .email-container { width: 90%; max-width: 600px; margin: 30px auto; background-color: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); overflow: hidden; }
     .header { text-align: center; padding: 40px 20px 30px; background-color: #990000; color: #fff; }
     .header h1 { margin: 0; font-size: 28px; font-weight: 700; }
-    .brand-text, .brand { color: #FFCC00; font-weight: bold; }
+    .brand-text, .brand { color: #E6B805; font-weight: bold; }
     .content { font-size: 16px; line-height: 1.6; padding: 30px; color: #000; background-color: #fff; }
     .content p { margin: 15px 0; }
-    .delivery-banner { background-color: #FFCC00; color: #000; text-align: center; padding: 20px; margin: 20px 0; border-radius: 8px; font-weight: bold; font-size: 18px; }
-    .order-info { background-color: #fff3cd; color: #000; border-left: 4px solid #FFCC00; padding: 20px; border-radius: 8px; margin: 20px 0; font-weight: 600; }
+    .delivery-banner { background-color: #E6B805; color: #000; text-align: center; padding: 20px; margin: 20px 0; border-radius: 8px; font-weight: bold; font-size: 18px; }
+    .order-info { background-color: #fff3cd; color: #000; border-left: 4px solid #E6B805; padding: 20px; border-radius: 8px; margin: 20px 0; font-weight: 600; }
     .order-info p { color: #000; margin: 8px 0; }
     .delivery-tips { background-color: #d1ecf1; color: #000; border-left: 4px solid #17a2b8; padding: 15px; margin: 20px 0; border-radius: 4px; font-weight: 600; }
     .footer { background-color: #000; color: #fff; text-align: center; padding: 20px; font-size: 14px; }
-    .footer .brand { color: #FFCC00; font-weight: bold; }
+    .footer .brand { color: #E6B805; font-weight: bold; }
   </style>
 </head>
 <body>
@@ -998,16 +998,16 @@ exports.handleOrderStatus = async (request, response) => {
     .email-container { width: 90%; max-width: 600px; margin: 30px auto; background-color: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); overflow: hidden; }
     .header { text-align: center; padding: 40px 20px 30px; background-color: #990000; color: #fff; }
     .header h1 { margin: 0; font-size: 28px; font-weight: 700; }
-    .brand-text, .brand { color: #FFCC00; font-weight: bold; }
+    .brand-text, .brand { color: #E6B805; font-weight: bold; }
     .content { font-size: 16px; line-height: 1.6; padding: 30px; color: #000; background-color: #fff; }
     .content p { margin: 15px 0; }
     .order-info { background-color: #d4edda; color: #000; border-radius: 8px; padding: 20px; margin: 20px 0; font-weight: bold; }
     .order-info p { color: #000; font-weight: 600; margin: 8px 0; }
-    .fee-approval { background-color: #FFCC00; color: #000; text-align: center; padding: 20px; margin: 20px 0; border-radius: 8px; font-weight: bold; font-size: 18px; }
+    .fee-approval { background-color: #E6B805; color: #000; text-align: center; padding: 20px; margin: 20px 0; border-radius: 8px; font-weight: bold; font-size: 18px; }
     .timeline { background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; }
     .timeline h3 { color: #990000; margin-top: 0; }
     .footer { background-color: #000; color: #fff; text-align: center; padding: 20px; font-size: 14px; }
-    .footer .brand { color: #FFCC00; font-weight: bold; }
+    .footer .brand { color: #E6B805; font-weight: bold; }
   </style>
 </head>
 <body>
@@ -1062,16 +1062,16 @@ exports.handleOrderStatus = async (request, response) => {
     .email-container { width: 90%; max-width: 600px; margin: 30px auto; background-color: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); overflow: hidden; }
     .header { text-align: center; padding: 40px 20px 30px; background-color: #990000; color: #fff; }
     .header h1 { margin: 0; font-size: 28px; font-weight: 700; }
-    .brand-text, .brand { color: #FFCC00; font-weight: bold; }
+    .brand-text, .brand { color: #E6B805; font-weight: bold; }
     .content { font-size: 16px; line-height: 1.6; padding: 30px; color: #000; background-color: #fff; }
     .content p { margin: 15px 0; }
-    .success-banner { background-color: #FFCC00; color: #000; text-align: center; padding: 20px; margin: 20px 0; border-radius: 8px; font-weight: bold; font-size: 18px; }
-    .order-info { background-color: #fff3cd; color: #000; border-left: 4px solid #FFCC00; padding: 20px; border-radius: 8px; margin: 20px 0; font-weight: 600; }
+    .success-banner { background-color: #E6B805; color: #000; text-align: center; padding: 20px; margin: 20px 0; border-radius: 8px; font-weight: bold; font-size: 18px; }
+    .order-info { background-color: #fff3cd; color: #000; border-left: 4px solid #E6B805; padding: 20px; border-radius: 8px; margin: 20px 0; font-weight: 600; }
     .order-info p { color: #000; margin: 8px 0; }
     .wallet-update { background-color: #d4edda; color: #000; border-left: 4px solid #28a745; padding: 20px; border-radius: 8px; margin: 20px 0; font-weight: 600; }
     .next-steps { background-color: #d1ecf1; color: #000; border-left: 4px solid #17a2b8; padding: 15px; margin: 20px 0; border-radius: 4px; font-weight: 600; }
     .footer { background-color: #000; color: #fff; text-align: center; padding: 20px; font-size: 14px; }
-    .footer .brand { color: #FFCC00; font-weight: bold; }
+    .footer .brand { color: #E6B805; font-weight: bold; }
   </style>
 </head>
 <body>
@@ -1167,15 +1167,15 @@ exports.handleOrderStatus = async (request, response) => {
     .email-container { width: 90%; max-width: 600px; margin: 30px auto; background-color: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); overflow: hidden; }
     .header { text-align: center; padding: 40px 20px 30px; background-color: #990000; color: #fff; }
     .header h1 { margin: 0; font-size: 28px; font-weight: 700; }
-    .brand-text, .brand { color: #FFCC00; font-weight: bold; }
+    .brand-text, .brand { color: #E6B805; font-weight: bold; }
     .content { font-size: 16px; line-height: 1.6; padding: 30px; color: #000; background-color: #fff; }
     .content p { margin: 15px 0; }
-    .order-info { background-color: #FFCC00; color: #000; border-radius: 8px; padding: 20px; margin: 20px 0; font-weight: bold; }
+    .order-info { background-color: #E6B805; color: #000; border-radius: 8px; padding: 20px; margin: 20px 0; font-weight: bold; }
     .order-info p { color: #000; font-weight: 600; margin: 8px 0; }
-    .balance-warning { background-color: #FFCC00; color: #000; border-radius: 8px; padding: 15px; margin: 20px 0; font-weight: bold; }
-    .action-button { background-color: #FFCC00; color: #000; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: bold; display: inline-block; margin: 15px 0; text-align: center; }
+    .balance-warning { background-color: #E6B805; color: #000; border-radius: 8px; padding: 15px; margin: 20px 0; font-weight: bold; }
+    .action-button { background-color: #E6B805; color: #000; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: bold; display: inline-block; margin: 15px 0; text-align: center; }
     .footer { background-color: #000; color: #fff; text-align: center; padding: 20px; font-size: 14px; }
-    .footer .brand { color: #FFCC00; font-weight: bold; }
+    .footer .brand { color: #E6B805; font-weight: bold; }
   </style>
 </head>
 <body>
@@ -1263,7 +1263,7 @@ exports.createWithdrawal = async (req, res) => {
     .email-container { width: 90%; max-width: 600px; margin: 30px auto; background-color: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); overflow: hidden; }
     .header { text-align: center; padding: 40px 20px 30px; background-color: #990000; color: #fff; }
     .header h1 { margin: 0; font-size: 28px; font-weight: 700; }
-    .brand-text, .brand { color: #FFCC00; font-weight: bold; }
+    .brand-text, .brand { color: #E6B805; font-weight: bold; }
     .content { font-size: 16px; line-height: 1.6; padding: 30px; color: #000; background-color: #fff; }
     .content p { margin: 15px 0; }
     .order-info { background-color: #f8f8f8; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
@@ -1406,10 +1406,10 @@ exports.createOrderForExternalRecipient = async (request, response) => {
             .container, .email-container { width: 90%; max-width: 600px; margin: 30px auto; background-color: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); overflow: hidden; }
             .header { text-align: center; padding: 40px 20px 30px; background-color: #990000; color: #fff; }
             .header h1 { margin: 0; font-size: 28px; font-weight: 700; }
-            .brand-text, .brand { color: #FFCC00; font-weight: bold; }
+            .brand-text, .brand { color: #E6B805; font-weight: bold; }
             .content { font-size: 16px; line-height: 1.6; padding: 30px; color: #000; background-color: #fff; }
             .content p { margin: 15px 0; }
-            .order-details, .order-info, .fee-info, .wallet-update, .success-box, .delivery-banner, .balance-warning, .next-steps, .surprise-box { background-color: #FFCC00; color: #000; border-radius: 8px; padding: 20px; margin: 20px 0; font-weight: bold; }
+            .order-details, .order-info, .fee-info, .wallet-update, .success-box, .delivery-banner, .balance-warning, .next-steps, .surprise-box { background-color: #E6B805; color: #000; border-radius: 8px; padding: 20px; margin: 20px 0; font-weight: bold; }
             .alert-box { background-color: #990000; color: #fff; border-radius: 8px; padding: 20px; margin: 20px 0; font-weight: bold; }
             .footer { background-color: #000; color: #fff; text-align: center; padding: 20px; font-size: 14px; }
           </style>
@@ -1468,10 +1468,10 @@ exports.createOrderForExternalRecipient = async (request, response) => {
                 .container, .email-container { width: 90%; max-width: 600px; margin: 30px auto; background-color: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); overflow: hidden; }
                 .header { text-align: center; padding: 40px 20px 30px; background-color: #990000; color: #fff; }
                 .header h1 { margin: 0; font-size: 28px; font-weight: 700; }
-                .brand-text, .brand { color: #FFCC00; font-weight: bold; }
+                .brand-text, .brand { color: #E6B805; font-weight: bold; }
                 .content { font-size: 16px; line-height: 1.6; padding: 30px; color: #000; background-color: #fff; }
                 .content p { margin: 15px 0; }
-                .surprise-box { background-color: #FFCC00; color: #000; text-align: center; padding: 20px; margin: 20px 0; border-radius: 8px; font-weight: bold; font-size: 18px; }
+                .surprise-box { background-color: #E6B805; color: #000; text-align: center; padding: 20px; margin: 20px 0; border-radius: 8px; font-weight: bold; font-size: 18px; }
                 .order-details { background-color: #d4edda; color: #000; border-left: 4px solid #28a745; padding: 20px; border-radius: 8px; margin: 20px 0; font-weight: 600; }
                 .order-details p { color: #000; margin: 8px 0; }
                 .footer { background-color: #000; color: #fff; text-align: center; padding: 20px; font-size: 14px; }

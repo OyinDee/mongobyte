@@ -143,13 +143,13 @@ exports.createRestaurant = async (request, response) => {
             .container { width: 90%; max-width: 600px; margin: 30px auto; padding: 0; border-radius: 12px; background-color: #fff; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); overflow: hidden; }
             .header { text-align: center; padding: 40px 20px 30px; background-color: #990000; color: #fff; }
             .header h1 { margin: 0; font-size: 28px; font-weight: 700; }
-            .brand-text { color: #FFCC00; font-weight: bold; }
+            .brand-text { color: #E6B805; font-weight: bold; }
             .content { font-size: 16px; line-height: 1.6; padding: 30px; color: #000; background-color: #fff; }
             .content p { margin: 15px 0; }
-            .password { background: #FFCC00; color: #000000; font-size: 28px; font-weight: 800; text-align: center; padding: 25px; margin: 25px 0; border-radius: 8px; letter-spacing: 2px; box-shadow: 0 3px 10px rgba(255, 204, 0, 0.3); }
-            .welcome-box { background: #FFCC00; border-left: 4px solid #FFCC00; padding: 20px; margin: 20px 0; border-radius: 8px; }
+            .password { background: #E6B805; color: #000000; font-size: 28px; font-weight: 800; text-align: center; padding: 25px; margin: 25px 0; border-radius: 8px; letter-spacing: 2px; box-shadow: 0 3px 10px rgba(255, 204, 0, 0.3); }
+            .welcome-box { background: #E6B805; border-left: 4px solid #E6B805; padding: 20px; margin: 20px 0; border-radius: 8px; }
             .footer { background-color: #000; color: #fff; text-align: center; padding: 20px; font-size: 14px; }
-            .footer .brand { color: #FFCC00; font-weight: bold; }
+            .footer .brand { color: #E6B805; font-weight: bold; }
           </style>
         </head>
         <body>
@@ -422,14 +422,14 @@ exports.createWithdrawal = async (req, res) => {
     .email-container { width: 90%; max-width: 600px; margin: 30px auto; background-color: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); overflow: hidden; }
     .header { text-align: center; padding: 40px 20px 30px; background-color: #990000; color: #fff; }
     .header h1 { margin: 0; font-size: 28px; font-weight: 700; }
-    .brand-text { color: #FFCC00; font-weight: bold; }
+    .brand-text { color: #E6B805; font-weight: bold; }
     .content { font-size: 16px; line-height: 1.6; padding: 30px; color: #000; background-color: #fff; }
     .content p { margin: 15px 0; }
-    .withdrawal-info { background: #FFCC00; border-left: 4px solid #FFCC00; padding: 20px; border-radius: 8px; margin: 20px 0; }
+    .withdrawal-info { background: #E6B805; border-left: 4px solid #E6B805; padding: 20px; border-radius: 8px; margin: 20px 0; }
     .withdrawal-info p { color: #000000; font-weight: 600; margin: 8px 0; }
-    .amount { background: #FFCC00; color: #000000; font-size: 24px; font-weight: 800; text-align: center; padding: 15px; margin: 20px 0; border-radius: 8px; letter-spacing: 1px; }
+    .amount { background: #E6B805; color: #000000; font-size: 24px; font-weight: 800; text-align: center; padding: 15px; margin: 20px 0; border-radius: 8px; letter-spacing: 1px; }
     .footer { background-color: #000; color: #fff; text-align: center; padding: 20px; font-size: 14px; }
-    .footer .brand { color: #FFCC00; font-weight: bold; }
+    .footer .brand { color: #E6B805; font-weight: bold; }
   </style>
 </head>
 <body>
@@ -478,15 +478,15 @@ exports.createWithdrawal = async (req, res) => {
     .email-container { width: 90%; max-width: 600px; margin: 30px auto; background-color: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); overflow: hidden; }
     .header { text-align: center; padding: 40px 20px 30px; background-color: #990000; color: #fff; }
     .header h1 { margin: 0; font-size: 28px; font-weight: 700; }
-    .brand-text { color: #FFCC00; font-weight: bold; }
+    .brand-text { color: #E6B805; font-weight: bold; }
     .content { font-size: 16px; line-height: 1.6; padding: 30px; color: #000; background-color: #fff; }
     .content p { margin: 15px 0; }
-    .withdrawal-info { background: #FFCC00; border-left: 4px solid #FFCC00; padding: 20px; border-radius: 8px; margin: 20px 0; }
+    .withdrawal-info { background: #E6B805; border-left: 4px solid #E6B805; padding: 20px; border-radius: 8px; margin: 20px 0; }
     .withdrawal-info p { color: #000000; font-weight: 600; margin: 8px 0; }
-    .amount { background: #FFCC00; color: #000000; font-size: 28px; font-weight: 800; text-align: center; padding: 20px; margin: 20px 0; border-radius: 8px; letter-spacing: 1px; }
+    .amount { background: #E6B805; color: #000000; font-size: 28px; font-weight: 800; text-align: center; padding: 20px; margin: 20px 0; border-radius: 8px; letter-spacing: 1px; }
     .urgent-tag { background-color: #990000; color: #fff; padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: bold; display: inline-block; margin-bottom: 15px; }
     .footer { background-color: #000; color: #fff; text-align: center; padding: 20px; font-size: 14px; }
-    .footer .brand { color: #FFCC00; font-weight: bold; }
+    .footer .brand { color: #E6B805; font-weight: bold; }
   </style>
 </head>
 <body>

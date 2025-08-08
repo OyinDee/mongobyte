@@ -713,10 +713,10 @@ const processGroupOrderPayment = async (req, res) => {
     .container, .email-container { width: 90%; max-width: 600px; margin: 30px auto; background-color: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); overflow: hidden; }
     .header { text-align: center; padding: 40px 20px 30px; background-color: #990000; color: #fff; }
     .header h1 { margin: 0; font-size: 28px; font-weight: 700; }
-    .brand-text, .brand { color: #FFCC00; font-weight: bold; }
+    .brand-text, .brand { color: #E6B805; font-weight: bold; }
     .content { font-size: 16px; line-height: 1.6; padding: 30px; color: #000; background-color: #fff; }
     .content p { margin: 15px 0; }
-    .highlight, .success-box, .alert-box, .fee-info, .bonus-info, .reward-info, .update-info, .order-info { background-color: #FFCC00; color: #000; border-radius: 8px; padding: 20px; margin: 20px 0; font-weight: bold; }
+    .highlight, .success-box, .alert-box, .fee-info, .bonus-info, .reward-info, .update-info, .order-info { background-color: #E6B805; color: #000; border-radius: 8px; padding: 20px; margin: 20px 0; font-weight: bold; }
     .footer { background-color: #000; color: #fff; text-align: center; padding: 20px; font-size: 14px; }
   </style>
 </head>
@@ -799,10 +799,10 @@ const processGroupOrderPayment = async (req, res) => {
     .container, .email-container { width: 90%; max-width: 600px; margin: 30px auto; background-color: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); overflow: hidden; }
     .header { text-align: center; padding: 40px 20px 30px; background-color: #990000; color: #fff; }
     .header h1 { margin: 0; font-size: 28px; font-weight: 700; }
-    .brand-text, .brand { color: #FFCC00; font-weight: bold; }
+    .brand-text, .brand { color: #E6B805; font-weight: bold; }
     .content { font-size: 16px; line-height: 1.6; padding: 30px; color: #000; background-color: #fff; }
     .content p { margin: 15px 0; }
-    .order-info { background-color: #FFCC00; color: #000; border-radius: 8px; padding: 20px; margin: 20px 0; font-weight: bold; }
+    .order-info { background-color: #E6B805; color: #000; border-radius: 8px; padding: 20px; margin: 20px 0; font-weight: bold; }
     .footer { background-color: #000; color: #fff; text-align: center; padding: 20px; font-size: 14px; }
   </style>
 </head>
@@ -852,9 +852,9 @@ const processGroupOrderPayment = async (req, res) => {
     .container, .email-container { width: 90%; max-width: 600px; margin: 30px auto; background-color: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); overflow: hidden; }
     .header { text-align: center; padding: 40px 20px 30px; background-color: #990000; color: #fff; }
     .header h1 { margin: 0; font-size: 28px; font-weight: 700; }
-    .brand-text, .brand { color: #FFCC00; font-weight: bold; }
+    .brand-text, .brand { color: #E6B805; font-weight: bold; }
     .content { font-size: 16px; line-height: 1.6; padding: 30px; color: #000; background-color: #fff; }
-    .order-info { background-color: #FFCC00; color: #000; border-radius: 8px; padding: 20px; margin: 20px 0; font-weight: bold; }
+    .order-info { background-color: #E6B805; color: #000; border-radius: 8px; padding: 20px; margin: 20px 0; font-weight: bold; }
     .footer { background-color: #000; color: #fff; text-align: center; padding: 20px; font-size: 14px; }
   </style>
 </head>

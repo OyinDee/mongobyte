@@ -1,7 +1,11 @@
 // routes/payment.routes.js
 const express = require('express');
 const { initiatePayment, verifyPayment } = require('../controllers/paymentControllers.js');
-const { authenticateUser } = require('../middlewares/authenticateUser.js')
+const { authenticateUser } = require('../middlewares/authenticateUser.js');
+const { paymentInitiationLimiter } = require('../middlewares/rateLimiter.js');
+const { transactionLock } = require('../middlewares/transactionLock.js');
+const { concurrencyGuard } = require('../middlewares/concurrencyGuard.js');
+const { paymentValidation, handleValidationErrors, sanitizeAmount } = require('../middlewares/inputValidation.js');
 const router = express.Router();
 
 /**
@@ -25,7 +29,16 @@ const router = express.Router();
  *         description: Validation error
  */
 
-router.post('/pay', authenticateUser, initiatePayment);
+router.post('/pay', 
+  authenticateUser, 
+  concurrencyGuard('payment'),
+  paymentInitiationLimiter,
+  paymentValidation,
+  handleValidationErrors,
+  sanitizeAmount,
+  transactionLock('payment'),
+  initiatePayment
+);
 
 /**
  * @swagger
