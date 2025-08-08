@@ -23,12 +23,11 @@ const lockSchema = new mongoose.Schema({
   },
   createdAt: {
     type: Date,
-    default: Date.now,
-    expires: 30 // Auto-expire after 30 seconds using MongoDB TTL index
+    default: Date.now
   }
 });
 
-// Ensure TTL index is created
+// Define TTL index
 lockSchema.index({ createdAt: 1 }, { expireAfterSeconds: 30 });
 
 const TransactionLock = mongoose.model('TransactionLock', lockSchema);
