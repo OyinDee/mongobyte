@@ -605,13 +605,19 @@ exports.fetchNotifications = async (request, response) => {
   }
 
   try {
-
     const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
 
     let userId;
     let restaurantId;
 
-    if (decodedToken.user) {
+    // Handle new token structure
+    if (decodedToken.type === 'user' && decodedToken.userId) {
+      userId = decodedToken.userId;
+    } else if (decodedToken.type === 'restaurant' && decodedToken.restaurantId) {
+      restaurantId = decodedToken.restaurantId;
+    }
+    // Fallback for old token structure (backward compatibility)
+    else if (decodedToken.user) {
       userId = decodedToken.user._id; 
     } else if (decodedToken.restaurant) {
       restaurantId = decodedToken.restaurant._id; 
@@ -620,7 +626,6 @@ exports.fetchNotifications = async (request, response) => {
     if (!userId && !restaurantId) {
       return response.status(400).json({ message: 'Invalid token data' });
     }
-
 
     const notifications = await Notification.find(userId ? { userId } : { restaurantId }) 
 
