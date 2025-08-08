@@ -196,7 +196,8 @@ router.get('/debug/list', restaurantController.debugRestaurants);
  * /restaurants/{id}:
  *   get:
  *     tags: [Restaurants]
- *     summary: Get restaurant by ID
+ *     summary: Get restaurant by ID (public)
+ *     description: Retrieve public restaurant details
  *     parameters:
  *       - in: path
  *         name: id
@@ -209,8 +210,53 @@ router.get('/debug/list', restaurantController.debugRestaurants);
  *       404:
  *         description: Restaurant not found
  */
-
 router.get('/:id', restaurantController.getRestaurantById);
+
+/**
+ * @swagger
+ * /restaurants/{id}/profile:
+ *   get:
+ *     tags: [Restaurants]
+ *     summary: Get authenticated restaurant profile
+ *     description: Retrieve restaurant details including wallet balance for authenticated restaurant owner
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Restaurant profile with wallet balance
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 customId:
+ *                   type: string
+ *                 name:
+ *                   type: string
+ *                 description:
+ *                   type: string
+ *                 location:
+ *                   type: string
+ *                 contactNumber:
+ *                   type: string
+ *                 email:
+ *                   type: string
+ *                 imageUrl:
+ *                   type: string
+ *                 isActive:
+ *                   type: boolean
+ *                 walletBalance:
+ *                   type: number
+ *       404:
+ *         description: Restaurant not found
+ */
+router.get('/:id/profile', authenticate, restaurantController.getRestaurantProfile);
 
 /**
  * @swagger

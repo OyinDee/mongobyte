@@ -1,7 +1,50 @@
 const express = require('express');
 const router = express.Router();
 const withdrawalController = require('../controllers/withdrawalController');
+const { createWithdrawal } = require('../controllers/orderController');
 const authenticate = require('../middlewares/authenticateRestaurant');
+
+/**
+ * @swagger
+ * /withdrawals:
+ *   post:
+ *     tags: [Withdrawals]
+ *     summary: Create withdrawal request
+ *     description: Create a new withdrawal request for the authenticated restaurant
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               restaurantName:
+ *                 type: string
+ *                 description: Restaurant name
+ *               amount:
+ *                 type: number
+ *                 description: Amount to withdraw
+ *             required:
+ *               - restaurantName
+ *               - amount
+ *     responses:
+ *       201:
+ *         description: Withdrawal request created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       400:
+ *         description: Bad request (insufficient balance, etc.)
+ *       404:
+ *         description: Restaurant not found
+ */
+router.post('/', authenticate, createWithdrawal);
 
 /**
  * @swagger

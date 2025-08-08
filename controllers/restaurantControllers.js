@@ -1,4 +1,12 @@
+const Restaurant = require('../models/Restaurants');
+const Order = require('../models/Orders');
+const Meal = require('../models/Meals');
+const Notification = require('../models/Notifications');
+const Withdrawal = require('../models/Withdrawals');
+const sendEmail = require('../configs/nodemailer');
 const { getBreakdown } = require('./restaurantRevenueHelpers');
+const crypto = require('crypto');
+
 // Get total and breakdown revenue for a restaurant
 exports.getRestaurantRevenue = async (req, res) => {
   const { id } = req.params;
@@ -106,13 +114,6 @@ exports.getRestaurantRevenue = async (req, res) => {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
-const Restaurant = require('../models/Restaurants');
-const crypto = require('crypto')
-const sendEmail = require('../configs/nodemailer');
-const Meal = require('../models/Meals')
-const Withdrawal = require('../models/Withdrawals');
-const Notification = require('../models/Notifications');
-const Order = require('../models/Orders');
 
 function generatePassword() {
     return crypto.randomBytes(5).toString('hex');
@@ -257,11 +258,14 @@ exports.getRestaurantById = async (request, response) => {
         
         let restaurant = null;
         
+        // Always exclude sensitive fields for public access
+        const selectFields = '-password -bankName -accountNumber -accountHolder -walletBalance -verificationCode';
+        
         // Check if it's a valid MongoDB ObjectId format
         if (id.match(/^[0-9a-fA-F]{24}$/)) {
             console.log('Trying MongoDB ObjectId search first');
             restaurant = await Restaurant.findById(id)
-                .select('-password -bankName -accountNumber -accountHolder -walletBalance -verificationCode')
+                .select(selectFields)
                 .populate('meals');
         }
         
@@ -271,7 +275,7 @@ exports.getRestaurantById = async (request, response) => {
             restaurant = await Restaurant.findOne({ 
                 customId: { $regex: new RegExp(`^${id}$`, 'i') } 
             })
-            .select('-password -bankName -accountNumber -accountHolder -walletBalance -verificationCode')
+            .select(selectFields)
             .populate('meals');
         }
         
@@ -279,7 +283,7 @@ exports.getRestaurantById = async (request, response) => {
         if (!restaurant) {
             console.log('Trying exact case customId match');
             restaurant = await Restaurant.findOne({ customId: id })
-                .select('-password -bankName -accountNumber -accountHolder -walletBalance -verificationCode')
+                .select(selectFields)
                 .populate('meals');
         }
         
@@ -296,6 +300,70 @@ exports.getRestaurantById = async (request, response) => {
         response.json(restaurant);
     } catch (error) {
         console.error('Error in getRestaurantById:', error);
+        response.status(500).json({ 
+            message: 'Internal server error',
+            error: error.message 
+        });
+    }
+};
+
+exports.getRestaurantProfile = async (request, response) => {
+    const { id } = request.params;
+    
+    try {
+        console.log('Searching for authenticated restaurant profile with ID:', id);
+        
+        let restaurant = null;
+        
+        // Include wallet balance for authenticated restaurant owner
+        const selectFields = '-password -bankName -accountNumber -accountHolder -verificationCode';
+        
+        // Check if it's a valid MongoDB ObjectId format
+        if (id.match(/^[0-9a-fA-F]{24}$/)) {
+            console.log('Trying MongoDB ObjectId search first');
+            restaurant = await Restaurant.findById(id)
+                .select(selectFields)
+                .populate('meals');
+        }
+        
+        // If not found by ObjectId or not ObjectId format, try customId
+        if (!restaurant) {
+            console.log('Trying customId search (case-insensitive)');
+            restaurant = await Restaurant.findOne({ 
+                customId: { $regex: new RegExp(`^${id}$`, 'i') } 
+            })
+            .select(selectFields)
+            .populate('meals');
+        }
+        
+        // If still not found, try exact case match for customId
+        if (!restaurant) {
+            console.log('Trying exact case customId match');
+            restaurant = await Restaurant.findOne({ customId: id })
+                .select(selectFields)
+                .populate('meals');
+        }
+        
+        if (!restaurant) {
+            console.log('Restaurant not found with any method');
+            return response.status(404).json({ 
+                message: 'Restaurant not found',
+                searchedId: id,
+                suggestions: 'Please verify the restaurant ID is correct. You can use either the MongoDB ObjectId or the custom restaurant ID.'
+            });
+        }
+        
+        // Verify that the authenticated user is the owner of this restaurant
+        if (request.user.customId !== restaurant.customId) {
+            return response.status(403).json({ 
+                message: 'Access denied. You can only access your own restaurant profile.'
+            });
+        }
+        
+        console.log('Restaurant profile found:', restaurant.customId || restaurant._id);
+        response.json(restaurant);
+    } catch (error) {
+        console.error('Error in getRestaurantProfile:', error);
         response.status(500).json({ 
             message: 'Internal server error',
             error: error.message 
@@ -552,14 +620,26 @@ exports.createWithdrawal = async (req, res) => {
 
 exports.toggleRestaurantActiveStatus = async (request, response) => {
     const { id } = request.params;
+    const { isActive } = request.body;
+    
     try {
         const restaurant = await exports.findRestaurantById(id);
         if (!restaurant) {
             return response.status(404).json({ message: 'Restaurant not found' });
         }
-        restaurant.isActive = !restaurant.isActive;
+        
+        // If isActive is provided in body, use that value; otherwise toggle current status
+        if (typeof isActive === 'boolean') {
+            restaurant.isActive = isActive;
+        } else {
+            restaurant.isActive = !restaurant.isActive;
+        }
+        
         await restaurant.save();
-        response.status(200).json({ message: 'Status updated', isActive: restaurant.isActive });
+        response.status(200).json({ 
+            message: 'Status updated successfully', 
+            isActive: restaurant.isActive 
+        });
     } catch (error) {
         console.error(error);
         response.status(500).json({ message: 'Internal server error' });
