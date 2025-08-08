@@ -296,20 +296,26 @@ exports.getAllRestaurants = async (request, response) => {
                 restaurants = await Restaurant.find({ 
                     university: user.university,
                     isActive: true 
-                }).populate('meals');
+                })
+                .select('-password -bankName -accountNumber -accountHolder -walletBalance -verificationCode')
+                .populate('meals');
             } else {
                 console.log('User found but no university, returning all active restaurants');
                 // User exists but no university info, return all active restaurants
                 restaurants = await Restaurant.find({ 
                     isActive: true 
-                }).populate('meals');
+                })
+                .select('-password -bankName -accountNumber -accountHolder -walletBalance -verificationCode')
+                .populate('meals');
             }
         } else {
             console.log('No authenticated user, returning all active restaurants');
             // No authenticated user, return all active restaurants
             restaurants = await Restaurant.find({ 
                 isActive: true 
-            }).populate('meals');
+            })
+            .select('-password -bankName -accountNumber -accountHolder -walletBalance -verificationCode')
+            .populate('meals');
         }
 
         console.log(`Found ${restaurants.length} restaurants`);
@@ -329,7 +335,9 @@ exports.getAllRestaurantsPublic = async (request, response) => {
         console.log('Public request for all restaurants');
         const restaurants = await Restaurant.find({ 
             isActive: true 
-        }).populate('meals');
+        })
+        .select('-password -bankName -accountNumber -accountHolder -walletBalance -verificationCode')
+        .populate('meals');
 
         console.log(`Found ${restaurants.length} active restaurants`);
         response.json(restaurants);

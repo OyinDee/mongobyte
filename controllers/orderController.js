@@ -360,7 +360,8 @@ exports.getOrdersByRestaurant = async (request, response) => {
 
         const orders = await Order.find({ restaurant: restaurant._id })
         .populate('user')
-        .populate('meals.meal');
+        .populate('meals.meal')
+        .populate('restaurant', 'customId name location imageUrl');
       
         // if (!orders.length) {
         //     return response.status(404).json({ message: 'No orders found for this restaurant' });
@@ -413,7 +414,7 @@ exports.orderConfirmation = async (request, response) => {
   console.log(`Additional Fee: ${additionalFee}, Description: ${requestDescription}`);
 
   try {
-    const order = await Order.findOne({ customId: orderId }).populate('user meals.meal restaurant');
+    const order = await Order.findOne({ customId: orderId }).populate('user meals.meal').populate('restaurant', 'name location imageUrl university');
 
     if (!order) {
       return response.status(404).json({ message: 'Order not found' });
@@ -802,7 +803,7 @@ exports.markOrderAsDelivered = async (request, response) => {
   const { orderId } = request.params;
 
   try {
-    const order = await Order.findOne({ customId: orderId }).populate('user restaurant');
+    const order = await Order.findOne({ customId: orderId }).populate('user').populate('restaurant', 'name location imageUrl');
 
     if (!order) {
       return response.status(404).json({ message: 'Order not found' });
@@ -907,10 +908,11 @@ exports.handleOrderStatus = async (request, response) => {
     const { orderId } = request.params;
     const { action } = request.body; 
 
-    const order = await Order.findOne({ customId: orderId }).populate('restaurant').populate('user');
+    const order = await Order.findOne({ customId: orderId }).populate('restaurant', 'name location imageUrl').populate('user');
     if (!order) return response.status(404).json({ message: 'Order not found' });
 
     const user = await User.findById(order.user._id);
+    // Fetch restaurant separately for business operations (not exposed to client)
     const restaurant = await Restaurant.findById(order.restaurant._id);
     
     // Helper function to format phone number for SMS
@@ -1538,7 +1540,7 @@ exports.createOrderByOrderCustomId = async (req, res) => {
     }
     try {
         // Find the referenced order
-        const refOrder = await require('../models/Orders').findOne({ customId: orderCustomId }).populate('meals.meal').populate('restaurant');
+        const refOrder = await require('../models/Orders').findOne({ customId: orderCustomId }).populate('meals.meal').populate('restaurant', 'name location imageUrl isActive');
         if (!refOrder) {
             return res.status(404).json({ message: 'Referenced order not found.' });
         }

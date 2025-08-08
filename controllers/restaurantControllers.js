@@ -214,7 +214,11 @@ exports.createRestaurant = async (request, response) => {
 
 exports.getAllRestaurants = async (request, response) => {
     try {
-        const restaurants = await Restaurant.find().populate('meals');
+        // Exclude sensitive fields from the query
+        const restaurants = await Restaurant.find()
+            .select('-password -bankName -accountNumber -accountHolder -walletBalance -verificationCode')
+            .populate('meals');
+        
         // For each restaurant, get total orders and order details
         const restaurantIds = restaurants.map(r => r._id);
         // Get all orders for these restaurants
@@ -256,7 +260,9 @@ exports.getRestaurantById = async (request, response) => {
         // Check if it's a valid MongoDB ObjectId format
         if (id.match(/^[0-9a-fA-F]{24}$/)) {
             console.log('Trying MongoDB ObjectId search first');
-            restaurant = await Restaurant.findById(id).populate('meals');
+            restaurant = await Restaurant.findById(id)
+                .select('-password -bankName -accountNumber -accountHolder -walletBalance -verificationCode')
+                .populate('meals');
         }
         
         // If not found by ObjectId or not ObjectId format, try customId
@@ -264,13 +270,17 @@ exports.getRestaurantById = async (request, response) => {
             console.log('Trying customId search (case-insensitive)');
             restaurant = await Restaurant.findOne({ 
                 customId: { $regex: new RegExp(`^${id}$`, 'i') } 
-            }).populate('meals');
+            })
+            .select('-password -bankName -accountNumber -accountHolder -walletBalance -verificationCode')
+            .populate('meals');
         }
         
         // If still not found, try exact case match for customId
         if (!restaurant) {
             console.log('Trying exact case customId match');
-            restaurant = await Restaurant.findOne({ customId: id }).populate('meals');
+            restaurant = await Restaurant.findOne({ customId: id })
+                .select('-password -bankName -accountNumber -accountHolder -walletBalance -verificationCode')
+                .populate('meals');
         }
         
         if (!restaurant) {
@@ -301,12 +311,14 @@ exports.updateRestaurant = async (request, response) => {
         
         // Check if it's a valid MongoDB ObjectId format
         if (id.match(/^[0-9a-fA-F]{24}$/)) {
-            restaurant = await Restaurant.findByIdAndUpdate(id, request.body, { new: true });
+            restaurant = await Restaurant.findByIdAndUpdate(id, request.body, { new: true })
+                .select('-password -bankName -accountNumber -accountHolder -walletBalance -verificationCode');
         }
         
         // If not found by ObjectId, try customId
         if (!restaurant) {
-            restaurant = await Restaurant.findOneAndUpdate({ customId: id }, request.body, { new: true });
+            restaurant = await Restaurant.findOneAndUpdate({ customId: id }, request.body, { new: true })
+                .select('-password -bankName -accountNumber -accountHolder -walletBalance -verificationCode');
         }
         
         if (!restaurant) {
@@ -581,19 +593,22 @@ exports.findRestaurantById = async (id) => {
         
         // Check if it's a valid MongoDB ObjectId format
         if (id.match(/^[0-9a-fA-F]{24}$/)) {
-            restaurant = await Restaurant.findById(id);
+            restaurant = await Restaurant.findById(id)
+                .select('-password -bankName -accountNumber -accountHolder -walletBalance -verificationCode');
         }
         
         // If not found by ObjectId or not ObjectId format, try customId
         if (!restaurant) {
             restaurant = await Restaurant.findOne({ 
                 customId: { $regex: new RegExp(`^${id}$`, 'i') } 
-            });
+            })
+            .select('-password -bankName -accountNumber -accountHolder -walletBalance -verificationCode');
         }
         
         // If still not found, try exact case match for customId
         if (!restaurant) {
-            restaurant = await Restaurant.findOne({ customId: id });
+            restaurant = await Restaurant.findOne({ customId: id })
+                .select('-password -bankName -accountNumber -accountHolder -walletBalance -verificationCode');
         }
         
         return restaurant;
@@ -664,7 +679,9 @@ exports.getRestaurantsByUserUniversity = async (request, response) => {
             return response.status(400).json({ message: 'User does not have a university set.' });
         }
         const universityId = request.user.university;
-        const restaurants = await Restaurant.find({ university: universityId, isActive: true }).populate('meals');
+        const restaurants = await Restaurant.find({ university: universityId, isActive: true })
+            .select('-password -bankName -accountNumber -accountHolder -walletBalance -verificationCode')
+            .populate('meals');
         response.json(restaurants);
     } catch (error) {
         console.error('Error in getRestaurantsByUserUniversity:', error);

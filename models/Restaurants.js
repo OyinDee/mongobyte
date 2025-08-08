@@ -2,6 +2,17 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const generateId = require('../utils/generateID');
 
+/*
+ * SECURITY WARNING: This model contains sensitive fields that should NOT be exposed in API responses:
+ * - password: Hashed password for restaurant authentication
+ * - bankName, accountNumber, accountHolder: Banking information for payments
+ * - walletBalance: Current wallet balance
+ * - verificationCode: Used for account verification
+ * 
+ * Always use .select() to exclude these fields when fetching restaurants for client responses:
+ * .select('-password -bankName -accountNumber -accountHolder -walletBalance -verificationCode')
+ */
+
 const restaurantSchema = new mongoose.Schema({
     customId: {
         type: String,

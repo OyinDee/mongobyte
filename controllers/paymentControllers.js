@@ -24,7 +24,7 @@ const initiatePayment = async (request, response) => {
     const existingPendingPayment = await Payment.findOne({
       user_id: userId,
       status: 'pending',
-      createdAt: { $gte: new Date(Date.now() - 30 * 60 * 1000) } // 30 minutes
+      createdAt: { $gte: new Date(Date.now() - 10 * 60 * 1000) } // 30 minutes
     });
 
     if (existingPendingPayment) {
@@ -57,7 +57,7 @@ const initiatePayment = async (request, response) => {
           Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
           'Content-Type': 'application/json',
         },
-        timeout: 10000 // 10 second timeout
+        timeout: 100000 // 
       }
     );
 
